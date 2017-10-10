@@ -1,0 +1,13 @@
+# CHANGELOG
+# 2017-09-29
+#   ~ Merged in parameters from https://www.reddit.com/user/FinibusBonorum
+#   ~ Auto folder finder disabled if folder path specified
+#   ~ Moved winreg import into Windows-specific section to avoid Linux conflict
+#   ~ Refined winreg import
+#   ~ Realised that Windows has no default shebang support so just used Linux shebang line!
+#   ~ Added fix_row function that handles missing input headers better than previously
+#   ~ Renamed find_downloads() to find_directory()
+#   ~ Added header_swap function
+# 2017-10-04
+#   ~ Added g_hasheaders variable for if data is missing column headers
+#   ~ Actually implemented csv delimiter in csv function!

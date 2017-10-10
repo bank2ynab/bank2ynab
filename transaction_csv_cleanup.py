@@ -5,21 +5,8 @@
 # Searches specified folder or default download folder for exported
 # bank transaction file (.csv format) & adjusts format for YNAB import
 
-# CHANGELOG
-# 2017-09-29
-#   ~ Merged in parameters from https://www.reddit.com/user/FinibusBonorum
-#   ~ Auto folder finder disabled if folder path specified
-#   ~ Moved winreg import into Windows-specific section to avoid Linux conflict
-#   ~ Refined winreg import
-#   ~ Realised that Windows has no default shebang support so just used Linux shebang line!
-#   ~ Added fix_row function that handles missing input headers better than previously
-#   ~ Renamed find_downloads() to find_directory()
-#   ~ Added header_swap function
-# 2017-10-04
-#   ~ Added g_hasheaders variable for if data is missing column headers
-#   ~ Actually implemented csv delimiter in csv function!
-
 # OPERATIONS
+#   ~ Find all .conf files & execute following for each
 #   ~ Find & open TransactionExport.csv for processing
 #   ~ Change columns from
 #       Date, Details, Debit, Credit, Balance to
@@ -40,7 +27,20 @@ g_hasheaders = True
 #
 
 # don't edit below here unless you know what you're doing!
-import csv, os
+import csv, os, sys, configparser
+
+def get_conf_files():
+    # get all our config files
+    return [f for f in os.listdir(".") if f.endswith(".conf")]
+    
+def set_conf_params(file): # to do
+    # get parameters from our config file
+    print(file)
+    config = configparser.ConfigParser()
+    config.read(file)
+    for key in config["DEFAULT"]:
+        print("{}: {}".format(key, config["bank"][key]))
+    return
 
 def get_files():
     # find the transaction file         
@@ -119,14 +119,22 @@ def find_directory():
     return dir
     
 def main():
-    # find all applicable files
-    files = get_files()
-    for file in files:
-        # create cleaned csv for each file
-        output = clean_data(file)
-        write_data(file, output)
-        # delete original csv file
-        os.remove(file)
+    # find all config files
+    conf_files = get_conf_files()
+    # process folder for each config file
+    for f in conf_files:
+        # reset starting directory
+        os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+        # set parameters
+        set_conf_params(f)
+        # find all applicable files
+        files = get_files()
+        for file in files:
+            # create cleaned csv for each file
+            output = clean_data(file)
+            write_data(file, output)
+            # delete original csv file
+            os.remove(file)
     return
 
 main()

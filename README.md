@@ -16,6 +16,8 @@ A common project to consolidate all conversion efforts from various banks' expor
 - Windows or Mac or Linux
 - Support for Python, or Ruby, or some other scripting language (to be defined)
 
+----
+
 ![XKCD on standards](https://imgs.xkcd.com/comics/standards.png)
 
 

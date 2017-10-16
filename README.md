@@ -10,7 +10,7 @@ A common project to consolidate all conversion efforts from various banks' expor
   - take advantage of this project to get more import formats.
   - give back to this project by sharing your existing import formats.
 - add a brainstorming item as a new issue in the [issue list](https://github.com/torbengb/bank2ynab/issues)
-- read or add to the [wiki](https://github.com/torbengb/bank2ynab/wiki)
+- read or add to the [wiki](https://github.com/torbengb/bank2ynab/wiki) and most importantly the [list of bank formats](https://github.com/torbengb/bank2ynab/wiki/ImportFormats).
 
 ## Features
 

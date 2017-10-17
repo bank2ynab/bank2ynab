@@ -67,7 +67,7 @@ def clean_data(file):
     has_headers = g_config["has_headers"]
     output_data = []
     with open(file) as transaction_file:
-        transaction_reader = csv.reader(transaction_file, delimiter = delim)
+        transaction_reader = csv.reader(transaction_file, delimiter=str(delim).encode('utf-8'), quotechar=str(u'"').encode('utf-8'))
         transaction_data = list(transaction_reader)
 
         # make each row of our new transaction file

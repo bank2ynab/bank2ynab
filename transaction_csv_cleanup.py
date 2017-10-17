@@ -55,7 +55,7 @@ def get_files():
     b = g_config["input_filename"]
     c = g_config["fixed_prefix"]
     
-    if b is not "":
+    if b is not "" and g_config["path"] is not "":
         os.chdir(find_directory())
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
     return []

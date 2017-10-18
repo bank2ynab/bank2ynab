@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 # transaction_csv_cleanup.py
 # for Python 3
 
@@ -54,7 +54,6 @@ def get_files():
     a = g_config["ext"]
     b = g_config["input_filename"]
     c = g_config["fixed_prefix"]
-    
     if b is not "":
         os.chdir(find_directory())
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
@@ -108,6 +107,7 @@ def header_swap(header):
 def write_data(filename, data):
     # write out the new CSV file
     new_filename = g_config["fixed_prefix"] + filename
+    print("Writing file: ",new_filename)
     with open(new_filename, "w", newline = "") as file:
         writer = csv.writer(file)
         for row in data:
@@ -138,6 +138,7 @@ def main():
     all_configs = get_configs()
     # process account for each config file
     for section in all_configs.sections():
+        print("Trying format: ",section)
         # reset starting directory
         os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
         # create configuration variables
@@ -146,11 +147,13 @@ def main():
         # find all applicable files
         files = get_files()
         for file in files:
+            print("Parsing file: ",file)
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)
             # delete original csv file
             if g_config["delete_original"] is True:
+                print("Removing file: ",file)
                 os.remove(file)
 
 # Let's run this thing!

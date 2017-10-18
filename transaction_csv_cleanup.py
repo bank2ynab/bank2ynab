@@ -23,7 +23,7 @@ def get_configs():
     # get all our config files
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
     config = configparser.ConfigParser()
-    config.read(conf_files)
+    config.read(conf_files, encoding = "utf-8")
     return config
     
 def fix_conf_params(section): # to do
@@ -145,7 +145,6 @@ def main():
         g_config = fix_conf_params(all_configs[section])
         # find all applicable files
         files = get_files()
-        print("{}, {}".format(section, files))
         for file in files:
             # create cleaned csv for each file
             output = clean_data(file)

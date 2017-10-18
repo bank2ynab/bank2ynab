@@ -23,7 +23,7 @@ def get_configs():
     # get all our config files
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
     config = configparser.ConfigParser()
-    config.read(conf_files)
+    config.read(conf_files, encoding = "utf-8")
     return config
     
 def fix_conf_params(section): # to do
@@ -55,7 +55,7 @@ def get_files():
     b = g_config["input_filename"]
     c = g_config["fixed_prefix"]
     
-    if b is not "":
+    if b is not "" and g_config["path"] is not "":
         os.chdir(find_directory())
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
     return []
@@ -67,7 +67,7 @@ def clean_data(file):
     has_headers = g_config["has_headers"]
     output_data = []
     with open(file) as transaction_file:
-        transaction_reader = csv.reader(transaction_file, delimiter = delim)
+        transaction_reader = csv.reader(transaction_file, delimiter=str(delim).encode('utf-8'), quotechar=str(u'"').encode('utf-8'))
         transaction_data = list(transaction_reader)
 
         # make each row of our new transaction file
@@ -145,7 +145,6 @@ def main():
         g_config = fix_conf_params(all_configs[section])
         # find all applicable files
         files = get_files()
-        print("{}, {}".format(section, files))
         for file in files:
             # create cleaned csv for each file
             output = clean_data(file)

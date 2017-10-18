@@ -1,6 +1,6 @@
 # CHANGELOG
 # 2017-09-29
-#   ~ Merged in parameters from https://www.reddit.com/user/FinibusBonorum
+#   ~ Merged in parameters from Reddit suggestions
 #   ~ Auto folder finder disabled if folder path specified
 #   ~ Moved winreg import into Windows-specific section to avoid Linux conflict
 #   ~ Refined winreg import

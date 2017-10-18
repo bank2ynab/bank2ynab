@@ -1,7 +1,11 @@
 # bank2ynab
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
-## Contribute
+## Why?
+
+There are currently more than 80 GitHub projects related to YNAB converter scripts. Clearly there's a need, but until now these solutions have been fragmented. The present project "bank2ynab" aims to focus the efforts on a common source that encapsulates a large number of bank formats. This will also provide a common basis for a solution using a variety of programming languages.
+
+## How? Contribute!
 
 - If you're "just a user":
   - tell us your import format and we can create a converter - for you and for everyone else!

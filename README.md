@@ -18,13 +18,26 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 ## Features
 
-- convert your downloaded bank statements into YNAB's input format
-- maybe coming: automatically download your bank statements?
+***Convert your downloaded bank statements into YNAB's input format.*** Here's what this script does, step by step:
+
+1. Look for and parse the `config.conf`. This file contains all the rules and import formats.
+1. Look for and parse every CSV file in the configured download directory.
+1. If the CSV file matches any of the configured formats: 
+   1. create a new CSV file using YNAB's CSV format. 
+   1. Fill the new file with the correct columns.
+   1. Add a blank Category column.
+   1. Optionally swap columns `Payee` and `Memo`.
+   1. Optionally delete the original CSV file.
 
 ## Requirements
 
 - Windows or Mac or Linux
 - Support for Python, or Ruby, or some other scripting language (to be defined)
+
+## Wish List
+
+- add many more input formats from all the other YNAB-CSV-conversion projects.
+- maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
 
 ----
 

@@ -29,13 +29,12 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 ## <a name="how"></a>How? Contribute!
 
 - If you're "just a user":
-  - tell us your import format and we can create a converter - for you and for everyone else!
-  - use the converter provided here and give us feedback - or participate!
+  - [tell us your import format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can create a converter - for you and for everyone else!
+  - use the converter provided here and [give us feedback](https://github.com/torbengb/bank2ynab/issues/new) - or participate!
 - If you've already built a YNAB converter:
   - take advantage of this project to get more import formats.
-  - give back to this project by sharing your existing import formats.
-- add a brainstorming item as a new issue in the [issue list](https://github.com/torbengb/bank2ynab/issues)
-- read or add to the [wiki](https://github.com/torbengb/bank2ynab/wiki) and most importantly the [list of bank formats](https://github.com/torbengb/bank2ynab/wiki/ImportFormats).
+  - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
+- Add a brainstorming item as a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
 
 ## <a name="wishlist"></a>Wish List
 
@@ -58,13 +57,8 @@ Using `bank2ynab` is easy:
 - Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
   - `Source Path =` the path where you save your downloaded CSV files.
   - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
-- Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* 
-  - *(to do @torbengb : more details to be added here!)*
-  - `Source Filename Pattern =` *to do*
-  - `Source CSV Delimiter = ,` some banks use `;` as a delimiter instead.
-  - `Source Has Column Headers = True` set to `False` if it's not the case.
-  - `Input Columns = Date,Payee,Outflow,Inflow,Running Balance` modify the order to match your file. Enter `skip` for irrelevant columns.
-- Run the `bank2ynab` conversion script. How to do this depends on your operating system:
+- Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
+- Run the `bank2ynab.py` conversion script to receive the YNAB-ready CSV output. How to do this depends on your operating system:
   - *(to do: more details to be added here!)*
 - Drag-and-drop the converted CSV file onto the YNAB web app. 
   - YNAB will detect this and offer you import options. If you had already swtiched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
@@ -79,4 +73,4 @@ For details, please see our [issue list labeled "Bug"](https://github.com/torben
 
 ----
 
-Disclaimer: This tool is neither officially supported by YNAB (the company) nor by YNAB (the software) in any way. Use of this tool could introduce problems into your budget that YNAB, through its official support channels, will not be able to troubleshoot or fix. Please use at your own risk!
+*Disclaimer: This tool is neither officially supported by YNAB (the company) nor by YNAB (the software) in any way. Use of this tool could introduce problems into your budget that YNAB, through its official support channels, will not be able to troubleshoot or fix. Please use at your own risk!*

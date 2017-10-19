@@ -54,13 +54,15 @@ Using `bank2ynab` is easy:
   - Make sure to choose CSV format.
   - *(to do @torbengb : save with default filename?)*
   - It's okay if the statements contain data that you already have in YNAB. YNAB will detect and skip these.
-- Check the configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
+- Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
   - `Source Path =` the path where you save your downloaded CSV files.
-  - `Source CSV Delimiter = ,` some banks use `;` as a delimiter instead.
-  - `Source Has Column Headers = True` set to `False` if it's not the case.
   - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
 - Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format.
   - *(to do @torbengb : more details to be added here!)*
+  - `Source Filename Pattern =` *to do*
+  - `Source CSV Delimiter = ,` some banks use `;` as a delimiter instead.
+  - `Source Has Column Headers = True` set to `False` if it's not the case.
+  - `Input Columns = Date,Payee,Outflow,Inflow,Running Balance` modify the order to match your file. Enter `skip` for irrelevant columns.
 - Run the `banbk2ynab` conversion script. How to do this depends on your operating system:
   - *(to do: more details to be added here!)*
 - Drag-and-drop the converted CSV file onto the YNAB web app. 

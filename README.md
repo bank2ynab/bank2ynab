@@ -71,10 +71,7 @@ Using `bank2ynab` is easy:
 
 ## <a name="knownbugs"></a>Known Bugs
 
-- the downloaded CSV file must not end with a blank line (issue #12)
-  - workaround: remove the trailing Enter.
-- the script fails if the downloaded CSV file contains special characters like üöäÜÖÄßæøåÆØÅ (issue #12)
-  - workaround: open the file in Notepad and use search&replace to remove the special characters. (Yes this sucks, we're working on it!)
+For details, please see our [issue list labeled "Bug"](https://github.com/torbengb/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug).
 
 ----
 

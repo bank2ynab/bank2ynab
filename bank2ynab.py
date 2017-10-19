@@ -61,7 +61,12 @@ def get_files():
     b = g_config["input_filename"]
     c = g_config["fixed_prefix"]
     if b is not "":
-        os.chdir(find_directory())
+        try:
+            os.chdir(find_directory(g_config["path"]))
+        except:
+            print("Specified directory not found, attempting to find Downloads folder.")
+            os.chdir(find_directory(""))
+            
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
     return []
     
@@ -120,9 +125,8 @@ def write_data(filename, data):
             writer.writerow(row)
     return
     
-def find_directory():
+def find_directory(filepath):
     # finds the downloads folder for the active user if path is not set
-    filepath = g_config["path"]
     if filepath is "":
         if os.name is "nt":
             # Windows

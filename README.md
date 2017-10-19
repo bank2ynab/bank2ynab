@@ -11,14 +11,14 @@ A common project to consolidate all conversion efforts from various banks' expor
 
 ## <a name="what"></a>What? (Features)
 
-***Convert your downloaded bank statements into YNAB's input format.*** Here's what this script does, step by step:
+***Convert your downloaded bank statements into YNAB's input format.*** 
 
-1. Look for and parse the `config.conf`. This file contains all the rules and import formats.
+`bank2ynab` can be easily extended to handle more banks' CSV formats. It uses Python and if there is interest, the project could also include the same solution using other programming languages. Here's what this script does, step by step:
+
+1. Look for and parse the `bank2ynab.conf`. This file contains all the rules and import formats.
 1. Look for and parse every CSV file in the configured download directory.
 1. If the CSV file matches any of the configured formats: 
-   1. create a new CSV file using YNAB's CSV format. 
-   1. Fill the new file with the correct columns.
-   1. Add a blank Category column.
+   1. create a new CSV file using YNAB's CSV format, and fill the new file with the correct column order. Also add a blank `Category` column.
    1. Optionally swap columns `Payee` and `Memo`.
    1. Optionally delete the original CSV file.
 
@@ -39,13 +39,15 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 ## <a name="wishlist"></a>Wish List
 
-- add many more input formats from all the other YNAB-CSV-conversion projects.
-- maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
+- primary goal: add many more input formats from all the other YNAB-CSV-conversion projects.
+- maybe coming later: automatically download your bank statements? (uses [external services](https://teller.io/); only available in some countries)
+- maybe coming later: automatically import the converted file into your YNAB?
 
 ## <a name="requirements"></a>Requirements
 
 - Windows or Mac or Linux
 - Support for Python, or Ruby, or some other scripting language (to be defined)
+  - currently Python v3.x is supported
 
 ## <a name="userguide"></a>User Guide
 
@@ -58,7 +60,7 @@ Using `bank2ynab` is easy:
 - Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
   - `Source Path =` the path where you save your downloaded CSV files.
   - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
-- Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* 
+- Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* We can do this for you (and improve our project) if you [submit a ticket here](https://github.com/torbengb/bank2ynab/issues/new).
   - *(to do @torbengb : more details to be added here!)*
   - `Source Filename Pattern =` *to do*
   - `Source CSV Delimiter = ,` some banks use `;` as a delimiter instead.
@@ -67,7 +69,7 @@ Using `bank2ynab` is easy:
 - Run the `bank2ynab` conversion script. How to do this depends on your operating system:
   - *(to do: more details to be added here!)*
 - Drag-and-drop the converted CSV file onto the YNAB web app. 
-  - YNAB will detect this and offer you import options. If you had already swtiched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
+  - Protip: Switch to the corresponding account view in YNAB first. YNAB will understand that you want to import this CSV file to this YNAB account.
 
 ## <a name="knownbugs"></a>Known Bugs
 
@@ -79,4 +81,4 @@ For details, please see our [issue list labeled "Bug"](https://github.com/torben
 
 ----
 
-Disclaimer: This tool is neither officially supported by YNAB (the company) nor by YNAB (the software) in any way. Use of this tool could introduce problems into your budget that YNAB, through its official support channels, will not be able to troubleshoot or fix. Please use at your own risk!
+*Disclaimer: This tool is neither officially supported by YNAB (the company) nor by YNAB (the software) in any way. Use of this tool could introduce problems into your budget that YNAB, through its official support channels, will not be able to troubleshoot or fix. Please use at your own risk!*

@@ -7,6 +7,7 @@ A common project to consolidate all conversion efforts from various banks' expor
 - [Wish List](#wishlist)
 - [Requirements](#requirements)
 - [User Guide](#userguide)
+- [Known Bugs](#knownbugs)
 
 ## <a name="what"></a>What? (Features)
 
@@ -67,6 +68,13 @@ Using `bank2ynab` is easy:
   - *(to do: more details to be added here!)*
 - Drag-and-drop the converted CSV file onto the YNAB web app. 
   - YNAB will detect this and offer you import options. If you had already swtiched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
+
+## <a name="knownbugs"></a>Known Bugs
+
+- the downloaded CSV file must not end with a blank line (issue #12)
+  - workaround: remove the trailing Enter.
+- the script fails if the downloaded CSV file contains special characters like üöäÜÖÄßæøåÆØÅ (issue #12)
+  - workaround: open the file in Notepad and use search&replace to remove the special characters. (Yes this sucks, we're working on it!)
 
 ----
 

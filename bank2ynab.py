@@ -28,6 +28,8 @@ import csv, os, sys, configparser
 def get_configs():
     # get all our config files
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
+    if conf_files == []:
+        print("Can't find configuration file.")
     config = configparser.ConfigParser()
     config.read(conf_files, encoding = "utf-8")
     return config

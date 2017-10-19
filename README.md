@@ -80,4 +80,6 @@ Using `bank2ynab` is easy:
 
 ![XKCD on standards](https://imgs.xkcd.com/comics/standards.png)
 
+----
 
+Disclaimer: This tool is neither officially supported by YNAB (the company) nor by YNAB (the software) in any way. Use of this tool could introduce problems into your budget that YNAB, through its official support channels, will not be able to troubleshoot or fix. Please use at your own risk!

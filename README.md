@@ -15,11 +15,11 @@ A common project to consolidate all conversion efforts from various banks' expor
 1. Look for and parse the `config.conf`. This file contains all the rules and import formats.
 1. Look for and parse every CSV file in the configured download directory.
 1. If the CSV file matches any of the configured formats: 
-   1. create a new CSV file using YNAB's CSV format. 
-   1. Fill the new file with the correct columns.
-   1. Add a blank Category column.
-   1. Optionally swap columns `Payee` and `Memo`.
-   1. Optionally delete the original CSV file.
+   1. create a new CSV file using YNAB's CSV format. 
+   1. Fill the new file with the correct columns.
+   1. Add a blank Category column.
+   1. Optionally swap columns `Payee` and `Memo`.
+   1. Optionally delete the original CSV file.
 
 ## <a name="why"></a>Why?
 

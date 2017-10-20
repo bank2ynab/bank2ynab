@@ -1,3 +1,4 @@
+![YNAB banner image](https://b.thumbs.redditmedia.com/-4WEzT9WdhQV_khUidt56887E01btV8IILeL6TNvtvI.png)
 # bank2ynab
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 

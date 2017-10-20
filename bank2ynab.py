@@ -1,27 +1,17 @@
 #! /usr/bin/python3
+#
 # bank2ynab.py
-# for Python 3
-# Please see here for details: https://github.com/torbengb/bank2ynab
-
+#
 # Searches specified folder or default download folder for exported
 # bank transaction file (.csv format) & adjusts format for YNAB import
-
-# OPERATIONS
-#   ~ Find all .conf files & get all configuration within
-#   ~ Do following for each configuration found
-#   ~ Find & open TransactionExport.csv for processing
-#   ~ Change columns from
-#       Date, Details, Debit, Credit, Balance to
-#       Date, Payee, Category, Memo, Outflow, Inflow & delete Balance column
-#   ~ Create blank Category column
-#   ~ Copy data from Payee column into Memo column
-#   ~ Write new data to new fixed file
-
-# DISCLAIMER: This tool is neither officially supported by YNAB (the company) 
-# nor by YNAB (the software) in any way. Use of this tool could introduce 
-# problems into your budget that YNAB, through its official support channels, 
-# will not be able to troubleshoot or fix. Please use at your own risk!
-
+# Please see here for details: https://github.com/torbengb/bank2ynab
+#
+# DISCLAIMER: Please use at your own risk. This tool is neither officially
+# supported by YNAB (the company) nor by YNAB (the software) in any way. 
+# Use of this tool could introduce problems into your budget that YNAB, 
+# through its official support channels, will not be able to troubleshoot 
+# or fix. See also the full MIT licence.
+#
 # don't edit below here unless you know what you're doing!
 import csv, os, sys, configparser
 

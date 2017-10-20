@@ -45,7 +45,10 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 ## <a name="requirements"></a>Requirements
 
 - Windows or Mac or Linux
-- Support for Python, or Ruby, or some other scripting language (to be defined)
+- Python version 3 installed
+  - we are looking into supporting Python version 2 as well. Work in progress.
+  - *(to do @torbengb : dependencies?)*
+- Support for other scripting languages may follow. Contributions are welcome!
 
 ## <a name="userguide"></a>User Guide
 

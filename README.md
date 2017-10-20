@@ -68,7 +68,7 @@ Using `bank2ynab` is easy:
      - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.py` file, choose *Send to* and then choose *Desktop (as shortcut)*. Now you can just double-click that shortcut.
    - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python ./bank2ynab.py`.
 1. Drag-and-drop the converted CSV file onto the YNAB web app. 
-   - YNAB will detect this and offer you import options. If you had already swtiched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
+   - YNAB will detect this and offer you import options. If you had already switched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
 
 ## <a name="knownbugs"></a>Known Bugs
 

@@ -64,7 +64,6 @@ Using `bank2ynab` is easy:
   - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
 - Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
 - Run the `bank2ynab.py` conversion script to receive the YNAB-ready CSV output file. How to do this depends on your operating system:
-  - *(to do @torbengb: more details to be added here!)*
   - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab.py`.
     - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.py` file, choose *Send to* and then choose *Desktop (as shortcut)*. Now you can just double-click that shortcut.
   - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python ./bank2ynab.py`.

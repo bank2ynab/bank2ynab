@@ -56,19 +56,19 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 Using `bank2ynab` is easy:
 
-- Download some bank statements from your banking website.
-  - Make sure to choose CSV format. Save with the default suggested filename so that the converter can find it. 
-  - It's okay if the statements contain data that you already have in YNAB. YNAB will detect and skip these.
-- Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
-  - `Source Path = c:\users\example-username\Downloads` Specify where you save your downloaded CSV files. 
-  - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
-- Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
-- Run the `bank2ynab.py` conversion script to receive the YNAB-ready CSV output file. How to do this depends on your operating system:
-  - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab.py`.
-    - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.py` file, choose *Send to* and then choose *Desktop (as shortcut)*. Now you can just double-click that shortcut.
-  - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python ./bank2ynab.py`.
-- Drag-and-drop the converted CSV file onto the YNAB web app. 
-  - YNAB will detect this and offer you import options. If you had already swtiched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
+1. Download some bank statements from your banking website.
+   - Make sure to choose CSV format. Save with the default suggested filename so that the converter can find it. 
+   - It's okay if the statements contain data that you already have in YNAB. YNAB will detect and skip these.
+1. Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
+   - `Source Path = c:\users\example-username\Downloads` Specify where you save your downloaded CSV files. 
+   - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
+1. Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
+1. Run the `bank2ynab.py` conversion script to receive the YNAB-ready CSV output file. How to do this depends on your operating system:
+   - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab.py`.
+     - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.py` file, choose *Send to* and then choose *Desktop (as shortcut)*. Now you can just double-click that shortcut.
+   - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python ./bank2ynab.py`.
+1. Drag-and-drop the converted CSV file onto the YNAB web app. 
+   - YNAB will detect this and offer you import options. If you had already swtiched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
 
 ## <a name="knownbugs"></a>Known Bugs
 

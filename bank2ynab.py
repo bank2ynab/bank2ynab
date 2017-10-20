@@ -24,6 +24,7 @@
 
 # don't edit below here unless you know what you're doing!
 import csv, os, sys, configparser
+from future import unicode_literals # issue #25
 
 def get_configs():
     # get all our config files
@@ -74,6 +75,7 @@ def get_files():
 def clean_data(file):
     # extract data from transaction file
     delim = g_config["input_delimiter"]
+    delim = delim.encode('utf-8') # issue #25
     output_columns = g_config["output_columns"]
     has_headers = g_config["has_headers"]
     output_data = []
@@ -120,7 +122,7 @@ def write_data(filename, data):
     # write out the new CSV file
     new_filename = g_config["fixed_prefix"] + filename
     print("Writing file: ", new_filename)
-    with open(new_filename, "w", newline = "") as file:
+    with open(new_filename, "wb") as file: # issue #25
         writer = csv.writer(file)
         for row in data:
             writer.writerow(row)

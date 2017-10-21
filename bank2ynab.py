@@ -34,7 +34,7 @@ def get_configs():
     config.read(conf_files, encoding = "utf-8")
     return config
     
-def fix_conf_params(section): # to do
+def fix_conf_params(section):
     # repair parameters from our config file and return as a dictionary
     config = dict()
     config["input_columns"] = section["Input Columns"].split(",")

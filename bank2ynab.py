@@ -24,7 +24,7 @@
 
 # don't edit below here unless you know what you're doing!
 import csv, os, sys, configparser
-from future import unicode_literals # issue #25
+from __future__ import unicode_literals # issue #25
 
 def get_configs():
     # get all our config files

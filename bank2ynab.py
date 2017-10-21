@@ -69,9 +69,10 @@ def clean_data(file):
     output_data = []
     with open(file) as transaction_file:
         transaction_reader = csv.reader(transaction_file, delimiter = delim)
+        transaction_data = list(transaction_reader)
 
         # make each row of our new transaction file
-        for row in transaction_reader:
+        for row in transaction_data:
             # add new row to output list
             output_data.append(fix_row(row))
 
@@ -92,7 +93,7 @@ def fix_row(row):
             # check to see if our output header exists in input
             index = g_config["input_columns"].index(header)
             cell = row[index]
-        except (ValueError, IndexError):
+        except ValueError:
             # header isn't in input, default to blank cell
             cell = ""
         output.append(cell)

@@ -23,8 +23,14 @@
 # will not be able to troubleshoot or fix. Please use at your own risk!
 
 # don't edit below here unless you know what you're doing!
-from __future__ import unicode_literals # issue #25
-import csv, os, sys, configparser
+from __future__ import unicode_literals # python 2.x support
+import csv, os, sys
+
+# check which python version we're running
+if sys.version_info[0] == 2:
+    import ConfigParser as configparser
+else:
+    import configparser
 
 def get_configs():
     # get all our config files
@@ -122,14 +128,15 @@ def write_data(filename, data):
     new_filename = g_config["fixed_prefix"] + filename
     print("Writing file: ", new_filename)
     
-    if sys.version_info[0] == 2:  # Not named on 2.6
+    # check what version of python we're running to handle csv
+    if sys.version_info[0] == 2:
         access = 'wb'
         kwargs = {}
     else:
         access = 'wt'
         kwargs = {'newline':''}
     
-    with open(new_filename, access, **kwargs) as file: # issue #25
+    with open(new_filename, access, **kwargs) as file:
         writer = csv.writer(file)
         for row in data:
             writer.writerow(row)

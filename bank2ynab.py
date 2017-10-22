@@ -165,7 +165,7 @@ def main():
         files = get_files()
         for file in files:
             # increment for the summary:
-            g_files_processed += 1
+            files_processed += 1
             print("Parsing file: ", file)
             # create cleaned csv for each file
             output = clean_data(file)
@@ -175,7 +175,7 @@ def main():
                 print("Removing file: ", file)
                 os.remove(file)
             print("Done!")
-    print(files_processed, " files processed and ", g_files_converted, " converted.")
+    print("{} files processed and {} files converted.".format(files_processed, g_files_converted))
 
 # Let's run this thing!
 main()

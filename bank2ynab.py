@@ -119,7 +119,7 @@ def header_swap(header):
 def write_data(filename, data):
     # write out the new CSV file
     new_filename = g_config["fixed_prefix"] + filename
-    print("Writing file: ", new_filename)
+    print("Writing file: {}".format(new_filename))
     with open(new_filename, "w", newline = "") as file:
         writer = csv.writer(file)
         for row in data:
@@ -157,14 +157,13 @@ def main():
         # find all applicable files
         files = get_files()
         for file in files:
-            print("Parsing file: ", file)
-            print("Using format: ", section)
+            print("Parsing file: {}\nUsing format: {}".format(file, section))
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)
             # delete original csv file
             if g_config["delete_original"] is True:
-                print("Removing file: ", file)
+                print("Removing file: {}".format(file))
                 os.remove(file)
             print("Done!")
 

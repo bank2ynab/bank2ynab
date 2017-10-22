@@ -57,7 +57,7 @@ def get_files():
         try:
             os.chdir(find_directory(g_config["path"]))
         except:
-            print("Your specified download directory was not found: ", g_config["path"])
+            print("Your specified download directory was not found: {}".format(g_config["path"]))
             os.chdir(find_directory(""))
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
     return []

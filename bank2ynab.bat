@@ -1,1 +1,1 @@
-@py.exe "transaction_parser.py" %*
+@py.exe "bank2ynab.py" %*

@@ -73,7 +73,10 @@ def clean_data(file):
         # make each row of our new transaction file
         for row in transaction_reader:
             # add new row to output list
-            output_data.append(fix_row(row))
+            fixed_row = fix_row(row)
+            # check our row isn't a null transaction
+            if valid_row(fixed_row) is True:
+                output_data.append(fixed_row)
 
         # fix column headers
         if has_headers is False:
@@ -97,7 +100,15 @@ def fix_row(row):
             cell = ""
         output.append(cell)
     return output
-                
+
+def valid_row(row):
+    # if our row doesn't have an inflow or outflow, mark as invalid
+    inflow_index = g_config["output_columns"].index("Inflow")
+    outflow_index = g_config["output_columns"].index("Outflow")
+    if row[inflow_index] == "" and row[outflow_index] == "":
+        return False
+    return True
+    
 def header_swap(header):
     # replaces one column's value with another if required
     if g_config["payee_memo_swap"] is True:

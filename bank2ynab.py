@@ -5,13 +5,15 @@
 # Searches specified folder or default download folder for exported
 # bank transaction file (.csv format) & adjusts format for YNAB import
 # Please see here for details: https://github.com/torbengb/bank2ynab
+#
 # MIT License: https://github.com/torbengb/bank2ynab/blob/master/LICENSE
 #
 # DISCLAIMER: Please use at your own risk. This tool is neither officially
 # supported by YNAB (the company) nor by YNAB (the software) in any way. 
 # Use of this tool could introduce problems into your budget that YNAB, 
 # through its official support channels, will not be able to troubleshoot 
-# or fix. 
+# or fix. See also the full MIT licence.
+#
 #
 # don't edit below here unless you know what you're doing!
 import csv, os, sys, configparser
@@ -25,7 +27,7 @@ def get_configs():
     config.read(conf_files, encoding = "utf-8")
     return config
     
-def fix_conf_params(section): # to do
+def fix_conf_params(section):
     # repair parameters from our config file and return as a dictionary
     config = dict()
     config["input_columns"] = section["Input Columns"].split(",")
@@ -70,12 +72,14 @@ def clean_data(file):
     output_data = []
     with open(file) as transaction_file:
         transaction_reader = csv.reader(transaction_file, delimiter = delim)
-        transaction_data = list(transaction_reader)
 
         # make each row of our new transaction file
-        for row in transaction_data:
+        for row in transaction_reader:
             # add new row to output list
-            output_data.append(fix_row(row))
+            fixed_row = fix_row(row)
+            # check our row isn't a null transaction
+            if valid_row(fixed_row) is True:
+                output_data.append(fixed_row)
 
         # fix column headers
         if has_headers is False:
@@ -94,12 +98,20 @@ def fix_row(row):
             # check to see if our output header exists in input
             index = g_config["input_columns"].index(header)
             cell = row[index]
-        except ValueError:
+        except (ValueError, IndexError):
             # header isn't in input, default to blank cell
             cell = ""
         output.append(cell)
     return output
-                
+
+def valid_row(row):
+    # if our row doesn't have an inflow or outflow, mark as invalid
+    inflow_index = g_config["output_columns"].index("Inflow")
+    outflow_index = g_config["output_columns"].index("Outflow")
+    if row[inflow_index] == "" and row[outflow_index] == "":
+        return False
+    return True
+    
 def header_swap(header):
     # replaces one column's value with another if required
     if g_config["payee_memo_swap"] is True:

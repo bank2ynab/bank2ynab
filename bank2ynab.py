@@ -26,7 +26,7 @@
 from __future__ import unicode_literals # python 2.x support
 import csv, os, sys
 
-# check which python version we're running
+# check which python version we're running for python 2.x support
 if sys.version_info[0] == 2:
     import ConfigParser as configparser
 else:
@@ -130,11 +130,11 @@ def write_data(filename, data):
     
     # check what version of python we're running to handle csv
     if sys.version_info[0] == 2:
-        access = 'wb'
+        access = "wb"
         kwargs = {}
     else:
-        access = 'wt'
-        kwargs = {'newline':''}
+        access = "wt"
+        kwargs = {"newline":""}
     
     with open(new_filename, access, **kwargs) as file:
         writer = csv.writer(file)

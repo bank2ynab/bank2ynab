@@ -148,8 +148,7 @@ def find_directory(filepath):
     
 def main():
     # initialize variables for summary:
-    global g_files_processed
-    g_files_processed = 0
+    files_processed = 0
     global g_files_converted
     g_files_converted = 0
     # get all configuration details
@@ -176,7 +175,7 @@ def main():
                 print("Removing file: ", file)
                 os.remove(file)
             print("Done!")
-    print(g_files_processed, " files processed and ", g_files_converted, " converted.")
+    print(files_processed, " files processed and ", g_files_converted, " converted.")
 
 # Let's run this thing!
 main()

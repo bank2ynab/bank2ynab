@@ -62,8 +62,6 @@ def get_files():
     return []
     
 def clean_data(file):
-    # increment for the summary:
-    g_files_converted += 1
     # extract data from transaction file
     delim = g_config["input_delimiter"]
     output_columns = g_config["output_columns"]
@@ -149,8 +147,6 @@ def find_directory(filepath):
 def main():
     # initialize variables for summary:
     files_processed = 0
-    global g_files_converted
-    g_files_converted = 0
     # get all configuration details
     all_configs = get_configs()
     # process account for each config file
@@ -175,7 +171,7 @@ def main():
                 print("Removing file: ", file)
                 os.remove(file)
             print("Done!")
-    print("{} files processed and {} files converted.".format(files_processed, g_files_converted))
+    print("{} files processed.".format(files_processed))
 
 # Let's run this thing!
 main()

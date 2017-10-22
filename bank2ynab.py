@@ -166,6 +166,7 @@ def main():
             if g_config["delete_original"] is True:
                 print("Removing file: ", file)
                 os.remove(file)
+            print("Done!")
 
 # Let's run this thing!
 main()

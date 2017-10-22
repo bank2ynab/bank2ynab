@@ -149,7 +149,6 @@ def main():
     all_configs = get_configs()
     # process account for each config file
     for section in all_configs.sections():
-        print("Trying format: ", section)
         # reset starting directory
         os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
         # create configuration variables
@@ -159,6 +158,7 @@ def main():
         files = get_files()
         for file in files:
             print("Parsing file: ", file)
+            print("Using format: ", section)
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)

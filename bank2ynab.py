@@ -6,11 +6,14 @@
 # bank transaction file (.csv format) & adjusts format for YNAB import
 # Please see here for details: https://github.com/torbengb/bank2ynab
 #
+# MIT License: https://github.com/torbengb/bank2ynab/blob/master/LICENSE
+#
 # DISCLAIMER: Please use at your own risk. This tool is neither officially
 # supported by YNAB (the company) nor by YNAB (the software) in any way. 
 # Use of this tool could introduce problems into your budget that YNAB, 
 # through its official support channels, will not be able to troubleshoot 
 # or fix. See also the full MIT licence.
+#
 #
 # don't edit below here unless you know what you're doing!
 import csv, os, sys, configparser
@@ -56,7 +59,7 @@ def get_files():
         try:
             os.chdir(find_directory(g_config["path"]))
         except:
-            print("Specified directory not found, attempting to find Downloads folder.")
+            print("Your specified download directory was not found: {}".format(g_config["path"]))
             os.chdir(find_directory(""))
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
     return []
@@ -145,6 +148,8 @@ def find_directory(filepath):
     return dir
     
 def main():
+    # initialize variables for summary:
+    files_processed = 0
     # get all configuration details
     all_configs = get_configs()
     # process account for each config file
@@ -158,6 +163,9 @@ def main():
         files = get_files()
         for file in files:
             print("Parsing file: {}\nUsing format: {}".format(file, section))
+            # increment for the summary:
+            files_processed += 1
+
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)
@@ -166,6 +174,7 @@ def main():
                 print("Removing file: {}".format(file))
                 os.remove(file)
             print("Done!")
+    print("{} files processed.".format(files_processed))
 
 # Let's run this thing!
 main()

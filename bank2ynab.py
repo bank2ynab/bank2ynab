@@ -76,7 +76,7 @@ def clean_data(file):
         # make each row of our new transaction file
         for row in transaction_reader:
             # add new row to output list
-            fixed_row = fix_row(row)
+            fixed_row = auto_memo(fix_row(row))
             # check our row isn't a null transaction
             if valid_row(fixed_row) is True:
                 output_data.append(fixed_row)
@@ -120,7 +120,7 @@ def header_swap(header):
     return header
     
 def auto_memo(row):
-    # auto fill empty memo field with payee info if required
+    # auto fill empty memo field with payee info
     payee_index = g_config["output_columns"].index("Payee")
     memo_index = g_config["output_columns"].index("Memo")
     if row[memo_index] == "":

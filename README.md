@@ -16,7 +16,7 @@ A common project to consolidate all conversion efforts from various banks' expor
 
 ***Convert your downloaded bank statements into YNAB's input format.*** Here's what this script does, step by step:
 
-1. Look for and parse the `config.conf`. This file contains all the rules and import formats.
+1. Look for and parse the `bank2ynab.conf`. This file contains all the rules and import formats.
 1. Look for and parse every CSV file in the configured download directory.
 1. If the CSV file matches any of the configured formats: 
    1. create a new CSV file using YNAB's CSV format. 

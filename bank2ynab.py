@@ -39,7 +39,6 @@ def fix_conf_params(section):
     config["input_delimiter"] = section["Source CSV Delimiter"]
     config["has_headers"] = section.getboolean("Source Has Column Headers")
     config["delete_original"] = section.getboolean("Delete Source File")
-    config["payee_memo_swap"] = section.getboolean("Use Payees for Memo")    
         
     # # Direct bank download
     # Bank Download = False

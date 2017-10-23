@@ -93,7 +93,6 @@ def fix_row(row):
     # fixes a row of our file
     output = []
     for header in g_config["output_columns"]:
-        header = header_swap(header)
         try:
             # check to see if our output header exists in input
             index = g_config["input_columns"].index(header)
@@ -111,13 +110,6 @@ def valid_row(row):
     if row[inflow_index] == "" and row[outflow_index] == "":
         return False
     return True
-    
-def header_swap(header):
-    # replaces one column's value with another if required
-    if g_config["payee_memo_swap"] is True:
-        if header == "Memo":
-            return "Payee"
-    return header
     
 def auto_memo(row):
     # auto fill empty memo field with payee info

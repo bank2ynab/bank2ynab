@@ -118,7 +118,15 @@ def header_swap(header):
         if header == "Memo":
             return "Payee"
     return header
-                
+    
+def auto_memo(row):
+    # auto fill empty memo field with payee info if required
+    payee_index = g_config["output_columns"].index("Payee")
+    memo_index = g_config["output_columns"].index("Memo")
+    if row[memo_index] == "":
+        row[memo_index] = row[payee_index]
+    return row
+    
 def write_data(filename, data):
     # write out the new CSV file
     new_filename = g_config["fixed_prefix"] + filename

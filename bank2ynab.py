@@ -1,27 +1,20 @@
 #! /usr/bin/python3
+#
 # bank2ynab.py
-# for Python 3
-# Please see here for details: https://github.com/torbengb/bank2ynab
-
+#
 # Searches specified folder or default download folder for exported
 # bank transaction file (.csv format) & adjusts format for YNAB import
-
-# OPERATIONS
-#   ~ Find all .conf files & get all configuration within
-#   ~ Do following for each configuration found
-#   ~ Find & open TransactionExport.csv for processing
-#   ~ Change columns from
-#       Date, Details, Debit, Credit, Balance to
-#       Date, Payee, Category, Memo, Outflow, Inflow & delete Balance column
-#   ~ Create blank Category column
-#   ~ Copy data from Payee column into Memo column
-#   ~ Write new data to new fixed file
-
-# DISCLAIMER: This tool is neither officially supported by YNAB (the company) 
-# nor by YNAB (the software) in any way. Use of this tool could introduce 
-# problems into your budget that YNAB, through its official support channels, 
-# will not be able to troubleshoot or fix. Please use at your own risk!
-
+# Please see here for details: https://github.com/torbengb/bank2ynab
+#
+# MIT License: https://github.com/torbengb/bank2ynab/blob/master/LICENSE
+#
+# DISCLAIMER: Please use at your own risk. This tool is neither officially
+# supported by YNAB (the company) nor by YNAB (the software) in any way. 
+# Use of this tool could introduce problems into your budget that YNAB, 
+# through its official support channels, will not be able to troubleshoot 
+# or fix. See also the full MIT licence.
+#
+#
 # don't edit below here unless you know what you're doing!
 from __future__ import unicode_literals # python 2.x support
 import csv, os, sys
@@ -41,7 +34,7 @@ def get_configs():
     config.read(conf_files, encoding = "utf-8")
     return config
     
-def fix_conf_params(section): # to do
+def fix_conf_params(section):
     # repair parameters from our config file and return as a dictionary
     config = dict()
     config["input_columns"] = section["Input Columns"].split(",")
@@ -73,7 +66,7 @@ def get_files():
         try:
             os.chdir(find_directory(g_config["path"]))
         except:
-            print("Specified directory not found, attempting to find Downloads folder.")
+            print("Your specified download directory was not found: {}".format(g_config["path"]))
             os.chdir(find_directory(""))
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
     return []
@@ -86,12 +79,14 @@ def clean_data(file):
     output_data = []
     with open(file) as transaction_file:
         transaction_reader = csv.reader(transaction_file, delimiter = delim)
-        transaction_data = list(transaction_reader)
 
         # make each row of our new transaction file
-        for row in transaction_data:
+        for row in transaction_reader:
             # add new row to output list
-            output_data.append(fix_row(row))
+            fixed_row = fix_row(row)
+            # check our row isn't a null transaction
+            if valid_row(fixed_row) is True:
+                output_data.append(fixed_row)
 
         # fix column headers
         if has_headers is False:
@@ -110,12 +105,20 @@ def fix_row(row):
             # check to see if our output header exists in input
             index = g_config["input_columns"].index(header)
             cell = row[index]
-        except ValueError:
+        except (ValueError, IndexError):
             # header isn't in input, default to blank cell
             cell = ""
         output.append(cell)
     return output
-                
+
+def valid_row(row):
+    # if our row doesn't have an inflow or outflow, mark as invalid
+    inflow_index = g_config["output_columns"].index("Inflow")
+    outflow_index = g_config["output_columns"].index("Outflow")
+    if row[inflow_index] == "" and row[outflow_index] == "":
+        return False
+    return True
+    
 def header_swap(header):
     # replaces one column's value with another if required
     if g_config["payee_memo_swap"] is True:
@@ -126,8 +129,8 @@ def header_swap(header):
 def write_data(filename, data):
     # write out the new CSV file
     new_filename = g_config["fixed_prefix"] + filename
-    print("Writing file: ", new_filename)
-    
+    print("Writing file: {}".format(new_filename))
+
     # check what version of python we're running to handle csv
     if sys.version_info[0] == 2:
         access = "wb"
@@ -161,11 +164,12 @@ def find_directory(filepath):
     return dir
     
 def main():
+    # initialize variables for summary:
+    files_processed = 0
     # get all configuration details
     all_configs = get_configs()
     # process account for each config file
     for section in all_configs.sections():
-        print("Trying format: ", section)
         # reset starting directory
         os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
         # create configuration variables
@@ -174,14 +178,19 @@ def main():
         # find all applicable files
         files = get_files()
         for file in files:
-            print("Parsing file: ", file)
+            print("Parsing file: {}\nUsing format: {}".format(file, section))
+            # increment for the summary:
+            files_processed += 1
+
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)
             # delete original csv file
             if g_config["delete_original"] is True:
-                print("Removing file: ", file)
+                print("Removing file: {}".format(file))
                 os.remove(file)
+            print("Done!")
+    print("{} files processed.".format(files_processed))
 
 # Let's run this thing!
 main()

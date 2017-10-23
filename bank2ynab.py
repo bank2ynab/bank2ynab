@@ -148,6 +148,8 @@ def find_directory(filepath):
     return dir
     
 def main():
+    # initialize variables for summary:
+    files_processed = 0
     # get all configuration details
     all_configs = get_configs()
     # process account for each config file
@@ -161,6 +163,8 @@ def main():
         # find all applicable files
         files = get_files()
         for file in files:
+            # increment for the summary:
+            files_processed += 1
             print("Parsing file: ", file)
             # create cleaned csv for each file
             output = clean_data(file)
@@ -169,6 +173,8 @@ def main():
             if g_config["delete_original"] is True:
                 print("Removing file: ", file)
                 os.remove(file)
+            print("Done!")
+    print("{} files processed.".format(files_processed))
 
 # Let's run this thing!
 main()

@@ -43,6 +43,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 - add many more input formats from all the other YNAB-CSV-conversion projects.
 - maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
+- maybe coming later: automatically import the converted data into your YNAB app? (optional, default off)
 
 ## <a name="requirements"></a>Requirements
 

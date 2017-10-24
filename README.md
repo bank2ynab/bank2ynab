@@ -19,10 +19,7 @@ A common project to consolidate all conversion efforts from various banks' expor
 1. Look for and parse the `bank2ynab.conf`. This file contains all the rules and import formats.
 1. Look for and parse every CSV file in the configured download directory.
 1. If the CSV file matches any of the configured formats: 
-   1. create a new CSV file using YNAB's CSV format. 
-   1. Fill the new file with the correct columns.
-   1. Add a blank Category column.
-   1. Optionally swap columns `Payee` and `Memo`.
+   1. Create a new CSV file in YNAB's CSV format with the correct columns and a blank Category column.
    1. Optionally delete the original CSV file.
 
 ## <a name="why"></a>Why?
@@ -50,7 +47,6 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 - Windows or Mac or Linux
 - Python version 3 installed ([download it from python.org](https://www.python.org/downloads/))
   - we are looking into supporting Python version 2 as well. Work in progress.
-  - *(to do @torbengb : dependencies?)*
 - Support for other scripting languages may follow. Contributions are welcome!
 
 ## <a name="userguide"></a>User Guide
@@ -64,7 +60,7 @@ Using `bank2ynab` is easy:
    - `Source Path = c:\users\example-username\Downloads` Specify where you save your downloaded CSV files. 
    - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
 1. Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
-1. Run the `bank2ynab.py` conversion script to receive the YNAB-ready CSV output file. How to do this depends on your operating system:
+1. Run the `bank2ynab.py` conversion script to generate the YNAB-ready CSV output file. How to do this depends on your operating system:
    - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab.py`.
      - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.bat` file, choose *Send to* and then choose *Desktop (create shortcut)*. Now you can just double-click that shortcut!
    - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab.py`.

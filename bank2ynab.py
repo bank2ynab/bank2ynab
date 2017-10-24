@@ -162,7 +162,7 @@ def main():
         # find all applicable files
         files = get_files()
         for file in files:
-            print("Parsing file: {}\nUsing format: {}".format(file, section))
+            print("\nParsing file: {}\nUsing format: {}".format(file, section))
             # increment for the summary:
             files_processed += 1
 
@@ -174,7 +174,7 @@ def main():
                 print("Removing file: {}".format(file))
                 os.remove(file)
             print("Done!")
-    print("{} files processed.".format(files_processed))
+    print("\n{} files processed.\n".format(files_processed))
 
 # Let's run this thing!
 main()

@@ -29,7 +29,6 @@ except ImportError:
 
 import csv, os, sys
 
-
 def get_configs():
     # get all our config files
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]

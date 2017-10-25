@@ -16,7 +16,14 @@
 #
 #
 # don't edit below here unless you know what you're doing!
-import csv, os, sys, configparser
+from __future__ import unicode_literals # python 2.x support
+import csv, os, sys
+
+# check which python version we're running for python 2.x support
+if sys.version_info[0] == 2:
+    import ConfigParser as configparser
+else:
+    import configparser
 
 def get_configs():
     # get all our config files
@@ -122,7 +129,16 @@ def write_data(filename, data):
     # write out the new CSV file
     new_filename = g_config["fixed_prefix"] + filename
     print("Writing file: {}".format(new_filename))
-    with open(new_filename, "w", newline = "") as file:
+
+    # check what version of python we're running to handle csv
+    if sys.version_info[0] == 2:
+        access = "wb"
+        kwargs = {}
+    else:
+        access = "wt"
+        kwargs = {"newline":""}
+    
+    with open(new_filename, access, **kwargs) as file:
         writer = csv.writer(file)
         for row in data:
             writer.writerow(row)

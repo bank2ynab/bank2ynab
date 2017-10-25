@@ -163,9 +163,6 @@ def main():
         files = get_files()
         for file in files:
             print("\nParsing file: {}\nUsing format: {}".format(file, section))
-            # increment for the summary:
-            files_processed += 1
-
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)
@@ -173,6 +170,8 @@ def main():
             if g_config["delete_original"] is True:
                 print("Removing file: {}".format(file))
                 os.remove(file)
+            # increment for the summary:
+            files_processed += 1
             print("Done!")
     print("\n{} files processed.\n".format(files_processed))
 

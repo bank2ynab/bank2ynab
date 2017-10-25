@@ -16,7 +16,19 @@
 #
 #
 # don't edit below here unless you know what you're doing!
-import csv, os, sys, configparser
+
+# main Python2 switch
+# any module with different naming should be handled here
+__PY2 = False
+try:
+    import configparser
+except ImportError:
+    __PY2 = True
+    import ConfigParser as configparser
+    import codecs
+
+import csv, os, sys
+
 
 def get_configs():
     # get all our config files
@@ -24,22 +36,26 @@ def get_configs():
     if conf_files == []:
         print("Can't find configuration file.")
     config = configparser.ConfigParser()
-    config.read(conf_files, encoding = "utf-8")
+    if __PY2:
+        config.read(conf_files)
+    else:
+        config.read(conf_files, encoding="utf-8")
     return config
-    
-def fix_conf_params(section):
+
+
+def fix_conf_params(configparser_object, section_name):
     # repair parameters from our config file and return as a dictionary
     config = dict()
-    config["input_columns"] = section["Input Columns"].split(",")
-    config["output_columns"] = section["Output Columns"].split(",")
-    config["input_filename"] = section["Source Filename Pattern"]
-    config["path"] = section["Source Path"]
-    config["ext"] = section["Source Filename Extension"]
-    config["fixed_prefix"] = section["Output Filename Prefix"]
-    config["input_delimiter"] = section["Source CSV Delimiter"]
-    config["has_headers"] = section.getboolean("Source Has Column Headers")
-    config["delete_original"] = section.getboolean("Delete Source File")
-        
+    config["input_columns"] = configparser_object.get(section_name, "Input Columns").split(",")
+    config["output_columns"] = configparser_object.get(section_name, "Output Columns").split(",")
+    config["input_filename"] = configparser_object.get(section_name, "Source Filename Pattern")
+    config["path"] = configparser_object.get(section_name, "Source Path")
+    config["ext"] = configparser_object.get(section_name, "Source Filename Extension")
+    config["fixed_prefix"] = configparser_object.get(section_name, "Output Filename Prefix")
+    config["input_delimiter"] = configparser_object.get(section_name, "Source CSV Delimiter")
+    config["has_headers"] = configparser_object.getboolean(section_name, "Source Has Column Headers")
+    config["delete_original"] = configparser_object.getboolean(section_name, "Delete Source File")
+
     # # Direct bank download
     # Bank Download = False
     # Bank Download URL = ""
@@ -48,6 +64,7 @@ def fix_conf_params(section):
     # Bank Download Auth2 = ""
 
     return config
+
 
 def get_files():
     # find the transaction file
@@ -62,7 +79,8 @@ def get_files():
             os.chdir(find_directory(""))
         return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
     return []
-    
+
+
 def clean_data(file):
     # extract data from transaction file
     delim = g_config["input_delimiter"]
@@ -70,7 +88,7 @@ def clean_data(file):
     has_headers = g_config["has_headers"]
     output_data = []
     with open(file) as transaction_file:
-        transaction_reader = csv.reader(transaction_file, delimiter = delim)
+        transaction_reader = csv.reader(transaction_file, delimiter=delim)
 
         # make each row of our new transaction file
         for row in transaction_reader:
@@ -85,9 +103,10 @@ def clean_data(file):
             output_data.insert(0, output_columns)
         else:
             output_data[0] = output_columns
-    
+
     return output_data
-    
+
+
 def fix_row(row):
     # fixes a row of our file
     output = []
@@ -102,6 +121,7 @@ def fix_row(row):
         output.append(cell)
     return output
 
+
 def valid_row(row):
     # if our row doesn't have an inflow or outflow, mark as invalid
     inflow_index = g_config["output_columns"].index("Inflow")
@@ -109,7 +129,8 @@ def valid_row(row):
     if row[inflow_index] == "" and row[outflow_index] == "":
         return False
     return True
-    
+
+
 def auto_memo(row):
     # auto fill empty memo field with payee info
     payee_index = g_config["output_columns"].index("Payee")
@@ -117,35 +138,56 @@ def auto_memo(row):
     if row[memo_index] == "":
         row[memo_index] = row[payee_index]
     return row
-    
+
+
+def _open_output(filename):
+    """ Open output file, handling py2/py3 differences.
+    :param filename: path to file
+    :return: file object
+    """
+    if __PY2:
+        return codecs.open(filename, "w", "utf-8")
+    return open(filename, "w", newline="")
+
+
 def write_data(filename, data):
-    # write out the new CSV file
+    """ write out the new CSV file
+    :param filename: path to output file
+    :param data: cleaned data ready to output
+    """
     new_filename = g_config["fixed_prefix"] + filename
     print("Writing file: {}".format(new_filename))
-    with open(new_filename, "w", newline = "") as file:
-        writer = csv.writer(file)
+    with _open_output(new_filename) as f_out:
+        writer = csv.writer(f_out)
         for row in data:
             writer.writerow(row)
     return
-    
+
+
 def find_directory(filepath):
     # finds the downloads folder for the active user if path is not set
     if filepath is "":
         if os.name is "nt":
             # Windows
-            from winreg import OpenKey,  QueryValueEx, HKEY_CURRENT_USER # import Windows-specific stuff here
+            if __PY2:
+                import _winreg as winreg
+            else:
+                import winreg
             shell_path = "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
             dl_key = "{374DE290-123F-4565-9164-39C4925E467B}"
-            with OpenKey(HKEY_CURRENT_USER, shell_path) as key:
-                dir = QueryValueEx(key, dl_key)[0]
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, shell_path) as key:
+                input_dir = winreg.QueryValueEx(key, dl_key)[0]
         else:
-            # Linux
+            # Linux, OSX
             userhome = os.path.expanduser('~')
-            dir = os.path.join(userhome, "Downloads")      
+            input_dir = os.path.join(userhome, "Downloads")
     else:
-        dir = filepath
-    return dir
-    
+        if not os.path.exists(filepath):
+            raise Exception("Input directory not found: {}".format(filepath))
+        input_dir = filepath
+    return input_dir
+
+
 def main():
     # initialize variables for summary:
     files_processed = 0
@@ -157,7 +199,7 @@ def main():
         os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
         # create configuration variables
         global g_config
-        g_config = fix_conf_params(all_configs[section])
+        g_config = fix_conf_params(all_configs, section)
         # find all applicable files
         files = get_files()
         for file in files:
@@ -174,6 +216,7 @@ def main():
                 os.remove(file)
             print("Done!")
     print("{} files processed.".format(files_processed))
+
 
 # Let's run this thing!
 main()

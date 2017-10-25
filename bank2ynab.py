@@ -46,7 +46,6 @@ def fix_conf_params(section):
     config["input_delimiter"] = section["Source CSV Delimiter"]
     config["has_headers"] = section.getboolean("Source Has Column Headers")
     config["delete_original"] = section.getboolean("Delete Source File")
-    config["payee_memo_swap"] = section.getboolean("Use Payees for Memo")    
         
     # # Direct bank download
     # Bank Download = False
@@ -83,7 +82,7 @@ def clean_data(file):
         # make each row of our new transaction file
         for row in transaction_reader:
             # add new row to output list
-            fixed_row = fix_row(row)
+            fixed_row = auto_memo(fix_row(row))
             # check our row isn't a null transaction
             if valid_row(fixed_row) is True:
                 output_data.append(fixed_row)
@@ -100,7 +99,6 @@ def fix_row(row):
     # fixes a row of our file
     output = []
     for header in g_config["output_columns"]:
-        header = header_swap(header)
         try:
             # check to see if our output header exists in input
             index = g_config["input_columns"].index(header)
@@ -119,13 +117,14 @@ def valid_row(row):
         return False
     return True
     
-def header_swap(header):
-    # replaces one column's value with another if required
-    if g_config["payee_memo_swap"] is True:
-        if header == "Memo":
-            return "Payee"
-    return header
-                
+def auto_memo(row):
+    # auto fill empty memo field with payee info
+    payee_index = g_config["output_columns"].index("Payee")
+    memo_index = g_config["output_columns"].index("Memo")
+    if row[memo_index] == "":
+        row[memo_index] = row[payee_index]
+    return row
+    
 def write_data(filename, data):
     # write out the new CSV file
     new_filename = g_config["fixed_prefix"] + filename

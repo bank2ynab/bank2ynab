@@ -54,14 +54,19 @@ def get_files():
     a = g_config["ext"]
     b = g_config["input_filename"]
     c = g_config["fixed_prefix"]
+    files = list()
+    missing_dir = False
+    target_dir = g_config["path"]
     if b is not "":
         try:
-            os.chdir(find_directory(g_config["path"]))
+            os.chdir(find_directory(target_dir))
         except:
-            print("Your specified download directory was not found: {}".format(g_config["path"]))
+            missing_dir = True
             os.chdir(find_directory(""))
-        return [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
-    return []
+        files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
+        if files != [] and missing_dir is True:
+            print("Your specified download directory was not found: {}".format(target_dir))
+    return files
     
 def clean_data(file):
     # extract data from transaction file

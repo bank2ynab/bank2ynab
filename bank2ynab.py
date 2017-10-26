@@ -322,10 +322,9 @@ def main():
         # find all applicable files
         files = get_files(section)
         for file in files:
-            print("Parsing file: {}\nUsing format: {}".format(file, section))
+            print("Parsing file: {}".format(file))
             # increment for the summary:
             files_processed += 1
-
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)

@@ -155,11 +155,11 @@ def find_directory(filepath):
         dir = filepath
     return dir
     
-def main():
+def main(config_params):
     # initialize variables for summary:
     files_processed = 0
     # get all configuration details
-    all_configs = get_configs()
+    all_configs = config_params
     # process account for each config file
     for section in all_configs.sections():
         # reset starting directory
@@ -184,4 +184,4 @@ def main():
     print("{} files processed.".format(files_processed))
 
 # Let's run this thing!
-main()
+main(get_configs)

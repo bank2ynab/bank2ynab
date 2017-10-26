@@ -41,7 +41,6 @@ class CrossversionFileContext(object):
         self.csv_object = None
         self.params = kwds
         self.is_py2 = is_py2
-        self.encoding = detect_encoding(self.file_path)
 
     def __enter__(self):
         pass
@@ -59,13 +58,14 @@ class CrossversionFileContext(object):
 class CrossversionCsvReader(CrossversionFileContext):
     """ context manager returning a csv.Reader-compatible object regardless of Python version"""
     def __enter__(self):
+        encoding = detect_encoding(self.file_path)
         if self.is_py2:
             self.stream = open(self.file_path, "rb")
             self.csv_object = UnicodeReader(self.stream,
-                                        encoding=self.encoding,
+                                        encoding=encoding,
                                         **self.params)
         else:
-            self.stream = open(self.file_path, encoding=self.encoding)
+            self.stream = open(self.file_path, encoding=encoding)
             self.csv_object = csv.reader(self.stream, **self.params)
         return self.csv_object
 
@@ -307,11 +307,11 @@ def find_directory(filepath):
     return input_dir
 
 
-def main():
+def main(config_params):
     # initialize variables for summary:
     files_processed = 0
     # get all configuration details
-    all_configs = get_configs()
+    all_configs = config_params
     # process account for each config file
     for section in all_configs.sections():
         # reset starting directory
@@ -338,4 +338,4 @@ def main():
 
 # Let's run this thing!
 if __name__ == "__main__":
-    main()
+    main(get_configs())

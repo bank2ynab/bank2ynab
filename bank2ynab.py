@@ -187,23 +187,27 @@ def fix_conf_params(configparser_object, section_name):
     return config
 
 
-def get_files():
+def get_files(format):
     # find the transaction file
     a = g_config["ext"]
     b = g_config["input_filename"]
     c = g_config["fixed_prefix"]
     files = list()
     missing_dir = False
-    target_dir = g_config["path"]
+    try_path = g_config["path"]
+    path = ""
     if b is not "":
         try:
-            os.chdir(find_directory(target_dir))
+            path = find_directory(try_path) 
+            os.chdir(path)
         except:
             missing_dir = True
-            os.chdir(find_directory(""))
+            path = find_directory("") 
+            os.chdir(path)
         files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
         if files != [] and missing_dir is True:
-            print("Your specified download directory was not found: {}".format(target_dir))
+            s = "Format: {}\nCan't find: {}\nTrying: {}".format(format, try_path, path)
+            print(s)
     return files
     
 def clean_data(file):
@@ -317,12 +321,11 @@ def main():
         global g_config
         g_config = fix_conf_params(all_configs, section)
         # find all applicable files
-        files = get_files()
+        files = get_files(section)
         for file in files:
-            print("Parsing file: {}\nUsing format: {}".format(file, section))
+            print("Parsing file: {}".format(file))
             # increment for the summary:
             files_processed += 1
-
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)

@@ -79,7 +79,7 @@ class CrossversionCsvWriter(CrossversionFileContext):
                                         encoding="utf-8",
                                         **self.params)
         else:
-            self.stream = open(self.file_path, "w", encoding="utf-8")
+            self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
             self.csv_object = csv.writer(self.stream, **self.params)
         return self.csv_object
 

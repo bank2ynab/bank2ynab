@@ -206,8 +206,7 @@ def get_files():
             print("Your specified download directory was not found: {}".format(target_dir))
     return files
     
-def clean_data(file):
-
+def clean_data(file_path):
     # extract data from transaction file
     delim = g_config["input_delimiter"]
     output_columns = g_config["output_columns"]

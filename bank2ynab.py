@@ -305,8 +305,8 @@ def find_directory(filepath):
             raise Exception("Input directory not found: {}".format(filepath))
         input_dir = filepath
     return input_dir
-
-
+  
+  
 def main(config_params):
     # initialize variables for summary:
     files_processed = 0
@@ -339,3 +339,4 @@ def main(config_params):
 # Let's run this thing!
 if __name__ == "__main__":
     main(get_configs())
+

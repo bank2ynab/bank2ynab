@@ -157,6 +157,7 @@ def get_configs():
     if conf_files == []:
         print("Can't find configuration file.")
     config = configparser.ConfigParser()
+    global __PY2
     if __PY2:
         config.read(conf_files)
     else:
@@ -216,7 +217,7 @@ def clean_data(file_path):
     output_columns = g_config["output_columns"]
     has_headers = g_config["has_headers"]
     output_data = []
-
+    global __PY2
     with CrossversionCsvReader(file_path, __PY2, delimiter=delim) as transaction_reader:
         # make each row of our new transaction file
         for row in transaction_reader:
@@ -277,6 +278,7 @@ def write_data(filename, data):
     """
     new_filename = g_config["fixed_prefix"] + filename
     print("Writing file: {}".format(new_filename))
+    global __PY2
     with CrossversionCsvWriter(new_filename, __PY2) as writer:
         for row in data:
             writer.writerow(row)

@@ -32,7 +32,8 @@ import csv
 import os
 import sys
 
-
+# classes dealing with input and output charsets across python versions
+# (well, really just for py2...)
 class CrossversionFileContext(object):
     """ ContextManager class for common operations on files"""
     def __init__(self, file_path, is_py2, **kwds):
@@ -148,11 +149,12 @@ class UnicodeWriter:
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
-# end of py2 utilities
+# -- end of py2 utilities
+# -- end of charset-handling classes
 
-
+# Generic utilities
 def get_configs():
-    # get all our config files
+    """ Retrieve all configuration parameters."""
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
     if conf_files == []:
         print("Can't find configuration file.")
@@ -165,7 +167,16 @@ def get_configs():
 
 
 def fix_conf_params(configparser_object, section_name):
-    # repair parameters from our config file and return as a dictionary
+    """ from a ConfigParser object, return a dictionary of all parameters
+    for a given section in the expected format.
+    Because ConfigParser defaults to values under [DEFAULT] if present, these
+    values should always appear unless the file is really bad.
+
+    :param configparser_object: ConfigParser instance
+    :param section_name: string of section name in config file
+                        (e.g. "MyBank" matches "[MyBank]" in file)
+    :return: dict with all parameters
+    """
     config = dict()
     config["input_columns"] = configparser_object.get(section_name, "Input Columns").split(",")
     config["output_columns"] = configparser_object.get(section_name, "Output Columns").split(",")
@@ -176,8 +187,9 @@ def fix_conf_params(configparser_object, section_name):
     config["input_delimiter"] = configparser_object.get(section_name, "Source CSV Delimiter")
     config["has_headers"] = configparser_object.getboolean(section_name, "Source Has Column Headers")
     config["delete_original"] = configparser_object.getboolean(section_name, "Delete Source File")
+    config["bank_name"] = section_name
 
-    # # Direct bank download
+    # # Direct bank download, eventually...
     # Bank Download = False
     # Bank Download URL = ""
     # Bank Download Login = ""
@@ -187,104 +199,9 @@ def fix_conf_params(configparser_object, section_name):
     return config
 
 
-def get_files(format):
-    # find the transaction file
-    a = g_config["ext"]
-    b = g_config["input_filename"]
-    c = g_config["fixed_prefix"]
-    files = list()
-    missing_dir = False
-    try_path = g_config["path"]
-    path = ""
-    if b is not "":
-        try:
-            path = find_directory(try_path) 
-            os.chdir(path)
-        except:
-            missing_dir = True
-            path = find_directory("") 
-            os.chdir(path)
-        files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
-        if files != [] and missing_dir is True:
-            s = "Format: {}\nCan't find: {}\nTrying: {}".format(format, try_path, path)
-            print(s)
-    return files
-    
-def clean_data(file_path):
-    # extract data from transaction file
-    delim = g_config["input_delimiter"]
-    output_columns = g_config["output_columns"]
-    has_headers = g_config["has_headers"]
-    output_data = []
-
-    with CrossversionCsvReader(file_path, __PY2, delimiter=delim) as transaction_reader:
-        # make each row of our new transaction file
-        for row in transaction_reader:
-            # add new row to output list
-            fixed_row = auto_memo(fix_row(row))
-            # check our row isn't a null transaction
-            if valid_row(fixed_row) is True:
-                output_data.append(fixed_row)
-        # fix column headers
-        if has_headers is False:
-            output_data.insert(0, output_columns)
-        else:
-            if output_data:
-                output_data[0] = output_columns
-            else:
-                output_data.append(output_columns)
-    print("Parsed {} lines".format(len(output_data)))
-    return output_data
-
-
-def fix_row(row):
-    # fixes a row of our file
-    output = []
-    for header in g_config["output_columns"]:
-        try:
-            # check to see if our output header exists in input
-            index = g_config["input_columns"].index(header)
-            cell = row[index]
-        except (ValueError, IndexError):
-            # header isn't in input, default to blank cell
-            cell = ""
-        output.append(cell)
-    return output
-
-
-def valid_row(row):
-    # if our row doesn't have an inflow or outflow, mark as invalid
-    inflow_index = g_config["output_columns"].index("Inflow")
-    outflow_index = g_config["output_columns"].index("Outflow")
-    if row[inflow_index] == "" and row[outflow_index] == "":
-        return False
-    return True
-
-
-def auto_memo(row):
-    # auto fill empty memo field with payee info
-    payee_index = g_config["output_columns"].index("Payee")
-    memo_index = g_config["output_columns"].index("Memo")
-    if row[memo_index] == "":
-        row[memo_index] = row[payee_index]
-    return row
-
-
-def write_data(filename, data):
-    """ write out the new CSV file
-    :param filename: path to output file
-    :param data: cleaned data ready to output
-    """
-    new_filename = g_config["fixed_prefix"] + filename
-    print("Writing file: {}".format(new_filename))
-    with CrossversionCsvWriter(new_filename, __PY2) as writer:
-        for row in data:
-            writer.writerow(row)
-    return
-
-
 def find_directory(filepath):
-    # finds the downloads folder for the active user if path is not set
+    """ finds the downloads folder for the active user if filepath is not set
+    """
     if filepath is "":
         if os.name is "nt":
             # Windows
@@ -305,38 +222,169 @@ def find_directory(filepath):
             raise Exception("Input directory not found: {}".format(filepath))
         input_dir = filepath
     return input_dir
-  
-  
-def main(config_params):
-    # initialize variables for summary:
-    files_processed = 0
-    # get all configuration details
-    all_configs = config_params
-    # process account for each config file
-    for section in all_configs.sections():
-        # reset starting directory
-        os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
-        # create configuration variables
-        global g_config
-        g_config = fix_conf_params(all_configs, section)
-        # find all applicable files
-        files = get_files(section)
-        for file in files:
-            print("Parsing file: {}".format(file))
-            # increment for the summary:
-            files_processed += 1
-            # create cleaned csv for each file
-            output = clean_data(file)
-            write_data(file, output)
-            # delete original csv file
-            if g_config["delete_original"] is True:
-                print("Removing file: {}".format(file))
-                os.remove(file)
-            print("Done!")
-    print("{} files processed.".format(files_processed))
+# -- end of utilities
+
+# Classes doing the actual work
+
+
+class B2YBank(object):
+    """ Object parsing and outputting data for a specific bank.
+     This can be subclassed to handle formats requiring special handling,
+     overriding any of get_files(), read_data() or write_data()."""
+    
+    def __init__(self, config_object, is_py2=False):
+        """
+        :param config_object: dict containing config parameters
+        :param is_py2: flag signalling we are running under python 2
+        """
+        self.name = config_object.get("bank_name", "DEFAULT")
+        self.config = config_object
+        self._is_py2 = is_py2
+
+    def get_files(self):
+        """ find the transaction file
+        :return: list of matching files found
+        """
+        a = self.config["ext"]
+        b = self.config["input_filename"]
+        c = self.config["fixed_prefix"]
+        files = list()
+        missing_dir = False
+        try_path = self.config["path"]
+        path = ""
+        if b is not "":
+            try:
+                path = find_directory(try_path)
+                os.chdir(path)
+            except:
+                missing_dir = True
+                path = find_directory("")
+                os.chdir(path)
+            files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
+            if files != [] and missing_dir is True:
+                s = "Format: {}\nCan't find: {}\nTrying: {}".format(self.name, try_path, path)
+                print(s)
+        return files
+        
+    def read_data(self, file_path):
+        """ extract data from given transaction file
+        :param file_path: path to file
+        :return: list of cleaned data rows
+        """
+        delim = self.config["input_delimiter"]
+        output_columns = self.config["output_columns"]
+        has_headers = self.config["has_headers"]
+        output_data = []
+    
+        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as transaction_reader:
+            # make each row of our new transaction file
+            for row in transaction_reader:
+                # add new row to output list
+                fixed_row = self._auto_memo(self._fix_row(row))
+                # check our row isn't a null transaction
+                if self._valid_row(fixed_row) is True:
+                    output_data.append(fixed_row)
+            # fix column headers
+            if has_headers is False:
+                output_data.insert(0, output_columns)
+            else:
+                if output_data:
+                    output_data[0] = output_columns
+                else:
+                    output_data.append(output_columns)
+        print("Parsed {} lines".format(len(output_data)))
+        return output_data
+
+    def _fix_row(self, row):
+        """
+        rearrange a row of our file to match expected output format
+        :param row: list of values
+        :return: list of values in correct output format
+        """
+        output = []
+        for header in self.config["output_columns"]:
+            try:
+                # check to see if our output header exists in input
+                index = self.config["input_columns"].index(header)
+                cell = row[index]
+            except (ValueError, IndexError):
+                # header isn't in input, default to blank cell
+                cell = ""
+            output.append(cell)
+        return output
+
+    def _valid_row(self, row):
+        """ if our row doesn't have an inflow or outflow, mark as invalid
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        if row[inflow_index] == "" and row[outflow_index] == "":
+            return False
+        return True
+    
+    def _auto_memo(self, row):
+        """ auto fill empty memo field with payee info """
+        payee_index = self.config["output_columns"].index("Payee")
+        memo_index = self.config["output_columns"].index("Memo")
+        if row[memo_index] == "":
+            row[memo_index] = row[payee_index]
+        return row
+    
+    def write_data(self, filename, data):
+        """ write out the new CSV file
+        :param filename: path to output file
+        :param data: cleaned data ready to output
+        """
+        new_filename = self.config["fixed_prefix"] + filename
+        print("Writing file: {}".format(new_filename))
+        with CrossversionCsvWriter(new_filename, self._is_py2) as writer:
+            for row in data:
+                writer.writerow(row)
+        return
+    
+
+class Bank2Ynab(object):
+    """ Main program instance, responsible for gathering configuration,
+    creating the right object for each bank, and triggering elaboration."""
+
+    def __init__(self, config_object, is_py2=False):
+        self._is_py2 = is_py2
+        self.banks = []
+        for section in config_object.sections():
+            bank_config = fix_conf_params(config_object, section)
+            bank_object = B2YBank(bank_config, is_py2)
+            self.banks.append(bank_object)
+
+    def run(self):
+        """ Main program flow """
+        # initialize variables for summary:
+        files_processed = 0
+        # process account for each config file
+        for bank in self.banks:
+            # todo: all this going back and forth in directories is expensive
+            # and should probably be replaced by simple path manipulation
+
+            # reset starting directory
+            os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+            # find all applicable files
+            files = bank.get_files()
+            for original_file_path in files:
+                print("Parsing file: {}".format(original_file_path ))
+                # increment for the summary:
+                files_processed += 1
+                # create cleaned csv for each file
+                output = bank.read_data(original_file_path)
+                bank.write_data(original_file_path, output)
+                # delete original csv file
+                if bank.config["delete_original"] is True:
+                    print("Removing file: {}".format(original_file_path ))
+                    os.remove(original_file_path)
+                print("Done!")
+        print("{} files processed.".format(files_processed))
 
 
 # Let's run this thing!
 if __name__ == "__main__":
-    main(get_configs())
+    b2y = Bank2Ynab(get_configs(), __PY2)
+    b2y.run()
 

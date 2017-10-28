@@ -157,7 +157,7 @@ def get_configs():
     """ Retrieve all configuration parameters."""
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
     if conf_files == []:
-        print("Can't find configuration file.")
+        print("\nError: Can't find configuration file: bank2ynab.conf")
     config = configparser.ConfigParser()
     if __PY2:
         config.read(conf_files)
@@ -219,9 +219,10 @@ def find_directory(filepath):
             input_dir = os.path.join(userhome, "Downloads")
     else:
         if not os.path.exists(filepath):
-            raise Exception("Input directory not found: {}".format(filepath))
+            raise Exception("Error: Input directory not found: {}".format(filepath))
         input_dir = filepath
     return input_dir
+
 # -- end of utilities
 
 # Classes doing the actual work
@@ -262,7 +263,7 @@ class B2YBank(object):
                 os.chdir(path)
             files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
             if files != [] and missing_dir is True:
-                s = "Format: {}\nCan't find: {}\nTrying: {}".format(self.name, try_path, path)
+                s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:     {}".format(self.name, try_path, path)
                 print(s)
         return files
         
@@ -336,7 +337,7 @@ class B2YBank(object):
         :param data: cleaned data ready to output
         """
         new_filename = self.config["fixed_prefix"] + filename
-        print("Writing file: {}".format(new_filename))
+        print("Writing output file: {}".format(new_filename))
         with CrossversionCsvWriter(new_filename, self._is_py2) as writer:
             for row in data:
                 writer.writerow(row)
@@ -369,7 +370,7 @@ class Bank2Ynab(object):
             # find all applicable files
             files = bank.get_files()
             for original_file_path in files:
-                print("Parsing file: {}".format(original_file_path ))
+                print("\nParsing input file: {}".format(original_file_path ))
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file
@@ -377,14 +378,12 @@ class Bank2Ynab(object):
                 bank.write_data(original_file_path, output)
                 # delete original csv file
                 if bank.config["delete_original"] is True:
-                    print("Removing file: {}".format(original_file_path ))
+                    print("Removing input file: {}".format(original_file_path ))
                     os.remove(original_file_path)
-                print("Done!")
-        print("{} files processed.".format(files_processed))
+        print("\nDone! {} files processed.\n".format(files_processed))
 
 
 # Let's run this thing!
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
-

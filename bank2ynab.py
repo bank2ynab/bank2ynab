@@ -155,7 +155,7 @@ def get_configs():
     # get all our config files
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
     if conf_files == []:
-        print("Can't find configuration file.")
+        print("\nError: Can't find configuration file: bank2ynab.conf")
     config = configparser.ConfigParser()
     if __PY2:
         config.read(conf_files)
@@ -206,7 +206,7 @@ def get_files(format):
             os.chdir(path)
         files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
         if files != [] and missing_dir is True:
-            s = "Format: {}\nCan't find: {}\nTrying: {}".format(format, try_path, path)
+            s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:     {}".format(format, try_path, path)
             print(s)
     return files
     
@@ -275,7 +275,7 @@ def write_data(filename, data):
     :param data: cleaned data ready to output
     """
     new_filename = g_config["fixed_prefix"] + filename
-    print("Writing file: {}".format(new_filename))
+    print("Writing output file: {}".format(new_filename))
     with CrossversionCsvWriter(new_filename, __PY2) as writer:
         for row in data:
             writer.writerow(row)
@@ -301,7 +301,7 @@ def find_directory(filepath):
             input_dir = os.path.join(userhome, "Downloads")
     else:
         if not os.path.exists(filepath):
-            raise Exception("Input directory not found: {}".format(filepath))
+            raise Exception("Error: Input directory not found: {}".format(filepath))
         input_dir = filepath
     return input_dir
   
@@ -321,21 +321,20 @@ def main(config_params):
         # find all applicable files
         files = get_files(section)
         for file in files:
-            print("\nParsing file: {}\nUsing format: {}".format(file, section))
+            print("\nParsing input file:  {}".format(file))
+            # increment for the summary:
+            files_processed += 1
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)
             # delete original csv file
             if g_config["delete_original"] is True:
-                print("Removing file: {}".format(file))
+                print("Removing input file: {}".format(file))
                 os.remove(file)
-            # increment for the summary:
-            files_processed += 1
-            print("Done!")
-    print("\n{} files processed.\n".format(files_processed))
+    print("\nDone! {} files processed.\n".format(files_processed))
+
 
 
 # Let's run this thing!
 if __name__ == "__main__":
     main(get_configs())
-

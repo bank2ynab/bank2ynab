@@ -321,9 +321,7 @@ def main(config_params):
         # find all applicable files
         files = get_files(section)
         for file in files:
-            print("Parsing file: {}".format(file))
-            # increment for the summary:
-            files_processed += 1
+            print("\nParsing file: {}\nUsing format: {}".format(file, section))
             # create cleaned csv for each file
             output = clean_data(file)
             write_data(file, output)
@@ -331,8 +329,10 @@ def main(config_params):
             if g_config["delete_original"] is True:
                 print("Removing file: {}".format(file))
                 os.remove(file)
+            # increment for the summary:
+            files_processed += 1
             print("Done!")
-    print("{} files processed.".format(files_processed))
+    print("\n{} files processed.\n".format(files_processed))
 
 
 # Let's run this thing!

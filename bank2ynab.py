@@ -197,7 +197,7 @@ def get_configs():
     return config
 
 
-def fix_conf_params(configparser_object, section_name):
+def fix_conf_params(conf_obj, section_name):
     """ from a ConfigParser object, return a dictionary of all parameters
     for a given section in the expected format.
     Because ConfigParser defaults to values under [DEFAULT] if present, these
@@ -209,17 +209,17 @@ def fix_conf_params(configparser_object, section_name):
     :return: dict with all parameters
     """
     config = dict()
-    config["input_columns"] = configparser_object.get(section_name, "Input Columns").split(",")
-    config["output_columns"] = configparser_object.get(section_name, "Output Columns").split(",")
-    config["input_filename"] = configparser_object.get(section_name, "Source Filename Pattern")
-    config["path"] = configparser_object.get(section_name, "Source Path")
-    config["ext"] = configparser_object.get(section_name, "Source Filename Extension")
-    config["fixed_prefix"] = configparser_object.get(section_name, "Output Filename Prefix")
-    config["input_delimiter"] = configparser_object.get(section_name, "Source CSV Delimiter")
-    config["has_headers"] = configparser_object.getboolean(section_name, "Source Has Column Headers")
-    config["delete_original"] = configparser_object.getboolean(section_name, "Delete Source File")
+    config["input_columns"] = conf_obj.get(section_name, "Input Columns").split(",")
+    config["output_columns"] = conf_obj.get(section_name, "Output Columns").split(",")
+    config["input_filename"] = conf_obj.get(section_name, "Source Filename Pattern")
+    config["path"] = conf_obj.get(section_name, "Source Path")
+    config["ext"] = conf_obj.get(section_name, "Source Filename Extension")
+    config["fixed_prefix"] = conf_obj.get(section_name, "Output Filename Prefix")
+    config["input_delimiter"] = conf_obj.get(section_name, "Source CSV Delimiter")
+    config["has_headers"] = conf_obj.getboolean(section_name, "Source Has Column Headers")
+    config["delete_original"] = conf_obj.getboolean(section_name, "Delete Source File")
     config["bank_name"] = section_name
-
+    
     # # Direct bank download, eventually...
     # Bank Download = False
     # Bank Download URL = ""
@@ -230,7 +230,7 @@ def fix_conf_params(configparser_object, section_name):
     return config
 
     
-def get_config_line(conf_obj, section_name, param, boolean, splitter):
+def get_config_line(conf_obj, section_name, param, boolean, splitter): # to implement
     """Get parameter for a given section in the expected format."""
     if boolean is True:
         line = configparser_object.getboolean(section_name, param)

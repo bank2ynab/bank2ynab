@@ -19,6 +19,8 @@
 
 # main Python2 switch
 # any module with different naming should be handled here
+from os.path import abspath, join, dirname, basename
+
 __PY2 = False
 try:
     import configparser
@@ -256,12 +258,11 @@ class B2YBank(object):
         if b is not "":
             try:
                 path = find_directory(try_path)
-                os.chdir(path)
             except:
                 missing_dir = True
                 path = find_directory("")
-                os.chdir(path)
-            files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
+            path = abspath(path)
+            files = [join(path, f) for f in os.listdir(path) if f.endswith(a) if b in f if c not in f]
             if files != [] and missing_dir is True:
                 s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:     {}".format(self.name, try_path, path)
                 print(s)
@@ -336,12 +337,15 @@ class B2YBank(object):
         :param filename: path to output file
         :param data: cleaned data ready to output
         """
-        new_filename = self.config["fixed_prefix"] + filename
-        print("Writing output file: {}".format(new_filename))
-        with CrossversionCsvWriter(new_filename, self._is_py2) as writer:
+        target_dir = dirname(filename)
+        target_fname = basename(filename)
+        new_filename = self.config["fixed_prefix"] + target_fname
+        target_filename = join(target_dir, new_filename)
+        print("Writing output file: {}".format(target_filename))
+        with CrossversionCsvWriter(target_filename, self._is_py2) as writer:
             for row in data:
                 writer.writerow(row)
-        return
+        return target_filename
     
 
 class Bank2Ynab(object):
@@ -362,11 +366,6 @@ class Bank2Ynab(object):
         files_processed = 0
         # process account for each config file
         for bank in self.banks:
-            # todo: all this going back and forth in directories is expensive
-            # and should probably be replaced by simple path manipulation
-
-            # reset starting directory
-            os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
             # find all applicable files
             files = bank.get_files()
             for original_file_path in files:

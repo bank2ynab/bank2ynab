@@ -229,6 +229,17 @@ def fix_conf_params(configparser_object, section_name):
 
     return config
 
+    
+def get_config_line(conf_obj, section_name, param, boolean, splitter):
+    """Get parameter for a given section in the expected format."""
+    if boolean is True:
+        line = configparser_object.getboolean(section_name, param)
+    else:
+        line = configparser_object.get(section_name, param)
+    if splitter != "":
+        line = line.split(splitter)
+    return line
+
 
 def find_directory(filepath):
     """ finds the downloads folder for the active user if filepath is not set

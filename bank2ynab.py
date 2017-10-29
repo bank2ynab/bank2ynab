@@ -240,7 +240,8 @@ def find_directory(filepath):
                 import winreg
             except ImportError:
                 import _winreg as winreg
-            shell_path = "SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
+            shell_path = ("SOFTWARE\Microsoft\Windows\CurrentVersion"
+                          "\Explorer\Shell Folders")
             dl_key = "{374DE290-123F-4565-9164-39C4925E467B}"
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, shell_path) as key:
                 input_dir = winreg.QueryValueEx(key, dl_key)[0]
@@ -250,7 +251,8 @@ def find_directory(filepath):
             input_dir = os.path.join(userhome, "Downloads")
     else:
         if not os.path.exists(filepath):
-            raise FileNotFoundError("Error: Input directory not found: {}".format(filepath))
+            s = "Error: Input directory not found: {}"
+            raise FileNotFoundError(s.format(filepath))
         input_dir = filepath
     return input_dir
 
@@ -292,8 +294,9 @@ class B2YBank(object):
             path = abspath(path)
             files = [join(path, f) for f in os.listdir(path) if f.endswith(a) if b in f if c not in f]
             if files != [] and missing_dir is True:
-                s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:\t{}".format(self.name, try_path, path)
-                print(s)
+                s = ("\nFormat: {}\n\nError: Can't find download path: {}"
+                     "\nTrying default path instead:\t{}")
+                print(s.format(self.name, try_path, path))
         return files
 
     def read_data(self, file_path):

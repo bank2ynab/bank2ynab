@@ -148,8 +148,11 @@ class UnicodeWriter:
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
-# end of py2 utilities
+# -- end of py2 utilities
+# -- end of charset-handling classes
 
+
+# Generic Utilities
 def get_configs():
     # get all our config files
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]

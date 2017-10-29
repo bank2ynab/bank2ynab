@@ -16,11 +16,14 @@
 #
 #
 # don't edit below here unless you know what you're doing!
+from os.path import abspath, join, dirname, basename
+import codecs
+import csv
+import os
+import sys
 
 # main Python2 switch
 # any module with different naming should be handled here
-from os.path import abspath, join, dirname, basename
-
 __PY2 = False
 try:
     import configparser
@@ -29,15 +32,9 @@ except ImportError:
     import ConfigParser as configparser
     import cStringIO
 
-import codecs
-import csv
-import os
-import sys
 
 # classes dealing with input and output charsets across python versions
 # (well, really just for py2...)
-
-
 class CrossversionFileContext(object):
     """ ContextManager class for common operations on files"""
     def __init__(self, file_path, is_py2, **kwds):

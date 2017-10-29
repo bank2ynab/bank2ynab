@@ -244,9 +244,8 @@ def find_directory(filepath):
 
 # -- end of utilities
 
+
 # Classes doing the actual work
-
-
 class B2YBank(object):
     """ Object parsing and outputting data for a specific bank.
     This can be subclassed to handle formats requiring special handling,
@@ -281,7 +280,7 @@ class B2YBank(object):
             path = abspath(path)
             files = [join(path, f) for f in os.listdir(path) if f.endswith(a) if b in f if c not in f]
             if files != [] and missing_dir is True:
-                s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:     {}".format(self.name, try_path, path)
+                s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:\t{}".format(self.name, try_path, path)
                 print(s)
         return files
 

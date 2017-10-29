@@ -82,7 +82,8 @@ class CrossversionCsvWriter(CrossversionFileContext):
     def __enter__(self):
         if self.is_py2:
             self.stream = open(self.file_path, "wb")
-            self.csv_object = UnicodeWriter(self.stream,
+            self.csv_object = UnicodeWriter(
+                                    self.stream,
                                     encoding="utf-8",
                                     **self.params)
         else:

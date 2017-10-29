@@ -9,9 +9,9 @@
 # MIT License: https://github.com/torbengb/bank2ynab/blob/master/LICENSE
 #
 # DISCLAIMER: Please use at your own risk. This tool is neither officially
-# supported by YNAB (the company) nor by YNAB (the software) in any way. 
-# Use of this tool could introduce problems into your budget that YNAB, 
-# through its official support channels, will not be able to troubleshoot 
+# supported by YNAB (the company) nor by YNAB (the software) in any way.
+# Use of this tool could introduce problems into your budget that YNAB,
+# through its official support channels, will not be able to troubleshoot
 # or fix. See also the full MIT licence.
 #
 #
@@ -36,6 +36,8 @@ import sys
 
 # classes dealing with input and output charsets across python versions
 # (well, really just for py2...)
+
+
 class CrossversionFileContext(object):
     """ ContextManager class for common operations on files"""
     def __init__(self, file_path, is_py2, **kwds):
@@ -59,14 +61,15 @@ class CrossversionFileContext(object):
 
 
 class CrossversionCsvReader(CrossversionFileContext):
-    """ context manager returning a csv.Reader-compatible object regardless of Python version"""
+    """ context manager returning a csv.Reader-compatible object
+    regardless of Python version"""
     def __enter__(self):
         encoding = detect_encoding(self.file_path)
         if self.is_py2:
             self.stream = open(self.file_path, "rb")
             self.csv_object = UnicodeReader(self.stream,
-                                        encoding=encoding,
-                                        **self.params)
+                                            encoding=encoding,
+                                            **self.params)
         else:
             self.stream = open(self.file_path, encoding=encoding)
             self.csv_object = csv.reader(self.stream, **self.params)
@@ -74,13 +77,14 @@ class CrossversionCsvReader(CrossversionFileContext):
 
 
 class CrossversionCsvWriter(CrossversionFileContext):
-    """ context manager returning a csv.Writer-compatible object regardless of Python version"""
+    """ context manager returning a csv.Writer-compatible object
+    regardless of Python version"""
     def __enter__(self):
         if self.is_py2:
             self.stream = open(self.file_path, "wb")
             self.csv_object = UnicodeWriter(self.stream,
-                                        encoding="utf-8",
-                                        **self.params)
+                                    encoding="utf-8",
+                                    **self.params)
         else:
             self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
             self.csv_object = csv.writer(self.stream, **self.params)
@@ -89,7 +93,8 @@ class CrossversionCsvWriter(CrossversionFileContext):
 
 def detect_encoding(filepath):
     """
-    Utility to detect file encoding. This is imperfect, but should work for the most common cases.
+    Utility to detect file encoding. This is imperfect, but
+    should work for the most common cases.
     :param filepath: string path to a given file
     :return: encoding alias that can be used with open() in py3 or codecs.open in py2
     """
@@ -106,7 +111,7 @@ def detect_encoding(filepath):
                  'iso2022_kr', 'latin_1', 'iso8859_2', 'iso8859_3', 'iso8859_4', 'iso8859_5', 'iso8859_6', 'iso8859_7',
                  'iso8859_8', 'iso8859_9', 'iso8859_10', 'iso8859_11', 'iso8859_13', 'iso8859_14', 'iso8859_15',
                  'iso8859_16', 'johab', 'koi8_r', 'koi8_u', 'mac_cyrillic', 'mac_greek', 'mac_iceland', 'mac_latin2',
-                 'mac_roman', 'mac_turkish', 'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213' ]
+                 'mac_roman', 'mac_turkish', 'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213']
     result = None
     for enc in encodings:
         try:
@@ -118,41 +123,53 @@ def detect_encoding(filepath):
             continue
     return result
 
+
 # utilities to be used only by py2
 # see https://docs.python.org/2/library/csv.html#examples for explanation
 class UTF8Recoder:
     def __init__(self, f, encoding):
         self.reader = codecs.getreader(encoding)(f)
+
     def __iter__(self):
         return self
+
     def next(self):
         return self.reader.next().encode("utf-8")
+
+
 class UnicodeReader:
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         f = UTF8Recoder(f, encoding)
         self.reader = csv.reader(f, dialect=dialect, **kwds)
+
     def next(self):
         row = self.reader.next()
         return [unicode(s, "utf-8") for s in row]
+
     def __iter__(self):
         return self
+
+
 class UnicodeWriter:
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         self.queue = cStringIO.StringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
         self.stream = f
         self.encoder = codecs.getincrementalencoder(encoding)()
+
     def writerow(self, row):
         self.writer.writerow([s.encode("utf-8") for s in row])
         data = self.queue.getvalue().decode("utf-8")
         data = self.encoder.encode(data)
         self.stream.write(data)
         self.queue.truncate(0)
+
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
 # -- end of py2 utilities
 # -- end of charset-handling classes
+
 
 # Generic utilities
 def get_configs():
@@ -232,9 +249,9 @@ def find_directory(filepath):
 
 class B2YBank(object):
     """ Object parsing and outputting data for a specific bank.
-     This can be subclassed to handle formats requiring special handling,
-     overriding any of get_files(), read_data() or write_data()."""
-    
+    This can be subclassed to handle formats requiring special handling,
+    overriding any of get_files(), read_data() or write_data()."""
+
     def __init__(self, config_object, is_py2=False):
         """
         :param config_object: dict containing config parameters
@@ -267,7 +284,7 @@ class B2YBank(object):
                 s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:     {}".format(self.name, try_path, path)
                 print(s)
         return files
-        
+
     def read_data(self, file_path):
         """ extract data from given transaction file
         :param file_path: path to file
@@ -277,7 +294,7 @@ class B2YBank(object):
         output_columns = self.config["output_columns"]
         has_headers = self.config["has_headers"]
         output_data = []
-    
+
         with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
@@ -323,7 +340,7 @@ class B2YBank(object):
         if row[inflow_index] == "" and row[outflow_index] == "":
             return False
         return True
-    
+
     def _auto_memo(self, row):
         """ auto fill empty memo field with payee info """
         payee_index = self.config["output_columns"].index("Payee")
@@ -331,7 +348,7 @@ class B2YBank(object):
         if row[memo_index] == "":
             row[memo_index] = row[payee_index]
         return row
-    
+
     def write_data(self, filename, data):
         """ write out the new CSV file
         :param filename: path to output file
@@ -346,7 +363,7 @@ class B2YBank(object):
             for row in data:
                 writer.writerow(row)
         return target_filename
-    
+
 
 class Bank2Ynab(object):
     """ Main program instance, responsible for gathering configuration,
@@ -369,7 +386,7 @@ class Bank2Ynab(object):
             # find all applicable files
             files = bank.get_files()
             for original_file_path in files:
-                print("\nParsing input file: {}".format(original_file_path ))
+                print("\nParsing input file: {}".format(original_file_path))
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file
@@ -377,7 +394,7 @@ class Bank2Ynab(object):
                 bank.write_data(original_file_path, output)
                 # delete original csv file
                 if bank.config["delete_original"] is True:
-                    print("Removing input file: {}".format(original_file_path ))
+                    print("Removing input file: {}".format(original_file_path))
                     os.remove(original_file_path)
         print("\nDone! {} files processed.\n".format(files_processed))
 

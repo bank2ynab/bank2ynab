@@ -9,9 +9,9 @@
 # MIT License: https://github.com/torbengb/bank2ynab/blob/master/LICENSE
 #
 # DISCLAIMER: Please use at your own risk. This tool is neither officially
-# supported by YNAB (the company) nor by YNAB (the software) in any way. 
-# Use of this tool could introduce problems into your budget that YNAB, 
-# through its official support channels, will not be able to troubleshoot 
+# supported by YNAB (the company) nor by YNAB (the software) in any way.
+# Use of this tool could introduce problems into your budget that YNAB,
+# through its official support channels, will not be able to troubleshoot
 # or fix. See also the full MIT licence.
 #
 #
@@ -56,7 +56,8 @@ class CrossversionFileContext(object):
 
 
 class CrossversionCsvReader(CrossversionFileContext):
-    """ context manager returning a csv.Reader-compatible object regardless of Python version"""
+    """ context manager returning a csv.Reader-compatible object
+    regardless of Python version"""
     def __enter__(self):
         encoding = detect_encoding(self.file_path)
         if self.is_py2:
@@ -71,7 +72,8 @@ class CrossversionCsvReader(CrossversionFileContext):
 
 
 class CrossversionCsvWriter(CrossversionFileContext):
-    """ context manager returning a csv.Writer-compatible object regardless of Python version"""
+    """ context manager returning a csv.Writer-compatible object
+    regardless of Python version"""
     def __enter__(self):
         if self.is_py2:
             self.stream = open(self.file_path, "wb")
@@ -103,7 +105,7 @@ def detect_encoding(filepath):
                  'iso2022_kr', 'latin_1', 'iso8859_2', 'iso8859_3', 'iso8859_4', 'iso8859_5', 'iso8859_6', 'iso8859_7',
                  'iso8859_8', 'iso8859_9', 'iso8859_10', 'iso8859_11', 'iso8859_13', 'iso8859_14', 'iso8859_15',
                  'iso8859_16', 'johab', 'koi8_r', 'koi8_u', 'mac_cyrillic', 'mac_greek', 'mac_iceland', 'mac_latin2',
-                 'mac_roman', 'mac_turkish', 'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213' ]
+                 'mac_roman', 'mac_turkish', 'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213']
     result = None
     for enc in encodings:
         try:
@@ -115,40 +117,52 @@ def detect_encoding(filepath):
             continue
     return result
 
+
 # utilities to be used only by py2
 # see https://docs.python.org/2/library/csv.html#examples for explanation
 class UTF8Recoder:
     def __init__(self, f, encoding):
         self.reader = codecs.getreader(encoding)(f)
+
     def __iter__(self):
         return self
+
     def next(self):
         return self.reader.next().encode("utf-8")
+
+
 class UnicodeReader:
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         f = UTF8Recoder(f, encoding)
         self.reader = csv.reader(f, dialect=dialect, **kwds)
+
     def next(self):
         row = self.reader.next()
         return [unicode(s, "utf-8") for s in row]
+
     def __iter__(self):
         return self
+
+
 class UnicodeWriter:
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         self.queue = cStringIO.StringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
         self.stream = f
         self.encoder = codecs.getincrementalencoder(encoding)()
+
     def writerow(self, row):
         self.writer.writerow([s.encode("utf-8") for s in row])
         data = self.queue.getvalue().decode("utf-8")
         data = self.encoder.encode(data)
         self.stream.write(data)
         self.queue.truncate(0)
+
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
 # end of py2 utilities
+
 
 def get_configs():
     # get all our config files
@@ -197,18 +211,19 @@ def get_files(format):
     path = ""
     if b is not "":
         try:
-            path = find_directory(try_path) 
+            path = find_directory(try_path)
             os.chdir(path)
         except:
             missing_dir = True
-            path = find_directory("") 
+            path = find_directory("")
             os.chdir(path)
         files = [f for f in os.listdir(".") if f.endswith(a) if b in f if c not in f]
         if files != [] and missing_dir is True:
             s = "\nFormat: {}\n\nError: Can't find download path: {}\nTrying default path instead:     {}".format(format, try_path, path)
             print(s)
     return files
-    
+
+
 def clean_data(file_path):
     # extract data from transaction file
     delim = g_config["input_delimiter"]
@@ -303,8 +318,8 @@ def find_directory(filepath):
             raise Exception("Error: Input directory not found: {}".format(filepath))
         input_dir = filepath
     return input_dir
-  
-  
+
+
 def main(config_params):
     # initialize variables for summary:
     files_processed = 0
@@ -331,7 +346,6 @@ def main(config_params):
                 print("Removing input file: {}".format(file))
                 os.remove(file)
     print("\nDone! {} files processed.\n".format(files_processed))
-
 
 
 # Let's run this thing!

@@ -31,8 +31,8 @@ except ImportError:
 
 import codecs
 import csv
+import importlib
 import os
-import sys
 
 # classes dealing with input and output charsets across python versions
 # (well, really just for py2...)
@@ -219,6 +219,9 @@ def fix_conf_params(conf_obj, section_name):
     config["has_headers"] = conf_obj.getboolean(section_name, "Source Has Column Headers")
     config["delete_original"] = conf_obj.getboolean(section_name, "Delete Source File")
     config["bank_name"] = section_name
+    config["plugin"] = None
+    if conf_obj.has_option(section_name, "Plugin"):
+        config["plugin"] = conf_obj.get(section_name, "Plugin")
     
     # # Direct bank download, eventually...
     # Bank Download = False
@@ -390,6 +393,21 @@ class B2YBank(object):
         return target_filename
 
 
+def build_bank(bank_config):
+    """ Factory method loading the correct class for a given configuration. """
+    plugin_module = bank_config.get("plugin", None)
+    if plugin_module:
+        p_mod = importlib.import_module(".{}".format(plugin_module), "plugins")
+        if not hasattr(p_mod, "build_bank"):
+            raise ImportError("The specified plugin {}.py".format(plugin_module) +
+                                    "does not contain the required "
+                                    "build_bank(config, is_py2) method.")
+        bank = p_mod.build_bank(bank_config, __PY2)
+        return bank
+    else:
+        return B2YBank(bank_config, __PY2)
+
+
 class Bank2Ynab(object):
     """ Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
@@ -399,7 +417,7 @@ class Bank2Ynab(object):
         self.banks = []
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)
-            bank_object = B2YBank(bank_config, is_py2)
+            bank_object = build_bank(bank_config)
             self.banks.append(bank_object)
 
     def run(self):

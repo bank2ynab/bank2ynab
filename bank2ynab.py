@@ -16,11 +16,14 @@
 #
 #
 # don't edit below here unless you know what you're doing!
+from os.path import abspath, join, dirname, basename
+import codecs
+import csv
+import os
+import sys
 
 # main Python2 switch
 # any module with different naming should be handled here
-from os.path import abspath, join, dirname, basename
-
 __PY2 = False
 try:
     import configparser
@@ -36,8 +39,6 @@ import os
 
 # classes dealing with input and output charsets across python versions
 # (well, really just for py2...)
-
-
 class CrossversionFileContext(object):
     """ ContextManager class for common operations on files"""
     def __init__(self, file_path, is_py2, **kwds):
@@ -184,6 +185,7 @@ class UnicodeWriter:
 # -- end of charset-handling classes
 
 
+# Generic utilities
 def get_configs():
     """ Retrieve all configuration parameters."""
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
@@ -208,37 +210,39 @@ def fix_conf_params(conf_obj, section_name):
                         (e.g. "MyBank" matches "[MyBank]" in file)
     :return: dict with all parameters
     """
-    config = dict()
-    config["input_columns"] = conf_obj.get(section_name, "Input Columns").split(",")
-    config["output_columns"] = conf_obj.get(section_name, "Output Columns").split(",")
-    config["input_filename"] = conf_obj.get(section_name, "Source Filename Pattern")
-    config["path"] = conf_obj.get(section_name, "Source Path")
-    config["ext"] = conf_obj.get(section_name, "Source Filename Extension")
-    config["fixed_prefix"] = conf_obj.get(section_name, "Output Filename Prefix")
-    config["input_delimiter"] = conf_obj.get(section_name, "Source CSV Delimiter")
-    config["has_headers"] = conf_obj.getboolean(section_name, "Source Has Column Headers")
-    config["delete_original"] = conf_obj.getboolean(section_name, "Delete Source File")
-    config["bank_name"] = section_name
-    config["plugin"] = None
-    if conf_obj.has_option(section_name, "Plugin"):
-        config["plugin"] = conf_obj.get(section_name, "Plugin")
-    
-    # # Direct bank download, eventually...
+    config = {
+            "input_columns": ["Input Columns", False, ","],
+            "output_columns": ["Output Columns", False, ","],
+            "input_filename": ["Source Filename Pattern", False, ""],
+            "path": ["Source Path", False, ""],
+            "ext": ["Source Filename Extension", False, ""],
+            "fixed_prefix": ["Output Filename Prefix", False, ""],
+            "input_delimiter": ["Source CSV Delimiter", False, ""],
+            "has_headers": ["Source Has Column Headers", True, ""],
+            "delete_original": ["Delete Source File", True, ""],
+            "plugin": ["Plugin", None, ""]}
+
     # Bank Download = False
     # Bank Download URL = ""
     # Bank Download Login = ""
     # Bank Download Auth1 = ""
     # Bank Download Auth2 = ""
+    for key in config:
+        config[key] = get_config_line(conf_obj, section_name, config[key])
+    config["bank_name"] = section_name
 
     return config
 
-    
-def get_config_line(conf_obj, section_name, param, boolean, splitter): # to implement
+
+def get_config_line(conf_obj, section_name, args):
     """Get parameter for a given section in the expected format."""
+    param = args[0]
+    boolean = args[1]
+    splitter = args[2]
     if boolean is True:
-        line = configparser_object.getboolean(section_name, param)
+        line = conf_obj.getboolean(section_name, param)
     else:
-        line = configparser_object.get(section_name, param)
+        line = conf_obj.get(section_name, param)
     if splitter != "":
         line = line.split(splitter)
     return line

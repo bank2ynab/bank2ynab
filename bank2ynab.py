@@ -171,7 +171,6 @@ class UnicodeWriter:
 # -- end of charset-handling classes
 
 
-# Generic utilities
 def get_configs():
     """ Retrieve all configuration parameters."""
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]

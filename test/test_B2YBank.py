@@ -5,7 +5,8 @@ from os.path import join, abspath, exists
 
 import os
 
-from bank2ynab import B2YBank, fix_conf_params
+from bank2ynab import B2YBank, fix_conf_params, build_bank
+from plugins.null import NullBank
 
 _PY2 = False
 try:
@@ -87,3 +88,11 @@ class TestB2YBank(TestCase):
                 # todo: check actual contents are what we expect
                 os.unlink(expected_file)
 
+    def test_build_bank(self):
+        b2yb = build_bank(self.defaults)
+        self.assertIsInstance(b2yb, B2YBank)
+        nullconfig = fix_conf_params(self.cp, "test_plugin")
+        nullb = build_bank(nullconfig)
+        self.assertIsInstance(nullb, NullBank)
+        missingconf = fix_conf_params(self.cp, "test_plugin_missing")
+        self.assertRaises(ImportError, build_bank, missingconf)

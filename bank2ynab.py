@@ -32,6 +32,10 @@ except ImportError:
     import ConfigParser as configparser
     import cStringIO
 
+import codecs
+import csv
+import importlib
+import os
 
 # classes dealing with input and output charsets across python versions
 # (well, really just for py2...)
@@ -215,9 +219,9 @@ def fix_conf_params(conf_obj, section_name):
             "fixed_prefix": ["Output Filename Prefix", False, ""],
             "input_delimiter": ["Source CSV Delimiter", False, ""],
             "has_headers": ["Source Has Column Headers", True, ""],
-            "delete_original": ["Delete Source File", True, ""]}
+            "delete_original": ["Delete Source File", True, ""],
+            "plugin": ["Plugin", None, ""]}
 
-    # Direct bank download, eventually...
     # Bank Download = False
     # Bank Download URL = ""
     # Bank Download Login = ""
@@ -393,6 +397,21 @@ class B2YBank(object):
         return target_filename
 
 
+def build_bank(bank_config):
+    """ Factory method loading the correct class for a given configuration. """
+    plugin_module = bank_config.get("plugin", None)
+    if plugin_module:
+        p_mod = importlib.import_module(".{}".format(plugin_module), "plugins")
+        if not hasattr(p_mod, "build_bank"):
+            raise ImportError("The specified plugin {}.py".format(plugin_module) +
+                                    "does not contain the required "
+                                    "build_bank(config, is_py2) method.")
+        bank = p_mod.build_bank(bank_config, __PY2)
+        return bank
+    else:
+        return B2YBank(bank_config, __PY2)
+
+
 class Bank2Ynab(object):
     """ Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
@@ -402,7 +421,7 @@ class Bank2Ynab(object):
         self.banks = []
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)
-            bank_object = B2YBank(bank_config, is_py2)
+            bank_object = build_bank(bank_config)
             self.banks.append(bank_object)
 
     def run(self):

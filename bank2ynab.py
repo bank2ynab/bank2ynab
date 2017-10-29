@@ -237,7 +237,7 @@ def find_directory(filepath):
             input_dir = os.path.join(userhome, "Downloads")
     else:
         if not os.path.exists(filepath):
-            raise Exception("Error: Input directory not found: {}".format(filepath))
+            raise FileNotFoundError("Error: Input directory not found: {}".format(filepath))
         input_dir = filepath
     return input_dir
 
@@ -273,7 +273,7 @@ class B2YBank(object):
         if b is not "":
             try:
                 path = find_directory(try_path)
-            except:
+            except FileNotFoundError:
                 missing_dir = True
                 path = find_directory("")
             path = abspath(path)

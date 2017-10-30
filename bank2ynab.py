@@ -325,7 +325,9 @@ class B2YBank(object):
         has_headers = self.config["has_headers"]
         output_data = []
 
-        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as transaction_reader:
+        with CrossversionCsvReader(file_path,
+                                   self._is_py2,
+                                   delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 # add new row to output list

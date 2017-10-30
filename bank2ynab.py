@@ -124,13 +124,14 @@ def detect_encoding(filepath):
                  'mac_iceland', 'mac_latin2', 'mac_roman', 'mac_turkish',
                  'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213']
     result = None
+    error = (ValueError, UnicodeError, UnicodeDecodeError, UnicodeEncodeError)
     for enc in encodings:
         try:
             with codecs.open(filepath, "r", encoding=enc) as f:
                 for line in f:
                     line.encode("utf-8")
                 return enc
-        except ValueError or UnicodeError or UnicodeDecodeError or UnicodeEncodeError:
+        except error:
             continue
     return result
 

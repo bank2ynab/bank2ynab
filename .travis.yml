@@ -15,6 +15,7 @@ python:
 script:
   - python test/test_B2YBank.py
 notifications:
+  email: false
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/23be690947c65bd7a84b

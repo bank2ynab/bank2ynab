@@ -217,7 +217,7 @@ def fix_conf_params(conf_obj, section_name):
             "input_delimiter": ["Source CSV Delimiter", False, ""],
             "has_headers": ["Source Has Column Headers", True, ""],
             "delete_original": ["Delete Source File", True, ""],
-            "plugin": ["Plugin", None, ""]}
+            "plugin": ["Plugin", False, ""]}
 
     # Bank Download = False
     # Bank Download URL = ""

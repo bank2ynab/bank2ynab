@@ -13,7 +13,7 @@ python:
   - "nightly"
 # command to run tests
 script:
-  - python test/test_B2YBank.py
+  - python -m unittest discover
 notifications:
   email: false
   webhooks:

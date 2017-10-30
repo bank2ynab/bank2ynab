@@ -314,7 +314,7 @@ class B2YBank(object):
                      if b in f if c not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
-                     "\nTrying default path instead:\t{}")
+                     "\nTrying default path instead:\t {}")
                 print(s.format(self.name, try_path, path))
         return files
 
@@ -437,7 +437,7 @@ class Bank2Ynab(object):
             # find all applicable files
             files = bank.get_files()
             for original_file_path in files:
-                print("\nParsing input file: {}".format(original_file_path))
+                print("\nParsing input file:  {}".format(original_file_path))
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file

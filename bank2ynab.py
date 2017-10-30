@@ -22,6 +22,7 @@ import csv
 import os
 import sys
 import importlib
+import re
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -310,8 +311,8 @@ class B2YBank(object):
             path = abspath(path)
             d = os.listdir(path)
             files = [join(path, f)
-                     for f in d if f.endswith(a)
-                     if b in f if c not in f]
+                           for f in d if re.search(b + a, f)
+                           if c not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
                      "\nTrying default path instead:\t {}")

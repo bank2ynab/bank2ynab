@@ -400,9 +400,10 @@ def build_bank(bank_config):
     if plugin_module:
         p_mod = importlib.import_module(".{}".format(plugin_module), "plugins")
         if not hasattr(p_mod, "build_bank"):
-            raise ImportError("The specified plugin {}.py".format(plugin_module) +
-                              "does not contain the required "
-                              "build_bank(config, is_py2) method.")
+            s = ("The specified plugin {}.py".format(plugin_module) +
+                 "does not contain the required "
+                 "build_bank(config, is_py2) method.")
+            raise ImportError(s)
         bank = p_mod.build_bank(bank_config, __PY2)
         return bank
     else:

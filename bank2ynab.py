@@ -21,6 +21,7 @@ import codecs
 import csv
 import os
 import sys
+import importlib
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -32,10 +33,6 @@ except ImportError:
     import ConfigParser as configparser
     import cStringIO
 
-import codecs
-import csv
-import importlib
-import os
 
 # classes dealing with input and output charsets across python versions
 # (well, really just for py2...)

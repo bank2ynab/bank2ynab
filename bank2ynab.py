@@ -308,7 +308,10 @@ class B2YBank(object):
                 missing_dir = True
                 path = find_directory("")
             path = abspath(path)
-            files = [join(path, f) for f in os.listdir(path) if f.endswith(a) if b in f if c not in f]
+            d = os.listdir(path)
+            files = [join(path, f)
+                     for f in d if f.endswith(a)
+                     if b in f if c not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
                      "\nTrying default path instead:\t{}")

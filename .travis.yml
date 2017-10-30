@@ -13,7 +13,7 @@ python:
   - "nightly"
 # command to run tests
 script:
-  - test/test_B2YBank.py
+  - python test/test_B2YBank.py
 notifications:
   webhooks:
     urls:

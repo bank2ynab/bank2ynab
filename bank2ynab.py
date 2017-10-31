@@ -215,6 +215,7 @@ def fix_conf_params(conf_obj, section_name):
             "input_filename": ["Source Filename Pattern", False, ""],
             "path": ["Source Path", False, ""],
             "ext": ["Source Filename Extension", False, ""],
+            "regex": ["Use Regex For Filename", True, ""],
             "fixed_prefix": ["Output Filename Prefix", False, ""],
             "input_delimiter": ["Source CSV Delimiter", False, ""],
             "has_headers": ["Source Has Column Headers", True, ""],
@@ -298,6 +299,7 @@ class B2YBank(object):
         a = self.config["ext"]
         b = self.config["input_filename"]
         c = self.config["fixed_prefix"]
+        regex_active = self.config["regex"]
         files = list()
         missing_dir = False
         try_path = self.config["path"]
@@ -310,9 +312,14 @@ class B2YBank(object):
                 path = find_directory("")
             path = abspath(path)
             d = os.listdir(path)
-            files = [join(path, f)
-                           for f in d if re.search(b + a, f)
-                           if c not in f]
+            if regex_active is True:
+                files = [join(path, f)
+                         for f in d if re.search(b + a, f)
+                         if c not in f]
+            else:
+                files = [join(path, f)
+                         for f in d if f.endswith(a)
+                         if b in f if c not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
                      "\nTrying default path instead:\t {}")

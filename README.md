@@ -12,6 +12,8 @@ A common project to consolidate all conversion efforts from various banks' expor
 - [User Guide](#userguide)
 - [Known Bugs](#knownbugs)
 
+master: ![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop) develop: ![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)
+
 ## <a name="what"></a>What? (Features)
 
 ***Convert your downloaded bank statements into YNAB's input format.*** Here's what this script does, step by step:

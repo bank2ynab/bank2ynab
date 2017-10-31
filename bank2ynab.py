@@ -296,32 +296,30 @@ class B2YBank(object):
         """ find the transaction file
         :return: list of matching files found
         """
-        a = self.config["ext"]
-        b = self.config["input_filename"]
-        c = self.config["fixed_prefix"]
+        ext = self.config["ext"]
+        file_pattern = self.config["input_filename"]
+        prefix = self.config["fixed_prefix"]
         regex_active = self.config["regex"]
         files = list()
         missing_dir = False
         try_path = self.config["path"]
         path = ""
-        if b is not "":
+        if file_pattern is not "":
             try:
                 path = find_directory(try_path)
             except FileNotFoundError:
                 missing_dir = True
                 path = find_directory("")
             path = abspath(path)
-            d = os.listdir(path)
+            directory_list = os.listdir(path)
             if regex_active is True:
                 files = [join(path, f)
-                         for f in d if f.endswith(a)
-                         if re.search(b, f)
-                         if c not in f]
+                         for f in directory_list if f.endswith(ext)
+                         if re.search(file_pattern, f) if prefix not in f]
             else:
                 files = [join(path, f)
-                         for f in d if f.endswith(a)
-                         if b in f
-                         if c not in f]
+                         for f in directory_list if f.endswith(ext)
+                         if file_pattern in f if prefix not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
                      "\nTrying default path instead:\t {}")

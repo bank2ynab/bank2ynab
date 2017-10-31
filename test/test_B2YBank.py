@@ -46,6 +46,7 @@ class TestB2YBank(TestCase):
                 ("test_num_files", 2),
                 ("test_num_files_noexist", 0),
                 ("test_num_files_extension", 0),
+                ("test_regex", 1)
                 ]:
 
             config = fix_conf_params(self.cp, section_name)

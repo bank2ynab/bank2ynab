@@ -39,13 +39,13 @@ class TestB2YBank(TestCase):
 
     def test_get_files(self):
         """ Test it's finding the right amount of files"""
-
         # if you need more tests, add sections to test.conf and then specify them here
         for section_name, num_files in [
                 ("test_num_files", 2),
                 ("test_num_files_noexist", 0),
                 ("test_num_files_extension", 0),
-                ("test_regex", 1)
+                ("test_regex", 1),
+                ("test_regex_noexist", 0)
                 ]:
 
             config = fix_conf_params(self.cp, section_name)

@@ -7,6 +7,7 @@ import os
 
 from bank2ynab import B2YBank, fix_conf_params, build_bank
 from plugins.null import NullBank
+from test.utils import get_test_confparser
 
 _PY2 = False
 try:
@@ -22,9 +23,7 @@ class TestB2YBank(TestCase):
 
     def setUp(self):
         global _PY2
-        self.py2 = _PY2
-        self.cp = configparser.ConfigParser()
-        self.cp.read([TestB2YBank.TESTCONFPATH])
+        self.cp, self.py2, = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None
 

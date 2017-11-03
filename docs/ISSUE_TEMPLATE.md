@@ -1,6 +1,8 @@
 (Dear submitter, please edit the following according to your needs. Thank you!)
+Delete Issue Report or Bank Format Addition section as appropriate.
 
-Script language: Python3
+# Issue Report:
+Script language: Python3, 2.x
 Operating system: Windows, Linux, MacOS
 OS Version: 
 
@@ -15,3 +17,19 @@ What ACTUALLY happened?
 
 Can you provide other helpful information?
 ...
+
+
+# Bank Format Addition
+Name of Bank:
+Country:
+Special Requirements:
+...
+
+**To be filled in as required. Delete fields that match default values.**
+Source Filename Pattern = example_transaction_export_filename
+Source Filename Extension = .csv
+Use Regex for Filename = False
+Source CSV Delimiter = ,
+Source Has Column Headers = True
+Input Columns = Date,Payee,Outflow,Inflow,Running Balance
+Plugin =

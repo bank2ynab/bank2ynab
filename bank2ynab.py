@@ -220,7 +220,8 @@ def fix_conf_params(conf_obj, section_name):
             "input_delimiter": ["Source CSV Delimiter", False, ""],
             "has_headers": ["Source Has Column Headers", True, ""],
             "delete_original": ["Delete Source File", True, ""],
-            "plugin": ["Plugin", False, ""]}
+            "plugin": ["Plugin", False, ""],
+            "combined_outflow_inflow": ["Combined Outflow Inflow", True, ""]}
 
     # Bank Download = False
     # Bank Download URL = ""
@@ -343,6 +344,7 @@ class B2YBank(object):
             for row in transaction_reader:
                 # add new row to output list
                 fixed_row = self._auto_memo(self._fix_row(row))
+                fixed_row = self._fix_combined_outflow_inflow(fixed_row)
                 # check our row isn't a null transaction
                 if self._valid_row(fixed_row) is True:
                     output_data.append(fixed_row)
@@ -356,6 +358,18 @@ class B2YBank(object):
                     output_data.append(output_columns)
         print("Parsed {} lines".format(len(output_data)))
         return output_data
+
+    def _fix_combined_outflow_inflow(self, row):
+        if self.config['combined_outflow_inflow']:
+            inflow_index = self.config["output_columns"].index("Inflow")
+            outflow_index = self.config["output_columns"].index("Outflow")
+            outflow = row[outflow_index]
+            if '-' in outflow:
+                row[outflow_index] = outflow.strip('-')
+            else:
+                row[inflow_index] = outflow
+                row[outflow_index] = ""
+        return row
 
     def _fix_row(self, row):
         """

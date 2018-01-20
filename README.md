@@ -7,6 +7,7 @@ A common project to consolidate all conversion efforts from various banks' expor
 - [What? (Features)](#what)
 - [Why?](#why)
 - [How?](#how)
+- [Installation Instructions](#install)
 - [Wish List](#wishlist)
 - [Requirements](#requirements)
 - [User Guide](#userguide)
@@ -35,6 +36,12 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
   - take advantage of this project to get more import formats.
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
 - Add a brainstorming item as a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
+
+## <a name=install></a>Installation Instructions
+
+- Download [this ZIP file](https://github.com/torbengb/bank2ynab/archive/master.zip)
+- Note the [Requirements](#requirements) for additional details!
+- When you're done, refer to the [User Guide](#userguide) below.
 
 ## <a name="wishlist"></a>Wish List
 

@@ -218,7 +218,9 @@ def fix_conf_params(conf_obj, section_name):
             "regex": ["Use Regex For Filename", True, ""],
             "fixed_prefix": ["Output Filename Prefix", False, ""],
             "input_delimiter": ["Source CSV Delimiter", False, ""],
-            "has_headers": ["Source Has Column Headers", True, ""],
+            "has_headers": ["Source Has Column Headers", True, ""], # DELETE THIS!
+            # "header_rows": ["Header Rows", False, ""],
+            # "footer_rows": ["Footer Rows", False, ""],
             "delete_original": ["Delete Source File", True, ""],
             "plugin": ["Plugin", False, ""]}
 
@@ -346,7 +348,7 @@ class B2YBank(object):
                 # check our row isn't a null transaction
                 if self._valid_row(fixed_row) is True:
                     output_data.append(fixed_row)
-            # fix column headers
+            # fix column headers - # CHANGE THIS
             if has_headers is False:
                 output_data.insert(0, output_columns)
             else:

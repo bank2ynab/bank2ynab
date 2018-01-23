@@ -5,7 +5,7 @@ from bank2ynab import B2YBank, CrossversionCsvReader
 class NLRabobankPlugin(B2YBank):
     def __init__(self, config_object, is_py2):
         super(NLRabobankPlugin, self).__init__(config_object, is_py2)
-        self.name = "NL Rabobank"
+        self.name = "nl-rabobank"
 
     def read_data(self, file_path):
         delim = self.config["input_delimiter"]

@@ -26,8 +26,9 @@ class NLRabobankPlugin(B2YBank):
 # DATE STUFF:
 # YNAB's date format is "DD/MM/YYYY". 
 # This bank's date format is "YYYMMDD" without delimiters.
-                date = row[2].split('-')
-                tmp["Date"] = date[2] + '/' + date[1] + '/' + date[0]
+# Moving the substrings into the proper order: https://stackoverflow.com/a/663175/20571
+                date = row[2]
+                tmp["Date"] = date[6:7] + '/' + date[4:5] + '/' + date[0:3]
 # PAYEE STUFF:
                 tmp["Payee"] = row[7]
 # CATEGORY STUFF:

@@ -348,10 +348,10 @@ class B2YBank(object):
                 # check our row isn't a null transaction
                 if self._valid_row(fixed_row) is True:
                     output_data.append(fixed_row)
-            # strip out header rows
-            # TODO - header rows (& maybe combine header and footer check)
-            # strip out footer rows
-            output_data = output_data[:-footer_rows or None]
+            # strip out header & footer rows
+            output_data = output_data[header_rows:-footer_rows or None]
+            # add in column headers
+            output_data.insert(0, output_columns)
         print("Parsed {} lines".format(len(output_data)))
         return output_data
 

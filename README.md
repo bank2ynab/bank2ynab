@@ -1,7 +1,7 @@
 <!-- I thought about adding some graphics for a better appearance, but it is too large and dominates the page:
 ![YNAB banner image](https://b.thumbs.redditmedia.com/-4WEzT9WdhQV_khUidt56887E01btV8IILeL6TNvtvI.png)
 -->
-# bank2ynab
+# bank2ynab []() ![Build status](https://travis-ci.org/torbengb/bank2ynab.svg?branch=develop)
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
 - [What? (Features)](#what)

@@ -2,7 +2,6 @@
 
 from bank2ynab import B2YBank, CrossversionCsvReader
 
-
 class SwedebankPlugin(B2YBank):
     def __init__(self, config_object, is_py2):
         super(SwedebankPlugin, self).__init__(config_object, is_py2)

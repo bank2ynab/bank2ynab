@@ -1,15 +1,15 @@
 <!-- I thought about adding some graphics for a better appearance, but it is too large and dominates the page:
 ![YNAB banner image](https://b.thumbs.redditmedia.com/-4WEzT9WdhQV_khUidt56887E01btV8IILeL6TNvtvI.png)
 -->
-# bank2ynab
+# bank2ynab []() ![Build status](https://travis-ci.org/torbengb/bank2ynab.svg?branch=develop)
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
 - [What? (Features)](#what)
+  - [Wish List](#wishlist)
 - [Why?](#why)
 - [How?](#how)
 - [Installation Instructions](#install)
-- [Wish List](#wishlist)
-- [Requirements](#requirements)
+  - [Requirements](#requirements)
 - [User Guide](#userguide)
 - [Known Bugs](#knownbugs)
 
@@ -22,6 +22,12 @@ A common project to consolidate all conversion efforts from various banks' expor
 1. If the CSV file matches any of the configured formats: 
    1. Create a new CSV file in YNAB's CSV format with the correct columns and a blank Category column.
    1. Optionally delete the original CSV file.
+
+### <a name="wishlist"></a>Wish List
+
+- add many more input formats from all the other YNAB-CSV-conversion projects.
+- maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
+- maybe coming later: automatically import the converted data into your YNAB app? (optional, default off)
 
 ## <a name="why"></a>Why?
 
@@ -36,6 +42,8 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
   - take advantage of this project to get more import formats.
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
 - Add a brainstorming item as a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
+- Join the chat over at https://gitter.im/bank2ynab/Lobby
+- See also: [the wiki](https://github.com/torbengb/bank2ynab/wiki).
 
 ## <a name=install></a>Installation Instructions
 
@@ -43,13 +51,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 - Note the [Requirements](#requirements) for additional details!
 - When you're done, refer to the [User Guide](#userguide) below.
 
-## <a name="wishlist"></a>Wish List
-
-- add many more input formats from all the other YNAB-CSV-conversion projects.
-- maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
-- maybe coming later: automatically import the converted data into your YNAB app? (optional, default off)
-
-## <a name="requirements"></a>Requirements
+### <a name="requirements"></a>Requirements
 
 - Windows or Mac or Linux
 - Python v2.7+ installed, v3.5+ preferred ([download it from python.org](https://www.python.org/downloads/))

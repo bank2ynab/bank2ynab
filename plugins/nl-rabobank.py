@@ -22,20 +22,22 @@ class NLRabobankPlugin(B2YBank):
                 if index == 0 and has_headers:
                     continue
                 tmp = {}
-# I assume that "[2]" means "field 2 in the current row".
-# DATE STUFF:
-# YNAB's date format is "DD/MM/YYYY". 
-# This bank's date format is "YYYMMDD" without delimiters.
-# Moving the substrings into the proper order: https://stackoverflow.com/a/663175/20571
+                """
+                I assume that "[2]" means "field 2 in the current row".
+                DATE STUFF:
+                YNAB's date format is "DD/MM/YYYY". 
+                This bank's date format is "YYYMMDD" without delimiters.
+                Moving the substrings into the proper order: https://stackoverflow.com/a/663175/20571
+                """
                 date = row[2]
                 tmp["Date"] = date[6:7] + '/' + date[4:5] + '/' + date[0:3]
-# PAYEE STUFF:
+                # PAYEE STUFF:
                 tmp["Payee"] = row[7]
-# CATEGORY STUFF:
+                # CATEGORY STUFF:
                 tmp["Category"] = ''
-# MEMO STUFF:
+                # MEMO STUFF:
                 tmp["Memo"] = row[11]
-# AMOUNT STUFF:
+                # AMOUNT STUFF:
                 # C means inflow (credit), D means outflow (debit)
                 if row[4] == 'C':
                     tmp["Outflow"] = ''

@@ -334,8 +334,8 @@ class B2YBank(object):
         """
         delim = self.config["input_delimiter"]
         output_columns = self.config["output_columns"]
-        header_rows = self.config["header_rows"]
-        footer_rows = self.config["footer_rows"]
+        header_rows = int(self.config["header_rows"])
+        footer_rows = int(self.config["footer_rows"])
         output_data = []
 
         with CrossversionCsvReader(file_path,

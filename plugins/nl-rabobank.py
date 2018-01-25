@@ -24,7 +24,6 @@ class NLRabobankPlugin(B2YBank):
                     continue
                 tmp = {}
                 """
-                I assume that "[2]" means "field 2 in the current row".
                 DATE STUFF:
                 YNAB's date format is "DD/MM/YYYY". 
                 This bank's date format is "YYYMMDD" without delimiters.

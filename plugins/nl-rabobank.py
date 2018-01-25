@@ -2,10 +2,10 @@
 
 from bank2ynab import B2YBank, CrossversionCsvReader
 
-class SwedebankPlugin(B2YBank):
+class NLRabobankPlugin(B2YBank):
     def __init__(self, config_object, is_py2):
-        super(SwedebankPlugin, self).__init__(config_object, is_py2)
-        self.name = "SwedeBank"
+        super(NLRabobankPlugin, self).__init__(config_object, is_py2)
+        self.name = "nl-rabobank"
 
     def read_data(self, file_path):
         delim = self.config["input_delimiter"]
@@ -23,17 +23,23 @@ class SwedebankPlugin(B2YBank):
                 if index == 0 and header_rows != 0:
                     continue
                 tmp = {}
-                date = row[2].split('-')
-                tmp["Date"] = date[2] + '/' + date[1] + '/' + date[0]
-                tmp["Payee"] = row[3]
+                """
+                DATE STUFF:
+                YNAB's date format is "DD/MM/YYYY". 
+                This bank's date format is "YYYMMDD" without delimiters.
+                Moving the substrings into the proper order: https://stackoverflow.com/a/663175/20571
+                """
+                date = row[2]
+                tmp["Date"] = date[6:7] + '/' + date[4:5] + '/' + date[0:3]
+                # PAYEE STUFF:
+                tmp["Payee"] = row[7]
+                # CATEGORY STUFF:
                 tmp["Category"] = ''
-                tmp["Memo"] = row[4]
-                # if the record ID is empty, it's some sort of balance, ignore
-                if row[8] == "":
-                    continue
-
-                # K is inflow, D is outflow - I guess Kredit and Debit ;)
-                if row[7] == 'K':
+                # MEMO STUFF:
+                tmp["Memo"] = row[11]
+                # AMOUNT STUFF:
+                # C means inflow (credit), D means outflow (debit)
+                if row[4] == 'C':
                     tmp["Outflow"] = ''
                     tmp["Inflow"] = row[5]
                 else:
@@ -49,4 +55,4 @@ class SwedebankPlugin(B2YBank):
 
 
 def build_bank(config, is_py2):
-    return SwedebankPlugin(config, is_py2)
+    return NLRabobankPlugin(config, is_py2)

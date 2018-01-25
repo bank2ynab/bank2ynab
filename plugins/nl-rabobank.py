@@ -11,7 +11,8 @@ class NLRabobankPlugin(B2YBank):
         delim = self.config["input_delimiter"]
         output_columns = self.config["output_columns"]
         # we know it should have headers, but we respect the setting
-        has_headers = self.config["has_headers"]
+        header_rows = self.config["header_rows"]
+        footer_rows = self.config["footer_rows"]
         output_data = []
 
         with CrossversionCsvReader(file_path,
@@ -19,7 +20,7 @@ class NLRabobankPlugin(B2YBank):
                                    delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 # skip first row if headers
-                if index == 0 and has_headers:
+                if index == 0 and header_rows != 0:
                     continue
                 tmp = {}
                 """

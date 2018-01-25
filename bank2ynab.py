@@ -218,9 +218,8 @@ def fix_conf_params(conf_obj, section_name):
             "regex": ["Use Regex For Filename", True, ""],
             "fixed_prefix": ["Output Filename Prefix", False, ""],
             "input_delimiter": ["Source CSV Delimiter", False, ""],
-            "has_headers": ["Source Has Column Headers", True, ""], # DELETE THIS!
-            # "header_rows": ["Header Rows", False, ""],
-            # "footer_rows": ["Footer Rows", False, ""],
+            "header_rows": ["Header Rows", False, ""],
+            "footer_rows": ["Footer Rows", False, ""],
             "delete_original": ["Delete Source File", True, ""],
             "plugin": ["Plugin", False, ""]}
 
@@ -335,7 +334,8 @@ class B2YBank(object):
         """
         delim = self.config["input_delimiter"]
         output_columns = self.config["output_columns"]
-        has_headers = self.config["has_headers"]
+        header_rows = self.config["header_rows"]
+        footer_rows = self.config["footer_rows"]
         output_data = []
 
         with CrossversionCsvReader(file_path,
@@ -348,14 +348,10 @@ class B2YBank(object):
                 # check our row isn't a null transaction
                 if self._valid_row(fixed_row) is True:
                     output_data.append(fixed_row)
-            # fix column headers - # CHANGE THIS
-            if has_headers is False:
-                output_data.insert(0, output_columns)
-            else:
-                if output_data:
-                    output_data[0] = output_columns
-                else:
-                    output_data.append(output_columns)
+            # strip out header rows
+            # TODO - header rows (& maybe combine header and footer check)
+            # strip out footer rows
+            output_data = output_data[:-footer_rows or None]
         print("Parsed {} lines".format(len(output_data)))
         return output_data
 

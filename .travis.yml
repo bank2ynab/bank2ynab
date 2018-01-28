@@ -14,7 +14,7 @@ python:
 before_install: pip install flake8
 script:
   - python -m unittest discover
-  - flake8 --builtins=FileNotFoundError
+  - flake8 --builtins=FileNotFoundError,unicode
 notifications:
   email: false
   webhooks:

@@ -11,9 +11,9 @@ python:
   - "3.7-dev" # 3.7 development branch
   - "nightly"
 # command to run tests
-before_install: pip install flake8
 script:
   - python -m unittest discover
+  - pip install flake8
   - flake8 --builtins=FileNotFoundError,unicode
 notifications:
   email: false

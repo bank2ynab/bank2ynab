@@ -11,13 +11,11 @@ python:
   - "3.7-dev" # 3.7 development branch
   - "nightly"
 # command to run tests
-install: 
-  - pip install flake8
-
 script:
+  - pip install flake8
   - python -m unittest discover
-  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then flake8 --builtins=FileNotFoundError
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then flake8 --builtins=unicode
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then flake8 --builtins=FileNotFoundError; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then flake8 --builtins=unicode; fi
   
 notifications:
   email: false

@@ -17,6 +17,7 @@ except ImportError:
     import ConfigParser as configparser
     import cStringIO
 
+
 class TestB2YBank(TestCase):
 
     TESTCONFPATH = join("test-data", "test.conf")
@@ -39,7 +40,7 @@ class TestB2YBank(TestCase):
 
     def test_get_files(self):
         """ Test it's finding the right amount of files"""
-        # if you need more tests, add sections to test.conf and then specify them here
+        # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_files in [
                 ("test_num_files", 2),
                 ("test_num_files_noexist", 0),
@@ -58,7 +59,7 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(files), num_files)
 
     def test_read_data(self):
-        # if you need more tests, add sections to test.conf and then specify them here
+        # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_records, fpath in [
                 ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
                 ("test_record_headers", 74, "test_headers.csv")
@@ -69,7 +70,7 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(records), num_records)
 
     def test_write_data(self):
-        # if you need more tests, add sections to test.conf and then specify them here
+        # if you need more tests, add sections to test.conf & specify them here
         # todo: incorporate multiple-file scenarios
         for section_name, num_records, fpath in [
             ("test_record_i18n", 74, "fixed_test_raiffeisen_01.csv"),

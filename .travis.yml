@@ -15,7 +15,7 @@ script:
   - python -m unittest discover
   - pip install flake8
   - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then flake8 --builtins=FileNotFoundError; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]]; then flake8 --builtins=unicode; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ] AND [ $TRAVIS_PYTHON_VERSION != 3.2 ]]; then flake8 --builtins=unicode; fi
   
 notifications:
   email: false

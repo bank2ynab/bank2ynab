@@ -53,7 +53,7 @@ class NullBank(B2YBank):
 
 def build_bank(config, is_py2):
     """ This factory function is called from the main program,
-    and expected to return a B2YBank subclass. 
+    and expected to return a B2YBank subclass.
     Without this, the module will fail to load properly.
 
     :param config: dict containing all available configuration parameters
@@ -61,4 +61,3 @@ def build_bank(config, is_py2):
     :return: a B2YBank subclass instance
     """
     return NullBank(config, is_py2)
-    

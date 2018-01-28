@@ -27,7 +27,7 @@ class NLRabobankPlugin(B2YBank):
                 DATE STUFF:
                 YNAB's date format is "DD/MM/YYYY".
                 This bank's date format is "YYYMMDD" without delimiters.
-                Moving the substrings into the proper order: 
+                Moving the substrings into the proper order:
                 https://stackoverflow.com/a/663175/20571
                 """
                 date = row[2]

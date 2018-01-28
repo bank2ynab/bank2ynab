@@ -20,7 +20,6 @@ from os.path import abspath, join, dirname, basename
 import codecs
 import csv
 import os
-import sys
 import importlib
 import re
 

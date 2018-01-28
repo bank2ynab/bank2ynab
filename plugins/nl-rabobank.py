@@ -2,6 +2,7 @@
 
 from bank2ynab import B2YBank, CrossversionCsvReader
 
+
 class NLRabobankPlugin(B2YBank):
     def __init__(self, config_object, is_py2):
         super(NLRabobankPlugin, self).__init__(config_object, is_py2)
@@ -12,7 +13,6 @@ class NLRabobankPlugin(B2YBank):
         output_columns = self.config["output_columns"]
         # we know it should have headers, but we respect the setting
         header_rows = self.config["header_rows"]
-        footer_rows = self.config["footer_rows"]
         output_data = []
 
         with CrossversionCsvReader(file_path,
@@ -25,9 +25,10 @@ class NLRabobankPlugin(B2YBank):
                 tmp = {}
                 """
                 DATE STUFF:
-                YNAB's date format is "DD/MM/YYYY". 
+                YNAB's date format is "DD/MM/YYYY".
                 This bank's date format is "YYYMMDD" without delimiters.
-                Moving the substrings into the proper order: https://stackoverflow.com/a/663175/20571
+                Moving the substrings into the proper order: 
+                https://stackoverflow.com/a/663175/20571
                 """
                 date = row[2]
                 tmp["Date"] = date[6:7] + '/' + date[4:5] + '/' + date[0:3]

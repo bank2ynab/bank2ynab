@@ -2,6 +2,7 @@
 
 from bank2ynab import B2YBank, CrossversionCsvReader
 
+
 class SwedebankPlugin(B2YBank):
     def __init__(self, config_object, is_py2):
         super(SwedebankPlugin, self).__init__(config_object, is_py2)
@@ -12,7 +13,6 @@ class SwedebankPlugin(B2YBank):
         output_columns = self.config["output_columns"]
         # we know it should have headers, but we respect the setting
         header_rows = self.config["header_rows"]
-        footer_rows = self.config["footer_rows"]
         output_data = []
 
         with CrossversionCsvReader(file_path,

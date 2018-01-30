@@ -314,7 +314,7 @@ class B2YBank(object):
             try:
                 directory_list = os.listdir(path)
             except FileNotFoundError:
-                directory_list = os.listdir("")
+                directory_list = os.listdir(".")
             if regex_active is True:
                 files = [join(path, f)
                          for f in directory_list if f.endswith(ext)

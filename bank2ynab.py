@@ -310,11 +310,11 @@ class B2YBank(object):
             except FileNotFoundError:
                 missing_dir = True
                 path = find_directory("")
+            path = abspath(path)
             try:
-                path = abspath(path)
+                directory_list = os.listdir(path)
             except FileNotFoundError:
-                path = ""
-            directory_list = os.listdir(path)
+                directory_list = os.listdir("")
             if regex_active is True:
                 files = [join(path, f)
                          for f in directory_list if f.endswith(ext)

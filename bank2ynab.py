@@ -35,7 +35,7 @@ except ImportError:
 try:
     FileNotFoundError
 except NameError:
-    FileNotFoundError = IOError
+    FileNotFoundError = OSError
 
 
 # classes dealing with input and output charsets across python versions

@@ -311,6 +311,9 @@ class B2YBank(object):
                 missing_dir = True
                 path = find_directory("")
             path = abspath(path)
+            if not os.path.exists(path):
+                s = "Error: Input directory not found: {}"
+                raise FileNotFoundError(s.format(filepath))
             directory_list = os.listdir(path)
             if regex_active is True:
                 files = [join(path, f)

@@ -32,6 +32,10 @@ except ImportError:
     __PY2 = True
     import ConfigParser as configparser
     import cStringIO
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 
 # classes dealing with input and output charsets across python versions

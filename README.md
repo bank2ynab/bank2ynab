@@ -12,6 +12,7 @@ A common project to consolidate all conversion efforts from various banks' expor
   - [Requirements](#requirements)
 - [User Guide](#userguide)
 - [Known Bugs](#knownbugs)
+- [List of Supported Banks](#formats)
 
 ## <a name="what"></a>What? (Features)
 
@@ -79,6 +80,29 @@ Using `bank2ynab` is easy:
 ## <a name="knownbugs"></a>Known Bugs
 
 For details, please see our [issue list labeled "Bug"](https://github.com/torbengb/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug).
+
+## <a name="formats"></a>List of Supported Banks
+
+Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/torbengb/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
+
+1. AT Raiffeisen Bank checking
+1. AT Raiffeisen Bank VISA card
+1. BR Inter checking
+1. DE Deutsche Kreditbank checking
+1. DE Deutsche Kreditbank credit card
+1. DE ING-DiBa
+1. DE Kreissparkasse
+1. DE N26
+1. DE Sparkasse Rhein-Neckar-Nord
+1. DK Nordea
+1. IE AIB Ireland
+1. IE Bank of Ireland
+1. NL Rabobank
+1. NO DNB
+1. MV Bank of Maldives, checking
+1. Personal Capital (software)
+1. UK Co-operative Bank
+1. SE Swedbank
 
 ----
 

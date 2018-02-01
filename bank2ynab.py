@@ -352,7 +352,7 @@ class B2YBank(object):
             # make each row of our new transaction file
             for row in transaction_reader:
                 # check if we need to process Inflow or Outflow flags
-                if cd_flags != []:
+                if len(cd_flags) == 3:
                     row = self._cd_flag_process(row)
                 # add new row to output list
                 fixed_row = self._auto_memo(self._fix_row(row))

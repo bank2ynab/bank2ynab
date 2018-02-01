@@ -224,6 +224,7 @@ def fix_conf_params(conf_obj, section_name):
             "header_rows": ["Header Rows", False, ""],
             "footer_rows": ["Footer Rows", False, ""],
             "delete_original": ["Delete Source File", True, ""],
+            "cd_flags": ["Inflow or Outflow Indicator", False, ","],
             "plugin": ["Plugin", False, ""]}
 
     # Bank Download = False
@@ -342,6 +343,7 @@ class B2YBank(object):
         output_columns = self.config["output_columns"]
         header_rows = int(self.config["header_rows"])
         footer_rows = int(self.config["footer_rows"])
+        cd_flags = self.config["cd_flags"]
         output_data = []
 
         with CrossversionCsvReader(file_path,
@@ -349,6 +351,9 @@ class B2YBank(object):
                                    delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
+                # check if we need to process Inflow or Outflow flags
+                if cd_flags != []:
+                    row = self._cd_flag_process(row)
                 # add new row to output list
                 fixed_row = self._auto_memo(self._fix_row(row))
                 # check our row isn't a null transaction
@@ -394,6 +399,18 @@ class B2YBank(object):
         memo_index = self.config["output_columns"].index("Memo")
         if row[memo_index] == "":
             row[memo_index] = row[payee_index]
+        return row
+
+    def _cd_flag_process(self, row):
+        """ fix rows where inflow or outflow is indicated by
+        a flag in a separate column """
+        cd_flags = self.config["cd_flags"]
+        indicator_col = cd_flags[0]
+        outflow_flag = cd_flags[2]
+        inflow_col = self.config["input_columns"].index("Inflow")
+        # if this row is indicated to be outflow, multiply Inflow by -1
+        if row[indicator_col] == outflow_flag:
+            row[inflow_col] = -1 * row[inflow_col]
         return row
 
     def write_data(self, filename, data):

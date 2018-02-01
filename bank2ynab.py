@@ -405,12 +405,12 @@ class B2YBank(object):
         """ fix rows where inflow or outflow is indicated by
         a flag in a separate column """
         cd_flags = self.config["cd_flags"]
-        indicator_col = cd_flags[0]
+        indicator_col = int(cd_flags[0])
         outflow_flag = cd_flags[2]
         inflow_col = self.config["input_columns"].index("Inflow")
         # if this row is indicated to be outflow, multiply Inflow by -1
         if row[indicator_col] == outflow_flag:
-            row[inflow_col] = -1 * row[inflow_col]
+            row[inflow_col] = -1 * float(row[inflow_col])
         return row
 
     def write_data(self, filename, data):

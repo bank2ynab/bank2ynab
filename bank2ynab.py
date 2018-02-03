@@ -410,7 +410,7 @@ class B2YBank(object):
         inflow_col = self.config["input_columns"].index("Inflow")
         # if this row is indicated to be outflow, multiply Inflow by -1
         if row[indicator_col] == outflow_flag:
-            row[inflow_col] = -1 * float(row[inflow_col])
+            row[inflow_col] = str(-1 * float(row[inflow_col]))
         return row
 
     def write_data(self, filename, data):

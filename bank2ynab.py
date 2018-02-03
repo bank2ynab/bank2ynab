@@ -419,7 +419,7 @@ class B2YBank(object):
         :param data: cleaned data ready to output
         """
         target_dir = dirname(filename)
-        target_fname = basename(filename)
+        target_fname = basename(filename)[:-4] + ".csv"
         new_filename = self.config["fixed_prefix"] + target_fname
         target_filename = join(target_dir, new_filename)
         print("Writing output file: {}".format(target_filename))

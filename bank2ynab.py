@@ -346,15 +346,20 @@ class B2YBank(object):
         cd_flags = self.config["cd_flags"]
         output_data = []
 
+        # get total number of rows in transaction file using a generator
+        with CrossversionCsvReader(file_path,
+                                   self._is_py2,
+                                   delimiter=delim) as row_count_reader:
+            row_count = sum(1 for row in row_count_reader)
+        
         with CrossversionCsvReader(file_path,
                                    self._is_py2,
                                    delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 line = transaction_reader.line_num
-                print(line)
-                # skip header & footer rows [TODO FOOTER ROWS]
-                if line > header_rows:
+                # skip header & footer rows
+                if header_rows < line <= (row_count - footer_rows):
                     # check if we need to process Inflow or Outflow flags
                     if len(cd_flags) == 3:
                         row = self._cd_flag_process(row)
@@ -363,11 +368,9 @@ class B2YBank(object):
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
-                else: # debug to see if it's working
-                    print("header: {}".format(line))
-            # add in column headers
-            output_data.insert(0, output_columns)
+        # add in column headers
         print("Parsed {} lines".format(len(output_data)))
+        output_data.insert(0, output_columns)
         return output_data
 
     def _fix_row(self, row):

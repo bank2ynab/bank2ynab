@@ -162,12 +162,12 @@ class UnicodeReader:
         row = self.reader.next()
         return [unicode(s, "utf-8") for s in row]
 
-    def line_num(self):
-        return self.reader.line_num()
-
     def __iter__(self):
         return self
 
+    @property
+    def line_num(self):
+        return self.reader.line_num()
 
 class UnicodeWriter:
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):

@@ -167,7 +167,7 @@ class UnicodeReader:
 
     @property
     def line_num(self):
-        return self.reader.line_num()
+        return self.reader.line_num
 
 class UnicodeWriter:
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):

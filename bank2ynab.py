@@ -161,6 +161,9 @@ class UnicodeReader:
     def next(self):
         row = self.reader.next()
         return [unicode(s, "utf-8") for s in row]
+        
+    def line_num(self):
+        return self.reader.line_num()
 
     def __iter__(self):
         return self

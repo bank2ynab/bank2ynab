@@ -351,16 +351,20 @@ class B2YBank(object):
                                    delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
-                # check if we need to process Inflow or Outflow flags
-                if len(cd_flags) == 3:
-                    row = self._cd_flag_process(row)
-                # add new row to output list
-                fixed_row = self._auto_memo(self._fix_row(row))
-                # check our row isn't a null transaction
-                if self._valid_row(fixed_row) is True:
-                    output_data.append(fixed_row)
-            # strip out header & footer rows
-            output_data = output_data[header_rows:-footer_rows or None]
+                line = transaction_reader.line_num
+                print(line)
+                # skip header & footer rows [TODO FOOTER ROWS]
+                if line > header_rows:
+                    # check if we need to process Inflow or Outflow flags
+                    if len(cd_flags) == 3:
+                        row = self._cd_flag_process(row)
+                    # add new row to output list
+                    fixed_row = self._auto_memo(self._fix_row(row))
+                    # check our row isn't a null transaction
+                    if self._valid_row(fixed_row) is True:
+                        output_data.append(fixed_row)
+                else: # debug to see if it's working
+                    print("header: {}".format(line))
             # add in column headers
             output_data.insert(0, output_columns)
         print("Parsed {} lines".format(len(output_data)))

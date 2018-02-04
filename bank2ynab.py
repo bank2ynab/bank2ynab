@@ -167,7 +167,7 @@ class UnicodeReader:
 
     @property
     def line_num(self):
-        return self.reader.line_num()
+        return self.reader.line_num
 
 
 class UnicodeWriter:

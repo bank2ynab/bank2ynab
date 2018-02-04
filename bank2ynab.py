@@ -351,7 +351,7 @@ class B2YBank(object):
                                    self._is_py2,
                                    delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
-        
+
         with CrossversionCsvReader(file_path,
                                    self._is_py2,
                                    delimiter=delim) as transaction_reader:

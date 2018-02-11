@@ -419,6 +419,7 @@ class B2YBank(object):
         
     def _fix_date(self, row, date_format):
         """ fix date format when required """
+        print(date_format) # debug
         date_col = self.config["input_columns"].index("Date")
         input_date = row[date_col]
         # do our actual date processing

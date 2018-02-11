@@ -227,6 +227,7 @@ def fix_conf_params(conf_obj, section_name):
             "input_delimiter": ["Source CSV Delimiter", False, ""],
             "header_rows": ["Header Rows", False, ""],
             "footer_rows": ["Footer Rows", False, ""],
+            "date_format": ["Date Format", False, ""],
             "delete_original": ["Delete Source File", True, ""],
             "cd_flags": ["Inflow or Outflow Indicator", False, ","],
             "plugin": ["Plugin", False, ""]}

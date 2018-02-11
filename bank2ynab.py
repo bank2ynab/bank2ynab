@@ -371,7 +371,7 @@ class B2YBank(object):
                         row = self._cd_flag_process(row)
                     # check if we need to fix the date format
                     if date_format: # need to find a good way to test this TODO
-                        row = self._fix_date(row)
+                        row = self._fix_date(row, date_format)
                     # add new row to output list
                     fixed_row = self._auto_memo(self._fix_row(row))
                     # check our row isn't a null transaction
@@ -417,10 +417,13 @@ class B2YBank(object):
             row[memo_index] = row[payee_index]
         return row
         
-    def _fix_date(self, row):
+    def _fix_date(self, row, date_format):
         """ fix date format when required """
-        # placeholder function - what do we need to do?
-        
+        date_col = self.config["input_columns"].index("Date")
+        input_date = row[date_col]
+        # do our actual date processing
+        output_date = input_date # placeholder - what do we actually need to do?
+        row[date_col] = output_date
         return row
 
     def _cd_flag_process(self, row):

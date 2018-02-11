@@ -416,6 +416,12 @@ class B2YBank(object):
         if row[memo_index] == "":
             row[memo_index] = row[payee_index]
         return row
+        
+    def _fix_date(self, row):
+        """ fix date format when required """
+        # placeholder function - what do we need to do?
+        
+        return row
 
     def _cd_flag_process(self, row):
         """ fix rows where inflow or outflow is indicated by

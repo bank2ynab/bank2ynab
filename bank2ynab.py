@@ -349,6 +349,7 @@ class B2YBank(object):
         header_rows = int(self.config["header_rows"])
         footer_rows = int(self.config["footer_rows"])
         cd_flags = self.config["cd_flags"]
+        date_format = self.config["date_format"]
         output_data = []
 
         # get total number of rows in transaction file using a generator
@@ -368,6 +369,9 @@ class B2YBank(object):
                     # check if we need to process Inflow or Outflow flags
                     if len(cd_flags) == 3:
                         row = self._cd_flag_process(row)
+                    # check if we need to fix the date format
+                    if date_format: # need to find a good way to test this TODO
+                        row = self._fix_date(row)
                     # add new row to output list
                     fixed_row = self._auto_memo(self._fix_row(row))
                     # check our row isn't a null transaction

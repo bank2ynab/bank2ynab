@@ -5,7 +5,7 @@
 
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
-master: ![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop) develop: ![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)
+master: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab) develop: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab)
 
 - [What? (Features)](#what)
   - [Wish List](#wishlist)

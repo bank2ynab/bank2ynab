@@ -22,6 +22,7 @@ import csv
 import os
 import importlib
 import re
+from datetime import datetime
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -227,6 +228,7 @@ def fix_conf_params(conf_obj, section_name):
             "input_delimiter": ["Source CSV Delimiter", False, ""],
             "header_rows": ["Header Rows", False, ""],
             "footer_rows": ["Footer Rows", False, ""],
+            "date_format": ["Date Format", False, ""],
             "delete_original": ["Delete Source File", True, ""],
             "cd_flags": ["Inflow or Outflow Indicator", False, ","],
             "plugin": ["Plugin", False, ""]}
@@ -348,6 +350,7 @@ class B2YBank(object):
         header_rows = int(self.config["header_rows"])
         footer_rows = int(self.config["footer_rows"])
         cd_flags = self.config["cd_flags"]
+        date_format = self.config["date_format"]
         output_data = []
 
         # get total number of rows in transaction file using a generator
@@ -367,6 +370,9 @@ class B2YBank(object):
                     # check if we need to process Inflow or Outflow flags
                     if len(cd_flags) == 3:
                         row = self._cd_flag_process(row)
+                    # check if we need to fix the date format
+                    if date_format:
+                        row = self._fix_date(row, date_format)
                     # add new row to output list
                     fixed_row = self._auto_memo(self._fix_row(row))
                     # check our row isn't a null transaction
@@ -397,6 +403,7 @@ class B2YBank(object):
 
     def _valid_row(self, row):
         """ if our row doesn't have an inflow or outflow, mark as invalid
+        :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
@@ -405,16 +412,34 @@ class B2YBank(object):
         return True
 
     def _auto_memo(self, row):
-        """ auto fill empty memo field with payee info """
+        """ auto fill empty memo field with payee info
+        :param row: list of values
+        """
         payee_index = self.config["output_columns"].index("Payee")
         memo_index = self.config["output_columns"].index("Memo")
         if row[memo_index] == "":
             row[memo_index] = row[payee_index]
         return row
 
+    def _fix_date(self, row, date_format):
+        """ fix date format when required
+        convert date to DD/MM/YYYY
+        :param row: list of values
+        : param date_format: date format string
+        """
+        date_col = self.config["input_columns"].index("Date")
+        # parse our date according to provided formatting string
+        input_date = datetime.strptime(row[date_col], date_format)
+        # do our actual date processing
+        output_date = datetime.strftime(input_date, "%d/%m/%Y")
+        row[date_col] = output_date
+        return row
+
     def _cd_flag_process(self, row):
         """ fix rows where inflow or outflow is indicated by
-        a flag in a separate column """
+        a flag in a separate column
+        :param row: list of values
+        """
         cd_flags = self.config["cd_flags"]
         indicator_col = int(cd_flags[0])
         outflow_flag = cd_flags[2]

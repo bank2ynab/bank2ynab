@@ -352,6 +352,9 @@ class B2YBank(object):
         cd_flags = self.config["cd_flags"]
         date_format = self.config["date_format"]
         output_data = []
+        
+        # give plugins a chance to pre-process the file
+        self._preprocess_file(file_path)
 
         # get total number of rows in transaction file using a generator
         with CrossversionCsvReader(file_path,
@@ -382,6 +385,15 @@ class B2YBank(object):
         print("Parsed {} lines".format(len(output_data)))
         output_data.insert(0, output_columns)
         return output_data
+        
+    def _preprocess_file(self, file_path):
+        """
+        function that exists solely to be used by plugins for pre-processing a file
+        that otherwise can be read normally (e.g. weird format)
+        :param file_path: path to file
+        """
+        # intentionally empty - the plugins can use this function
+        return
 
     def _fix_row(self, row):
         """

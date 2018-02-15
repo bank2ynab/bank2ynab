@@ -22,10 +22,23 @@ class Handelsbanken(B2YBank):
         :param file_path: path to file
         """
         print("Handelsbanken plugin triggered") # debug
-        with open(file_path) as file:
-            for row in file:
-                print(row) # debug
+        with open(file_path) as input_file:
+            for row in input_file:
                 # pretty sure that using a regex is the best way to do this
+                # using code cannibalised from https://github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py as a starting point - will credit if I actually use it!
+                cells = row.split(";")
+                new_cells = []
+                for cell in cells:
+                    es = re.findall('\>.*?\<', cell) 
+                    while ("><" in es):
+                        es.remove("><")
+                        for n,i in enumerate(es):
+                            es[n] = i[1:-1]
+                    if len(es) > 0:
+                        new_cells.append(es[0])
+                    
+                if new_cells:
+                    print("{}\n".format(new_cells))
         return
 
 

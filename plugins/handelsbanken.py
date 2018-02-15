@@ -1,6 +1,8 @@
 # Plugin for handling format of Handelsbanken [SE] bank export files
 """
-In progress...
+        Strips HTML formatting from input file, allowing it to be used by main script
+        With thanks to @joacand's script from here:
+        https://github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py 
 """
 from bank2ynab import B2YBank
 import re
@@ -17,28 +19,30 @@ class Handelsbanken(B2YBank):
 
     def _preprocess_file(self, file_path):
         """
-        Strips html formatting from input file
-        I THINK THAT IS ALL WE NEED TO DO BEFORE THE FILE IS READY. LET US SEE...
+        Strips HTML formatting from input file, modifying the input file directly
         :param file_path: path to file
         """
-        print("Handelsbanken plugin triggered") # debug
         with open(file_path) as input_file:
+            output_rows = []
             for row in input_file:
-                # pretty sure that using a regex is the best way to do this
-                # using code cannibalised from https://github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py as a starting point - will credit if I actually use it!
                 cells = row.split(";")
-                new_cells = []
+                new_row = []
                 for cell in cells:
                     es = re.findall('\>.*?\<', cell) 
                     while ("><" in es):
                         es.remove("><")
                         for n,i in enumerate(es):
                             es[n] = i[1:-1]
+                    # if our cell isn't empty, add it to the row
                     if len(es) > 0:
-                        new_cells.append(es[0])
-                    
-                if new_cells:
-                    print("{}\n".format(new_cells))
+                        new_row.append(es[0])
+                # if our row isn't empty, add it to the list of rows
+                if new_row:
+                    output_rows.append(";".join(new_row))
+            full_output = "\n".join(output_rows)
+        # overwrite our source file
+        with open(file_path, "w") as output_file:
+            output_file.write(full_output)
         return
 
 

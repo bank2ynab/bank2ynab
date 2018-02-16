@@ -1,11 +1,12 @@
 # Plugin for handling format of Handelsbanken [SE] bank export files
 """
-        Strips HTML formatting from input file, allowing it to be used by main script
+        Strip HTML from input file, allowing it to be used by main script
         With thanks to @joacand's script from here:
-        https://github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py 
+        github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py
 """
 from bank2ynab import B2YBank
 import re
+
 
 class Handelsbanken(B2YBank):
     def __init__(self, config_object, is_py2):
@@ -19,7 +20,7 @@ class Handelsbanken(B2YBank):
 
     def _preprocess_file(self, file_path):
         """
-        Strips HTML formatting from input file, modifying the input file directly
+        Strips HTML from input file, modifying the input file directly
         :param file_path: path to file
         """
         with open(file_path) as input_file:
@@ -28,21 +29,21 @@ class Handelsbanken(B2YBank):
                 cells = row.split(";")
                 new_row = []
                 for cell in cells:
-                    es = re.findall('\>.*?\<', cell) 
+                    es = re.findall('\>.*?\<', cell)
                     while ("><" in es):
                         es.remove("><")
-                        for n,i in enumerate(es):
+                        for n, i in enumerate(es):
                             es[n] = i[1:-1]
                     # if our cell isn't empty, add it to the row
                     if len(es) > 0:
                         new_row.append(es[0])
                 # if our row isn't empty, add it to the list of rows
                 if new_row:
-                    output_rows.append(";".join(new_row))
-            full_output = "\n".join(output_rows)
+                    output_rows.append(new_row)
         # overwrite our source file
         with open(file_path, "w") as output_file:
-            output_file.write(full_output)
+            for row in output_rows:
+                output_file.write("{}\n".format(";".join(row)))
         return
 
 

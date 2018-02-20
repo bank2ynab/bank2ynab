@@ -29,7 +29,7 @@ master: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branc
 
 ### <a name="wishlist"></a>Wish List
 
-- add many more input formats from all the other YNAB-CSV-conversion projects.
+- add many more input formats from all the [other YNAB-CSV-conversion projects](https://github.com/search?o=desc&q=ynab+convert&s=updated&type=Repositories&utf8=%E2%9C%93).
 - maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
 - maybe coming later: automatically import the converted data into your YNAB app? (optional, default off)
 

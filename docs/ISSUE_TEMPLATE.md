@@ -29,7 +29,8 @@ Special Requirements:
 Source Filename Pattern = example_transaction_export_filename
 Source Filename Extension = .csv
 Use Regex for Filename = False
+Header Rows = 1
+Footer Rows = 0
 Source CSV Delimiter = ,
-Source Has Column Headers = True
 Input Columns = Date,Payee,Outflow,Inflow,Running Balance
 Plugin =

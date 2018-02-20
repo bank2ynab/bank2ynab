@@ -32,5 +32,6 @@ Use Regex for Filename = False
 Header Rows = 1
 Footer Rows = 0
 Source CSV Delimiter = ,
+Inflow or Outflow Indicator =
 Input Columns = Date,Payee,Outflow,Inflow,Running Balance
 Plugin =

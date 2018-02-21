@@ -100,12 +100,15 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DK Nordea
 1. IE AIB Ireland
 1. IE Bank of Ireland
+1. MV Bank of Maldives, checking
+1. NL ING Bank
 1. NL Rabobank
 1. NO DNB
-1. MV Bank of Maldives, checking
 1. Personal Capital (software)
-1. UK Co-operative Bank
+1. SE Handelsbanken
+1. SE Nordea
 1. SE Swedbank
+1. UK Co-operative Bank
 
 ----
 

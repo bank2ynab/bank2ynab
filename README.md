@@ -109,6 +109,9 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Nordea
 1. SE Swedbank
 1. UK Co-operative Bank
+1. US BB&T
+1. US Schwab
+1. US TB Bank
 
 ----
 

@@ -20,9 +20,9 @@ from os.path import abspath, join, dirname, basename
 import codecs
 import csv
 import os
-import sys
 import importlib
 import re
+from datetime import datetime
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -33,6 +33,10 @@ except ImportError:
     __PY2 = True
     import ConfigParser as configparser
     import cStringIO
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = OSError
 
 
 # classes dealing with input and output charsets across python versions
@@ -162,6 +166,10 @@ class UnicodeReader:
     def __iter__(self):
         return self
 
+    @property
+    def line_num(self):
+        return self.reader.line_num
+
 
 class UnicodeWriter:
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
@@ -218,8 +226,11 @@ def fix_conf_params(conf_obj, section_name):
             "regex": ["Use Regex For Filename", True, ""],
             "fixed_prefix": ["Output Filename Prefix", False, ""],
             "input_delimiter": ["Source CSV Delimiter", False, ""],
-            "has_headers": ["Source Has Column Headers", True, ""],
+            "header_rows": ["Header Rows", False, ""],
+            "footer_rows": ["Footer Rows", False, ""],
+            "date_format": ["Date Format", False, ""],
             "delete_original": ["Delete Source File", True, ""],
+            "cd_flags": ["Inflow or Outflow Indicator", False, ","],
             "plugin": ["Plugin", False, ""]}
 
     # Bank Download = False
@@ -311,7 +322,10 @@ class B2YBank(object):
                 missing_dir = True
                 path = find_directory("")
             path = abspath(path)
-            directory_list = os.listdir(path)
+            try:
+                directory_list = os.listdir(path)
+            except FileNotFoundError:
+                directory_list = os.listdir(".")
             if regex_active is True:
                 files = [join(path, f)
                          for f in directory_list if f.endswith(ext)
@@ -333,29 +347,53 @@ class B2YBank(object):
         """
         delim = self.config["input_delimiter"]
         output_columns = self.config["output_columns"]
-        has_headers = self.config["has_headers"]
+        header_rows = int(self.config["header_rows"])
+        footer_rows = int(self.config["footer_rows"])
+        cd_flags = self.config["cd_flags"]
+        date_format = self.config["date_format"]
         output_data = []
+
+        # give plugins a chance to pre-process the file
+        self._preprocess_file(file_path)
+
+        # get total number of rows in transaction file using a generator
+        with CrossversionCsvReader(file_path,
+                                   self._is_py2,
+                                   delimiter=delim) as row_count_reader:
+            row_count = sum(1 for row in row_count_reader)
 
         with CrossversionCsvReader(file_path,
                                    self._is_py2,
                                    delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
-                # add new row to output list
-                fixed_row = self._auto_memo(self._fix_row(row))
-                # check our row isn't a null transaction
-                if self._valid_row(fixed_row) is True:
-                    output_data.append(fixed_row)
-            # fix column headers
-            if has_headers is False:
-                output_data.insert(0, output_columns)
-            else:
-                if output_data:
-                    output_data[0] = output_columns
-                else:
-                    output_data.append(output_columns)
+                line = transaction_reader.line_num
+                # skip header & footer rows
+                if header_rows < line <= (row_count - footer_rows):
+                    # check if we need to process Inflow or Outflow flags
+                    if len(cd_flags) == 3:
+                        row = self._cd_flag_process(row)
+                    # check if we need to fix the date format
+                    if date_format:
+                        row = self._fix_date(row, date_format)
+                    # add new row to output list
+                    fixed_row = self._auto_memo(self._fix_row(row))
+                    # check our row isn't a null transaction
+                    if self._valid_row(fixed_row) is True:
+                        output_data.append(fixed_row)
+        # add in column headers
         print("Parsed {} lines".format(len(output_data)))
+        output_data.insert(0, output_columns)
         return output_data
+
+    def _preprocess_file(self, file_path):
+        """
+        exists solely to be used by plugins for pre-processing a file
+        that otherwise can be read normally (e.g. weird format)
+        :param file_path: path to file
+        """
+        # intentionally empty - the plugins can use this function
+        return
 
     def _fix_row(self, row):
         """
@@ -377,6 +415,7 @@ class B2YBank(object):
 
     def _valid_row(self, row):
         """ if our row doesn't have an inflow or outflow, mark as invalid
+        :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
@@ -385,11 +424,41 @@ class B2YBank(object):
         return True
 
     def _auto_memo(self, row):
-        """ auto fill empty memo field with payee info """
+        """ auto fill empty memo field with payee info
+        :param row: list of values
+        """
         payee_index = self.config["output_columns"].index("Payee")
         memo_index = self.config["output_columns"].index("Memo")
         if row[memo_index] == "":
             row[memo_index] = row[payee_index]
+        return row
+
+    def _fix_date(self, row, date_format):
+        """ fix date format when required
+        convert date to DD/MM/YYYY
+        :param row: list of values
+        : param date_format: date format string
+        """
+        date_col = self.config["input_columns"].index("Date")
+        # parse our date according to provided formatting string
+        input_date = datetime.strptime(row[date_col], date_format)
+        # do our actual date processing
+        output_date = datetime.strftime(input_date, "%d/%m/%Y")
+        row[date_col] = output_date
+        return row
+
+    def _cd_flag_process(self, row):
+        """ fix rows where inflow or outflow is indicated by
+        a flag in a separate column
+        :param row: list of values
+        """
+        cd_flags = self.config["cd_flags"]
+        indicator_col = int(cd_flags[0])
+        outflow_flag = cd_flags[2]
+        inflow_col = self.config["input_columns"].index("Inflow")
+        # if this row is indicated to be outflow, multiply Inflow by -1
+        if row[indicator_col] == outflow_flag:
+            row[inflow_col] = str(-1 * float(row[inflow_col]))
         return row
 
     def write_data(self, filename, data):
@@ -398,7 +467,7 @@ class B2YBank(object):
         :param data: cleaned data ready to output
         """
         target_dir = dirname(filename)
-        target_fname = basename(filename)
+        target_fname = basename(filename)[:-4] + ".csv"
         new_filename = self.config["fixed_prefix"] + target_fname
         target_filename = join(target_dir, new_filename)
         print("Writing output file: {}".format(target_filename))
@@ -412,7 +481,7 @@ def build_bank(bank_config):
     """ Factory method loading the correct class for a given configuration. """
     plugin_module = bank_config.get("plugin", None)
     if plugin_module:
-        p_mod = importlib.import_module(".{}".format(plugin_module), "plugins")
+        p_mod = importlib.import_module("plugins.{}".format(plugin_module))
         if not hasattr(p_mod, "build_bank"):
             s = ("The specified plugin {}.py".format(plugin_module) +
                  "does not contain the required "

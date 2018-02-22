@@ -2,15 +2,20 @@
 ![YNAB banner image](https://b.thumbs.redditmedia.com/-4WEzT9WdhQV_khUidt56887E01btV8IILeL6TNvtvI.png)
 -->
 # bank2ynab
+
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
+master: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=master)](https://travis-ci.org/torbengb/bank2ynab) develop: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab)
+
 - [What? (Features)](#what)
+  - [Wish List](#wishlist)
 - [Why?](#why)
 - [How?](#how)
-- [Wish List](#wishlist)
-- [Requirements](#requirements)
+- [Installation Instructions](#install)
+  - [Requirements](#requirements)
 - [User Guide](#userguide)
 - [Known Bugs](#knownbugs)
+- [List of Supported Banks](#formats)
 
 ## <a name="what"></a>What? (Features)
 
@@ -21,6 +26,12 @@ A common project to consolidate all conversion efforts from various banks' expor
 1. If the CSV file matches any of the configured formats: 
    1. Create a new CSV file in YNAB's CSV format with the correct columns and a blank Category column.
    1. Optionally delete the original CSV file.
+
+### <a name="wishlist"></a>Wish List
+
+- add many more input formats from all the [other YNAB-CSV-conversion projects](https://github.com/search?o=desc&q=ynab+convert&s=updated&type=Repositories&utf8=%E2%9C%93).
+- maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
+- maybe coming later: automatically import the converted data into your YNAB app? (optional, default off)
 
 ## <a name="why"></a>Why?
 
@@ -35,18 +46,19 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
   - take advantage of this project to get more import formats.
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
 - Add a brainstorming item as a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
+- Join the chat over at https://gitter.im/bank2ynab/Lobby
+- See also: [the wiki](https://github.com/torbengb/bank2ynab/wiki).
 
-## <a name="wishlist"></a>Wish List
+## <a name=install></a>Installation Instructions
 
-- add many more input formats from all the other YNAB-CSV-conversion projects.
-- maybe coming later: automatically download your bank statements? (uses external services; only available in some countries)
-- maybe coming later: automatically import the converted data into your YNAB app? (optional, default off)
+- Download [this ZIP file](https://github.com/torbengb/bank2ynab/archive/master.zip)
+- Note the [Requirements](#requirements) for additional details!
+- When you're done, refer to the [User Guide](#userguide) below.
 
-## <a name="requirements"></a>Requirements
+### <a name="requirements"></a>Requirements
 
 - Windows or Mac or Linux
-- Python version 3 installed ([download it from python.org](https://www.python.org/downloads/))
-  - we are looking into supporting Python version 2 as well. Work in progress.
+- Python v2.7+ installed, v3.5+ preferred ([download it from python.org](https://www.python.org/downloads/))
 - Support for other scripting languages may follow. Contributions are welcome!
 
 ## <a name="userguide"></a>User Guide
@@ -71,6 +83,35 @@ Using `bank2ynab` is easy:
 ## <a name="knownbugs"></a>Known Bugs
 
 For details, please see our [issue list labeled "Bug"](https://github.com/torbengb/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug).
+
+## <a name="formats"></a>List of Supported Banks
+
+Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/torbengb/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
+
+1. AT Raiffeisen Bank checking
+1. AT Raiffeisen Bank VISA card
+1. BR Inter checking
+1. DE Deutsche Kreditbank checking
+1. DE Deutsche Kreditbank credit card
+1. DE ING-DiBa
+1. DE Kreissparkasse
+1. DE N26
+1. DE Sparkasse Rhein-Neckar-Nord
+1. DK Nordea
+1. IE AIB Ireland
+1. IE Bank of Ireland
+1. MV Bank of Maldives, checking
+1. NL ING Bank
+1. NL Rabobank
+1. NO DNB
+1. Personal Capital (software)
+1. SE Handelsbanken
+1. SE Nordea
+1. SE Swedbank
+1. UK Co-operative Bank
+1. US BB&T
+1. US Schwab
+1. US TB Bank
 
 ----
 

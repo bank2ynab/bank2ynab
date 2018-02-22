@@ -1,7 +1,8 @@
-from os.path import join, abspath, dirname
+from os.path import join
 
 PRODPATH = "bank2ynab.conf"
 TESTCONFPATH = join("test-data", "test.conf")
+
 
 def get_test_confparser():
     py2 = False

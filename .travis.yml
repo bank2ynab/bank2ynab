@@ -17,6 +17,7 @@ script:
   - pip install flake8
   - if [[ $TRAVIS_PYTHON_VERSION == 3* ]] && [[ $TRAVIS_PYTHON_VERSION != 3.2 ]]; then flake8 --builtins=unicode; fi
   - pip install codecov
+  - coverage run tests.py
 after_success:
   - codecov 
 notifications:

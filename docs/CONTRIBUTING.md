@@ -93,9 +93,11 @@ Unsure where to begin contributing? You can start by looking through these issue
 
 ### Coding Conventions
 
-Start reading our code and you'll get the hang of it. We optimize for readability:
+Start reading our code and you'll get the hang of it. 
 
-* We indent using four spaces (soft tabs)
+* We optimize for readability.
+* We indent using four spaces (soft tabs).
+* We use [Travis](https://travis-ci.org/torbengb/bank2ynab/branches) for automated testing. Don't break it, keep Travis happy.
 * This is open source software. Consider the people who will read your code, and make it look nice for them.
 * (More to be added later?)
 

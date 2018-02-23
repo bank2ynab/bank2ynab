@@ -8,3 +8,6 @@ plugins:
     config:
       tests_patterns:
         - test/**
+exclude_patterns:
+  - "test/"
+  - "test-data/"

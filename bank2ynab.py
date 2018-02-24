@@ -17,7 +17,11 @@
 #
 # don't edit below here unless you know what you're doing!
 from os.path import abspath, join, dirname, basename
-import codecs, csv, os, importlib, re, platform
+import codecs
+import csv
+import os
+import importlib
+import re
 from datetime import datetime
 
 # version number according to https://codereview.stackexchange.com/a/131490 :

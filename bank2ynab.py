@@ -22,10 +22,6 @@ from datetime import datetime
 from version import get_version
 from __init__ import *
 
-# version number according to https://codereview.stackexchange.com/a/131490 :
-version_info = (0, 0, 0)
-version = '.'.join(str(c) for c in version_info)
-
 # main Python2 switch
 # any module with different naming should be handled here
 __PY2 = False

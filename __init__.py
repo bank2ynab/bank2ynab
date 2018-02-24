@@ -10,12 +10,12 @@ AUTHOR           = "https://github.com/torbengb/bank2ynab/graphs/contributors"
 version_major    = 1 # must be integer
 version_minor    = 1 # must be integer
 version_patch    = "0" # must be string
-version_suffix   = "dev" # I'd like to *automagically* include the GitHub branch here.
+version_suffix   = "mytestbranch" # I'd like to *automagically* include the GitHub branch here.
 
 # proper release should not have a version suffix:
 if version_suffix == "master": version_suffix = ""
 # if it's not a master release then add the suffix to the patch level:
-if version_suffix != "": version_patch = version_patch + version_suffix
+if version_suffix != "": version_patch = version_patch + '-' + version_suffix
 
 # version number according to https://codereview.stackexchange.com/a/131490 :
 version_info = (version_major, version_minor, version_patch)

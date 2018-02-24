@@ -10,15 +10,16 @@ import io
 import os
 import sys
 from shutil import rmtree
-
 from setuptools import find_packages, setup, Command
+# https://github.com/Changaco/version.py :
+from version import get_version
 
 # Package meta-data.
-NAME = 'mypackage'
+NAME = 'bank2ynab'
 DESCRIPTION = 'My short description for my project.'
-URL = 'https://github.com/me/myproject'
-EMAIL = 'me@example.com'
-AUTHOR = 'Awesome Soul'
+URL = 'https://github.com/torbengb/bank2ynab'
+EMAIL = 'torben@g-b.dk'
+AUTHOR = 'https://github.com/torbengb/bank2ynab/graphs/contributors'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -34,7 +35,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.rst' is present in your MANIFEST.in file!
-with io.open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 # Load the package's __version__.py module as a dictionary.
@@ -114,4 +115,6 @@ setup(
     cmdclass={
         'upload': UploadCommand,
     },
+    # https://github.com/Changaco/version.py :
+    version=get_version(),
 )

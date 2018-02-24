@@ -23,6 +23,7 @@ import os
 import importlib
 import re
 from datetime import datetime
+from version import get_version
 
 # version number according to https://codereview.stackexchange.com/a/131490 :
 version_info = (0, 0, 0)

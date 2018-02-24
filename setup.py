@@ -16,7 +16,7 @@ from version import get_version
 
 # Package meta-data.
 NAME = 'bank2ynab'
-DESCRIPTION = 'My short description for my project.'
+DESCRIPTION = 'A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.'
 URL = 'https://github.com/torbengb/bank2ynab'
 EMAIL = 'torben@g-b.dk'
 AUTHOR = 'https://github.com/torbengb/bank2ynab/graphs/contributors'

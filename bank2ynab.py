@@ -17,12 +17,12 @@
 #
 # don't edit below here unless you know what you're doing!
 from os.path import abspath, join, dirname, basename
-import codecs
-import csv
-import os
-import importlib
-import re
+import codecs, csv, os, importlib, re, platform
 from datetime import datetime
+
+# version number according to https://codereview.stackexchange.com/a/131490 :
+version_info = (0, 0, 0)
+version = '.'.join(str(c) for c in version_info)
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -529,5 +529,7 @@ class Bank2Ynab(object):
 
 # Let's run this thing!
 if __name__ == "__main__":
+    print('bank2ynab ' + __version__ 
+        + ' using Python ' + platform.python_version())
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()

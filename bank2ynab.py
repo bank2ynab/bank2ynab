@@ -17,11 +17,12 @@
 #
 # don't edit below here unless you know what you're doing!
 from os.path import abspath, join, dirname, basename
--import codecs  +import codecs, csv, os, importlib, re, platform
--import csv 
--import os  
--import importlib   
--import re  
+import codecs
+import csv
+import os
+import importlib
+import re
+import platform
 from datetime import datetime
 from version import get_version
 from __init__ import *

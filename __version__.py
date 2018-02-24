@@ -1,1 +1,1 @@
-__version__ = "$Revision: 63990 $"
+from __init__ import VERSION

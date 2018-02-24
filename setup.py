@@ -11,15 +11,10 @@ import os
 import sys
 from shutil import rmtree
 from setuptools import find_packages, setup, Command
+# include the meta-data from the init file:
+from __init__ import *
 # https://github.com/Changaco/version.py :
 from version import get_version
-
-# Package meta-data.
-NAME = 'bank2ynab'
-DESCRIPTION = 'A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.'
-URL = 'https://github.com/torbengb/bank2ynab'
-EMAIL = 'torben@g-b.dk'
-AUTHOR = 'https://github.com/torbengb/bank2ynab/graphs/contributors'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -40,7 +35,8 @@ with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 # Load the package's __version__.py module as a dictionary.
 about = {}
-with open(os.path.join(here, NAME, '__version__.py')) as f:
+with open(os.path.join(here, #NAME, 
+        '__version__.py')) as f:
     exec(f.read(), about)
 
 
@@ -79,19 +75,21 @@ class UploadCommand(Command):
 
 # Where the magic happens:
 setup(
-    name=bank2ynab,
-    version=about['__version__'],
-    description=A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.,
-    long_description=A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.,
-    author=https://github.com/torbengb/bank2ynab/graphs/contributors,
-    author_email=torben@g-b.dk,
-    url=https://github.com/torbengb/bank2ynab,
+    name=NAME,
+    version=about['VERSION'],
+    # https://github.com/Changaco/version.py :
+    #version=get_version(),
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    author=AUTHOR,
+    author_email=EMAIL,
+    url=URL,
     # packages=find_packages(exclude=('tests',)),
     # If your package is a single module, use this instead of 'packages':
-    py_modules=['bank2ynab'],
+    py_modules=[NAME],
 
     # entry_points={
-    #     'console_scripts': ['mycli=bank2ynab:cli'],
+    #     'console_scripts': ['mycli=mymodule:cli'],
     # },
     install_requires=REQUIRED,
     include_package_data=True,
@@ -115,6 +113,4 @@ setup(
     cmdclass={
         'upload': UploadCommand,
     },
-    # https://github.com/Changaco/version.py :
-    version=get_version(),
 )

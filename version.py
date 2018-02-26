@@ -1,5 +1,5 @@
 # Source: https://github.com/Changaco/version.py
-# version.py saves you from having to hard-code the version number of 
+# version.py saves you from having to hard-code the version number of
 # your project by getting it from git tags (directly or indirectly).
 
 from os.path import dirname, isdir, join

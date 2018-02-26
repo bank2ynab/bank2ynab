@@ -13,7 +13,7 @@ from shutil import rmtree
 from setuptools import setup, Command
 # include the meta-data from the init file:
 from __init__ import NAME, DESCRIPTION, LONG_DESCRIPTION, \
-        URL, EMAIL, AUTHOR, VERSION
+        URL, EMAIL, AUTHOR
 
 # What packages are required for this module to be executed?
 REQUIRED = [

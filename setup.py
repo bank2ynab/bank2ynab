@@ -12,7 +12,7 @@ import sys
 from shutil import rmtree
 from setuptools import find_packages, setup, Command
 # include the meta-data from the init file:
-from __init__ import NAME, DESCRIPTION, LONG_DESCRIPTION, 
+from __init__ import NAME, DESCRIPTION, LONG_DESCRIPTION, \
         URL, EMAIL, AUTHOR, VERSION
 # https://github.com/Changaco/version.py :
 from version import get_version
@@ -66,8 +66,10 @@ class UploadCommand(Command):
         except OSError:
             pass
 
-        self.status('Building Source and Wheel (universal) distribution...')
-        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
+        self.status('Building Source and Wheel' \
+                    '(universal) distribution...')
+        os.system('{0} setup.py sdist bdist_wheel --universal' \
+                  .format(sys.executable))
 
         self.status('Uploading the package to PyPi via Twine…')
         os.system('twine upload dist/*')

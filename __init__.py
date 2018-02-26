@@ -7,10 +7,11 @@ EMAIL = "torben@g-b.dk"
 AUTHOR = "https://github.com/torbengb/bank2ynab/graphs/contributors"
 
 # define the version numbers:
-version_major = 1 # must be integer
-version_minor = 1 # must be integer
-version_patch = "0" # must be string
-version_suffix = "mytestbranch" # I'd like to *automagically* include the GitHub branch here.
+version_major = 1  # must be integer
+version_minor = 1  # must be integer
+version_patch = "0"  # must be string
+# I'd like to *automagically* include the GitHub branch here:
+version_suffix = "mytestbranch"  
 
 # proper release should not have a version suffix:
 if version_suffix == "master": 

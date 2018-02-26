@@ -24,9 +24,7 @@ import importlib
 import re
 import platform
 from datetime import datetime
-from version import get_version
-from __init__ import NAME, DESCRIPTION, LONG_DESCRIPTION, \
-        URL, EMAIL, AUTHOR, VERSION
+from __init__ import NAME, VERSION
 
 # main Python2 switch
 # any module with different naming should be handled here

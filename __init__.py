@@ -1,7 +1,9 @@
 # Package meta-data:
 NAME = "bank2ynab"
-DESCRIPTION = "A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format."
-LONG_DESCRIPTION = "A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format."
+DESCRIPTION = "A common project to consolidate all conversion efforts " \
+        "from various banks' export formats into YNAB's import format."
+LONG_DESCRIPTION = "A common project to consolidate all conversion efforts " \
+        "from various banks' export formats into YNAB's import format."
 URL = "https://github.com/torbengb/bank2ynab"
 EMAIL = "torben@g-b.dk"
 AUTHOR = "https://github.com/torbengb/bank2ynab/graphs/contributors"
@@ -11,7 +13,7 @@ version_major = 1  # must be integer
 version_minor = 1  # must be integer
 version_patch = "0"  # must be string
 # I'd like to *automagically* include the GitHub branch here:
-version_suffix = "mytestbranch"  
+version_suffix = "mytestbranch"
 
 # proper release should not have a version suffix:
 if version_suffix == "master":

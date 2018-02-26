@@ -14,12 +14,13 @@ version_patch = "0"  # must be string
 version_suffix = "mytestbranch"  
 
 # proper release should not have a version suffix:
-if version_suffix == "master": 
+if version_suffix == "master":
     version_suffix = ""
 # if it's not a master release then add the suffix to the patch level:
-if version_suffix != "": 
+if version_suffix != "":
     version_patch = version_patch + '-' + version_suffix
 
-# version number according to https://codereview.stackexchange.com/a/131490 :
+# version number according to
+# https://codereview.stackexchange.com/a/131490 :
 version_info = (version_major, version_minor, version_patch)
 VERSION = '.'.join(str(c) for c in version_info)

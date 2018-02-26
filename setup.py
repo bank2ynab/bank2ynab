@@ -12,7 +12,8 @@ import sys
 from shutil import rmtree
 from setuptools import find_packages, setup, Command
 # include the meta-data from the init file:
-from __init__ import *
+from __init__ import
+    NAME, DESCRIPTION, LONG_DESCRIPTION, URL, EMAIL, AUTHOR, VERSION
 # https://github.com/Changaco/version.py :
 from version import get_version
 
@@ -39,6 +40,7 @@ with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 about = {}
 with open(os.path.join(here, '__version__.py')) as f:
     exec(f.read(), about)
+
 
 class UploadCommand(Command):
     """Support setup.py upload."""
@@ -77,8 +79,6 @@ class UploadCommand(Command):
 setup(
     name=NAME,
     version=about['VERSION'],
-    # https://github.com/Changaco/version.py :
-    #version=get_version(),
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author=AUTHOR,

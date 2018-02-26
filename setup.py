@@ -66,10 +66,10 @@ class UploadCommand(Command):
         except OSError:
             pass
 
-        self.status('Building Source and Wheel'
-                    '(universal) distribution...')
-        os.system('{0} setup.py sdist bdist_wheel
-                  --universal'.format(sys.executable))
+        self.status('Building Source and Wheel(universal) '
+                    'distribution...')
+        os.system('{0} setup.py sdist bdist_wheel --universal'.format(
+                sys.executable))
 
         self.status('Uploading the package to PyPi via Twine…')
         os.system('twine upload dist/*')

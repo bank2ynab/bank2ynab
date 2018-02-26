@@ -1,4 +1,5 @@
 # https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore :
+# gitignore - Specifies intentionally untracked files to ignore
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

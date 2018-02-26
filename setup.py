@@ -12,8 +12,8 @@ import sys
 from shutil import rmtree
 from setuptools import find_packages, setup, Command
 # include the meta-data from the init file:
-from __init__ import
-    NAME, DESCRIPTION, LONG_DESCRIPTION, URL, EMAIL, AUTHOR, VERSION
+from __init__ import NAME, DESCRIPTION, LONG_DESCRIPTION, 
+        URL, EMAIL, AUTHOR, VERSION
 # https://github.com/Changaco/version.py :
 from version import get_version
 

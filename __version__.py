@@ -2,4 +2,4 @@
 # it. Sure I could edit their reference but that would make maintenance a tiny
 # bit more complicated.
 
-from __init__ import VERSION
+# from __init__ import VERSION

@@ -18,8 +18,7 @@ script:
   - if [[ $TRAVIS_PYTHON_VERSION == 3* ]] && [[ $TRAVIS_PYTHON_VERSION != 3.2 ]]; then flake8 --builtins=unicode; fi
   - pip install codecov
   - pip install coverage
-  - coverage run bank2ynab.py
-  # - if [[ $TRAVIS_PYTHON_VERSION == 3* ]] && [[ $TRAVIS_PYTHON_VERSION != 3.2 ]]; then coverage run bank2ynab.py; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3* ]] && [[ $TRAVIS_PYTHON_VERSION != 3.2 ]]; then coverage run bank2ynab.py; fi
 after_success:
   - codecov 
   - coverage report

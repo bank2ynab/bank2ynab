@@ -10,7 +10,7 @@ AUTHOR = "https://github.com/torbengb/bank2ynab/graphs/contributors"
 
 # define the version numbers:
 version_major = 1  # must be integer
-version_minor = 1  # must be integer
+version_minor = 0  # must be integer
 version_patch = "0"  # must be string
 # I'd like to *automagically* include the GitHub branch here:
 version_suffix = "mytestbranch"

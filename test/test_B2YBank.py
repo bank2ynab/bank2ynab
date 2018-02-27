@@ -10,7 +10,7 @@ from plugins.null import NullBank
 from test.utils import get_test_confparser
 
 _PY2 = False
-files_processed = 0
+
 
 class TestB2YBank(TestCase):
 
@@ -19,6 +19,7 @@ class TestB2YBank(TestCase):
     def setUp(self):
         global _PY2
         global files_processed
+        files_processed = 0
         self.cp, self.py2, = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None

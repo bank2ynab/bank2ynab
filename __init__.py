@@ -9,6 +9,7 @@ EMAIL = "torben@g-b.dk"
 AUTHOR = "https://github.com/torbengb/bank2ynab/graphs/contributors"
 
 # define the version numbers:
+# !! See also: https://github.com/torbengb/bank2ynab/wiki/VersionNumbers !!
 version_major = 1  # must be integer
 version_minor = 0  # must be integer
 version_patch = "0"  # must be string

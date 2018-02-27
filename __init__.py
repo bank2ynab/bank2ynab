@@ -12,8 +12,8 @@ AUTHOR = "https://github.com/torbengb/bank2ynab/graphs/contributors"
 version_major = 1  # must be integer
 version_minor = 0  # must be integer
 version_patch = "0"  # must be string
-# I'd like to *automagically* include the GitHub branch here:
-version_suffix = "mytestbranch"
+# I'd like to *automagically* include the GitHub branch name here:
+version_suffix = "version-numbering"
 
 # proper release should not have a version suffix:
 if version_suffix == "master":

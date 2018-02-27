@@ -470,10 +470,11 @@ class B2YBank(object):
             row[inflow_col] = str(-1 * float(row[inflow_col]))
         return row
 
-    def write_data(self, filename, data):
+    def write_data(self, filename, data, files_processed):
         """ write out the new CSV file
         :param filename: path to output file
         :param data: cleaned data ready to output
+        :param files_processed: filename suffix
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4] + ".csv"
@@ -517,7 +518,6 @@ class Bank2Ynab(object):
     def run(self):
         """ Main program flow """
         # initialize variables for summary:
-        global files_processed
         files_processed = 0
         # process account for each config file
         for bank in self.banks:
@@ -529,7 +529,7 @@ class Bank2Ynab(object):
                 files_processed += 1
                 # create cleaned csv for each file
                 output = bank.read_data(original_file_path)
-                bank.write_data(original_file_path, output)
+                bank.write_data(original_file_path, output, files_processed)
                 # delete original csv file
                 if bank.config["delete_original"] is True:
                     print("Removing input file: {}".format(original_file_path))

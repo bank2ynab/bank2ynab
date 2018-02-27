@@ -10,7 +10,7 @@ from plugins.null import NullBank
 from test.utils import get_test_confparser
 
 _PY2 = False
-
+files_processed = 0
 
 class TestB2YBank(TestCase):
 

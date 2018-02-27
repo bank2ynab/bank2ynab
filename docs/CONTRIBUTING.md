@@ -95,6 +95,8 @@ Unsure where to begin contributing? You can start by looking through these issue
 * [Beginner issues](https://github.com/torbengb/bank2ynab/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) - issues which should only require a few lines of code, and a test or two.
 * [Help wanted issues](https://github.com/torbengb/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) - issues which should be a bit more involved than `beginner` issues.
 
+Note our wiki pages, especially the [Branching Strategy](https://github.com/torbengb/bank2ynab/wiki/BranchingStrategy)!
+
 -----
 ## Style Guide
 
@@ -122,7 +124,7 @@ Start reading our code and you'll get the hang of it.
 
 ### Using Labels
 
-This section lists the labels we use to help us track and manage issues. Labels make it easy to use labels for finding groups of issues. An issue can have one or several labels. 
+This section lists the labels we use to help us track and manage issues. Labels make it easy to find groups of issues. An issue can have one or several labels. 
 
 | Label name   | Description   |
 | ------------ | ------------- |

@@ -114,6 +114,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Handelsbanken
 1. SE Nordea
 1. SE Swedbank
+1. SG POSB savings
 1. UK Co-operative Bank
 1. UK Monzo checking
 1. UK Barclaycard credit card

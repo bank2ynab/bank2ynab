@@ -18,7 +18,6 @@ class TestB2YBank(TestCase):
 
     def setUp(self):
         global _PY2
-        files_processed = 0
         self.cp, self.py2, = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None

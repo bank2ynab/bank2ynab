@@ -328,16 +328,18 @@ class B2YBank(object):
                 directory_list = os.listdir(".")
             if regex_active is True:
                 files = [join(path, f)
-                         for f in directory_list
+                         for f in directory_list 
                          if f.endswith(ext)
-                         if re.match(file_pattern, f)
+                        #if f.startswith(file_pattern)  # commenting out this attempt by torbengb.
+                         if re.search(file_pattern, f) 
+                        #if re.match(file_pattern, f)   # commenting out this attempt by nocalla.
                          if prefix not in f]
             else:
                 files = [join(path, f)
-                         for f in directory_list
+                         for f in directory_list 
                          if f.endswith(ext)
                          if f.startswith(file_pattern)
-                         if file_pattern in f
+                         if file_pattern in f 
                          if prefix not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"

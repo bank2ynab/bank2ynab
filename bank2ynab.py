@@ -478,7 +478,7 @@ class B2YBank(object):
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4] + ".csv"
-        new_filename = "{}{}_{}".format(self.config["fixed_prefix"], 
+        new_filename = "{}{}_{}".format(self.config["fixed_prefix"],
                                         files_processed, target_fname)
         target_filename = join(target_dir, new_filename)
         print("Writing output file: {}".format(target_filename))

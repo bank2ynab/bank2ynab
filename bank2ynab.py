@@ -330,9 +330,11 @@ class B2YBank(object):
                 files = [join(path, f)
                          for f in directory_list
                          if f.endswith(ext)
-# if f.startswith(file_pattern)  # commenting out this attempt by torbengb.
+                         # commenting out this attempt by torbengb:
+                         # if f.startswith(file_pattern)
                          if re.search(file_pattern, f)
-# if re.match(file_pattern, f)   # commenting out this attempt by nocalla.
+                         # commenting out this attempt by nocalla:
+                         # if re.match(file_pattern, f)
                          if prefix not in f]
             else:
                 files = [join(path, f)

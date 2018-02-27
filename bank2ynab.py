@@ -477,7 +477,7 @@ class B2YBank(object):
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4] + ".csv"
-        new_filename = self.config["fixed_prefix"] + target_fname
+        new_filename = self.config["fixed_prefix"] + str(files_processed) + "_" + target_fname
         target_filename = join(target_dir, new_filename)
         print("Writing output file: {}".format(target_filename))
         with CrossversionCsvWriter(target_filename, self._is_py2) as writer:
@@ -517,6 +517,7 @@ class Bank2Ynab(object):
     def run(self):
         """ Main program flow """
         # initialize variables for summary:
+        global files_processed
         files_processed = 0
         # process account for each config file
         for bank in self.banks:

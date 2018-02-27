@@ -19,6 +19,7 @@ class TestB2YBank(TestCase):
     def setUp(self):
         global _PY2
         global files_processed
+        files_processed = 0
         self.cp, self.py2, = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None
@@ -65,7 +66,6 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(records), num_records)
 
     def test_write_data(self):
-        files_processed = 0
         # if you need more tests, add sections to test.conf & specify them here
         # todo: incorporate multiple-file scenarios
         for section_name, num_records, fpath in [

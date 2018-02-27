@@ -10,7 +10,7 @@ from plugins.null import NullBank
 from test.utils import get_test_confparser
 
 _PY2 = False
-files_processed = 0
+
 
 class TestB2YBank(TestCase):
 
@@ -65,6 +65,7 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(records), num_records)
 
     def test_write_data(self):
+        files_processed = 0
         # if you need more tests, add sections to test.conf & specify them here
         # todo: incorporate multiple-file scenarios
         for section_name, num_records, fpath in [

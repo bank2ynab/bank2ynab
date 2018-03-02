@@ -5,11 +5,14 @@
 
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
-[![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab) 
+Development: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab) 
+![GitHub last commit](https://img.shields.io/github/last-commit/torbengb/bank2ynab.svg)
+[![GitHub open issues](https://img.shields.io/github/issues-raw/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/issues)
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
-[![codecov](https://codecov.io/gh/torbengb/bank2ynab/branch/develop/graph/badge.svg)](https://codecov.io/gh/torbengb/bank2ynab)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/8b6259502a92c06b0cd5/test_coverage)](https://codeclimate.com/github/torbengb/bank2ynab/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/8b6259502a92c06b0cd5/maintainability)](https://codeclimate.com/github/torbengb/bank2ynab/maintainability)
+
+Testing:
+[![Coverage Status](https://coveralls.io/repos/github/torbengb/bank2ynab/badge.svg?branch=develop)](https://coveralls.io/github/torbengb/bank2ynab?branch=develop)
+[![Code Climate issues](https://img.shields.io/codeclimate/issues/github/torbengb/bank2ynab.svg)](https://codeclimate.com/github/torbengb/bank2ynab/issues)
 
 - [What? (Features)](#what)
   - [Wish List](#wishlist)

@@ -483,7 +483,7 @@ class B2YBank(object):
             new_filename = "{}{}_{}".format(self.config["fixed_prefix"],
                                             target_fname, counter)
         ):
-            counter++
+            counter += 1
         target_filename = join(target_dir, new_filename)
         print("Writing output file: {}".format(target_filename))
         with CrossversionCsvWriter(target_filename, self._is_py2) as writer:

@@ -5,7 +5,7 @@
 
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
-Development:  
+Development: 
 [![GitHub open issues](https://img.shields.io/github/issues-raw/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/commits/develop)
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)

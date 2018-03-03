@@ -76,7 +76,7 @@ class TestB2YBank(TestCase):
             for f in b.get_files():
                 output_data = b.read_data(f)
                 self.assertEqual(len(output_data), num_records)
-                result_file = b.write_data(f, output_data, 0)
+                result_file = b.write_data(f, output_data)
                 # check the file is where we expect it to be
                 expected_file = abspath(join('test-data', fpath))
                 self.assertTrue(exists(expected_file))

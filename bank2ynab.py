@@ -478,12 +478,13 @@ class B2YBank(object):
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
         counter = 0
-        new_filename = basename(filename)
-        while os.path.isfile(new_filename):  # fix for issue #182
+        new_filename = "{}{}_{}.csv".format(
+                self.config["fixed_prefix"],
+                target_fname, counter)
+        while os.path.isfile(new_filename):
             new_filename = "{}{}_{}.csv".format(
                 self.config["fixed_prefix"],
                 target_fname, counter)
-
             counter += 1
         target_filename = join(target_dir, new_filename)
         print("Writing output file: {}".format(target_filename))

@@ -100,6 +100,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. AT Raiffeisen Bank VISA card
 1. BE KBC checking
 1. BR Inter checking
+1. CA TD Canada Trust, checking+Visa
 1. DE Commerzbank checking
 1. DE Deutsche Kreditbank checking
 1. DE Deutsche Kreditbank credit card

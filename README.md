@@ -133,7 +133,7 @@ Here is a list of the banks and their formats that we already support. Note that
 
 ----
 
-![XKCD on standards](https://imgs.xkcd.com/comics/standards.png)
+[![XKCD on standards: Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.](https://imgs.xkcd.com/comics/standards.png)](https://xkcd.com/927/)
 
 ----
 

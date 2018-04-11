@@ -337,7 +337,6 @@ class B2YBank(object):
                          for f in directory_list
                          if f.endswith(ext)
                          if f.startswith(file_pattern)
-                         if file_pattern in f
                          if prefix not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"

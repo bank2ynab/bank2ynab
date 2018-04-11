@@ -6,6 +6,7 @@
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
 Development: 
+[![GitHub issues by-label](https://img.shields.io/github/issues-raw/torbengb/bank2ynab/bug.svg)](https://github.com/torbengb/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
 [![GitHub open issues](https://img.shields.io/github/issues-raw/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/commits/develop)
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
@@ -100,6 +101,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. AT Raiffeisen Bank VISA card
 1. BE KBC checking
 1. BR Inter checking
+1. CA TD Canada Trust, checking+Visa
 1. DE Commerzbank checking
 1. DE Deutsche Kreditbank checking
 1. DE Deutsche Kreditbank credit card
@@ -131,7 +133,7 @@ Here is a list of the banks and their formats that we already support. Note that
 
 ----
 
-![XKCD on standards](https://imgs.xkcd.com/comics/standards.png)
+[![XKCD on standards: Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.](https://imgs.xkcd.com/comics/standards.png)](https://xkcd.com/927/)
 
 ----
 

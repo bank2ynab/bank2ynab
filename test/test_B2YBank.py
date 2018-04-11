@@ -66,16 +66,17 @@ class TestB2YBank(TestCase):
     def test_write_data(self):
         # if you need more tests, add sections to test.conf & specify them here
         # todo: incorporate multiple-file scenarios
+        # todo: allow incremental file suffixes when files named the same
         for section_name, num_records, fpath in [
-            ("test_record_i18n", 74, "fixed_0_test_raiffeisen_01.csv"),
-            ("test_record_headers", 74, "fixed_0_test_headers.csv")
+            ("test_record_i18n", 74, "fixed_test_raiffeisen_01_0.csv"),
+            ("test_record_headers", 74, "fixed_test_headers_0.csv")
         ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)
             for f in b.get_files():
                 output_data = b.read_data(f)
                 self.assertEqual(len(output_data), num_records)
-                result_file = b.write_data(f, output_data, 0)
+                result_file = b.write_data(f, output_data)
                 # check the file is where we expect it to be
                 expected_file = abspath(join('test-data', fpath))
                 self.assertTrue(exists(expected_file))

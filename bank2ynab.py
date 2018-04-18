@@ -444,6 +444,8 @@ class B2YBank(object):
         : param date_format: date format string
         """
         date_col = self.config["input_columns"].index("Date")
+        if row[date_col] == "":
+            return row
         # parse our date according to provided formatting string
         input_date = datetime.strptime(row[date_col], date_format)
         # do our actual date processing

@@ -56,7 +56,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
 - Add a brainstorming item as a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
 - Join the chat over at https://gitter.im/bank2ynab/Lobby
-- See also: [the wiki](https://github.com/torbengb/bank2ynab/wiki).
+- See also: [the wiki](https://github.com/torbengb/bank2ynab/wiki), perhaps most importantly [this page about import formats](https://github.com/torbengb/bank2ynab/wiki/ImportFormats).
 
 ## <a name=install></a>Installation Instructions
 

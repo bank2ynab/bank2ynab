@@ -16,8 +16,9 @@ class OCBC_Bank_SG(B2YBank):
 
     def _preprocess_file(self, file_path):
         """
-        exists solely to be used by plugins for pre-processing a file
-        that otherwise can be read normally (e.g. weird format)
+        For every row that doesn't have a valid date field
+        strip out separators and append to preceding row.
+        Overwrite input file with modified output.
         :param file_path: path to file
         """
         # what do we actually want to do?
@@ -47,7 +48,6 @@ class OCBC_Bank_SG(B2YBank):
         with open(file_path, 'w') as output_file:
             for row in output_rows:
                 output_file.write(row)
-
         return
 
 

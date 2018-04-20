@@ -198,7 +198,7 @@ def get_configs():
     conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
     if conf_files == []:
         print("\nError: Can't find configuration file: bank2ynab.conf")
-    config = configparser.ConfigParser()
+    config = configparser.RawConfigParser()
     if __PY2:
         config.read(conf_files)
     else:

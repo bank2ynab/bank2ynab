@@ -5,7 +5,16 @@
 
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
-master: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=master)](https://travis-ci.org/torbengb/bank2ynab) develop: [![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab)
+Development: 
+[![GitHub issues by-label](https://img.shields.io/github/issues-raw/torbengb/bank2ynab/bug.svg)](https://github.com/torbengb/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+[![GitHub open issues](https://img.shields.io/github/issues-raw/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/commits/develop)
+[![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
+
+Testing:
+[![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab)
+[![Coverage Status](https://coveralls.io/repos/github/torbengb/bank2ynab/badge.svg?branch=develop)](https://coveralls.io/github/torbengb/bank2ynab?branch=develop)
+[![Code Climate issues](https://img.shields.io/codeclimate/issues/github/torbengb/bank2ynab.svg)](https://codeclimate.com/github/torbengb/bank2ynab/issues)
 
 - [What? (Features)](#what)
   - [Wish List](#wishlist)
@@ -47,7 +56,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
 - Add a brainstorming item as a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
 - Join the chat over at https://gitter.im/bank2ynab/Lobby
-- See also: [the wiki](https://github.com/torbengb/bank2ynab/wiki).
+- See also: [the wiki](https://github.com/torbengb/bank2ynab/wiki), perhaps most importantly [this page about import formats](https://github.com/torbengb/bank2ynab/wiki/ImportFormats).
 
 ## <a name=install></a>Installation Instructions
 
@@ -90,32 +99,43 @@ Here is a list of the banks and their formats that we already support. Note that
 
 1. AT Raiffeisen Bank checking
 1. AT Raiffeisen Bank VISA card
+1. BE KBC checking
 1. BR Inter checking
+1. CA TD Canada Trust, checking+Visa
+1. DE Commerzbank checking
 1. DE Deutsche Kreditbank checking
 1. DE Deutsche Kreditbank credit card
 1. DE ING-DiBa
 1. DE Kreissparkasse
 1. DE N26
 1. DE Sparkasse Rhein-Neckar-Nord
+1. DE Ostseesparkasse Rostock checking
+1. DE Ostseesparkasse Rostock credit card
 1. DK Nordea
 1. IE AIB Ireland
 1. IE Bank of Ireland
 1. MV Bank of Maldives, checking
+1. NL Bunq checking
 1. NL ING Bank
-1. NL Rabobank
+1. NL Rabobank (2017 format)
+1. NL Rabobank (2018 format)
 1. NO DNB
 1. Personal Capital (software)
 1. SE Handelsbanken
 1. SE Nordea
 1. SE Swedbank
+1. SG POSB savings
 1. UK Co-operative Bank
+1. UK Monzo checking
+1. UK Barclaycard credit card
+1. UK first direct checking
 1. US BB&T
 1. US Schwab
 1. US TB Bank
 
 ----
 
-![XKCD on standards](https://imgs.xkcd.com/comics/standards.png)
+[![XKCD on standards: Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.](https://imgs.xkcd.com/comics/standards.png)](https://xkcd.com/927/)
 
 ----
 

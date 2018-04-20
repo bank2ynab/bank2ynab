@@ -328,12 +328,16 @@ class B2YBank(object):
                 directory_list = os.listdir(".")
             if regex_active is True:
                 files = [join(path, f)
-                         for f in directory_list if f.endswith(ext)
-                         if re.search(file_pattern, f) if prefix not in f]
+                         for f in directory_list
+                         if f.endswith(ext)
+                         if re.match(file_pattern + ".*\.", f)
+                         if prefix not in f]
             else:
                 files = [join(path, f)
-                         for f in directory_list if f.endswith(ext)
-                         if file_pattern in f if prefix not in f]
+                         for f in directory_list
+                         if f.endswith(ext)
+                         if f.startswith(file_pattern)
+                         if prefix not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
                      "\nTrying default path instead:\t {}")
@@ -467,8 +471,16 @@ class B2YBank(object):
         :param data: cleaned data ready to output
         """
         target_dir = dirname(filename)
-        target_fname = basename(filename)[:-4] + ".csv"
-        new_filename = self.config["fixed_prefix"] + target_fname
+        target_fname = basename(filename)[:-4]
+        counter = 0
+        new_filename = "{}{}_{}.csv".format(
+                self.config["fixed_prefix"],
+                target_fname, counter)
+        while os.path.isfile(new_filename):
+            new_filename = "{}{}_{}.csv".format(
+                self.config["fixed_prefix"],
+                target_fname, counter)
+            counter += 1
         target_filename = join(target_dir, new_filename)
         print("Writing output file: {}".format(target_filename))
         with CrossversionCsvWriter(target_filename, self._is_py2) as writer:

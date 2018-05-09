@@ -421,7 +421,7 @@ class B2YBank(object):
         return output
 
     def _valid_row(self, row):
-        """ if our row doesn't have an inflow or outflow or is blank, mark as invalid
+        """ if our row doesn't have an inflow or outflow, mark as invalid
         :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")

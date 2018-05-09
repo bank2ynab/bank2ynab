@@ -374,6 +374,9 @@ class B2YBank(object):
                 line = transaction_reader.line_num
                 # skip header & footer rows
                 if header_rows < line <= (row_count - footer_rows):
+                    # skip blank rows
+                    if len(row) == 0:
+                        continue
                     # check if we need to process Inflow or Outflow flags
                     if len(cd_flags) == 3:
                         row = self._cd_flag_process(row)
@@ -418,7 +421,7 @@ class B2YBank(object):
         return output
 
     def _valid_row(self, row):
-        """ if our row doesn't have an inflow or outflow, mark as invalid
+        """ if our row doesn't have an inflow or outflow or is blank, mark as invalid
         :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")

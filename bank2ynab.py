@@ -465,7 +465,7 @@ class B2YBank(object):
         indicator_col = int(cd_flags[0])
         outflow_flag = cd_flags[2]
         inflow_col = self.config["input_columns"].index("Inflow")
-        outlow_col = self.config["input_columns"].index("Outflow")
+        outflow_col = self.config["input_columns"].index("Outflow")
         # if this row is indicated to be outflow, move amount to outflow
         if row[indicator_col] == outflow_flag:
             row[outflow_col] = row[inflow_col]

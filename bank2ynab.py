@@ -465,11 +465,9 @@ class B2YBank(object):
         indicator_col = int(cd_flags[0])
         outflow_flag = cd_flags[2]
         inflow_col = self.config["input_columns"].index("Inflow")
-        outflow_col = self.config["input_columns"].index("Outflow")
-        # if this row is indicated to be outflow, move amount to outflow
+        # if this row is indicated to be outflow, make inflow negative
         if row[indicator_col] == outflow_flag:
-            row[outflow_col] = row[inflow_col]
-            row[inflow_col] = ""
+            row[inflow_col] = "-" + row[inflow_col]
         return row
 
     def write_data(self, filename, data):

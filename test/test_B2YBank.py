@@ -68,8 +68,8 @@ class TestB2YBank(TestCase):
         # todo: incorporate multiple-file scenarios
         # todo: allow incremental file suffixes when files named the same
         for section_name, num_records, fpath in [
-            ("test_record_i18n", 74, "fixed_test_raiffeisen_01_0.csv"),
-            ("test_record_headers", 74, "fixed_test_headers_0.csv")
+            ("test_record_i18n", 74, "fixed_test_raiffeisen_01.csv"),
+            ("test_record_headers", 74, "fixed_test_headers.csv")
         ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)

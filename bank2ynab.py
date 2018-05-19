@@ -477,11 +477,11 @@ class B2YBank(object):
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
-        counter = 0
-        new_filename = "{}{}_{}.csv".format(
+        new_filename = "{}{}.csv".format(
                 self.config["fixed_prefix"],
-                target_fname, counter)
+                target_fname)
         while os.path.isfile(new_filename):
+            counter = 0
             new_filename = "{}{}_{}.csv".format(
                 self.config["fixed_prefix"],
                 target_fname, counter)

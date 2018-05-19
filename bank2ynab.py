@@ -195,8 +195,8 @@ class UnicodeWriter:
 # Generic utilities
 def get_configs():
     """ Retrieve all configuration parameters."""
-    conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
-    if conf_files == []:
+    conf_files = ["bank2ynab.conf", "user_configuration.conf"]
+    if not os.path.exists("bank2ynab.conf"):
         print("\nError: Can't find configuration file: bank2ynab.conf")
     config = configparser.RawConfigParser()
     if __PY2:

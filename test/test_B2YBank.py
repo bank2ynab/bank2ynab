@@ -92,3 +92,25 @@ class TestB2YBank(TestCase):
         self.assertIsInstance(nullb, NullBank)
         missingconf = fix_conf_params(self.cp, "test_plugin_missing")
         self.assertRaises(ImportError, build_bank, missingconf)
+
+    def test_preprocess_file(self):
+        # todo
+
+    def test_fix_row(self):
+        # todo
+
+    def test_valid_row(self):
+        # todo
+
+    def test_valid_row(self):
+        # todo
+
+    def test_auto_memo(self):
+        # todo
+
+    def test_fix_date(self):
+        # todo
+
+    def test_cd_flag_process():
+        # todo
+

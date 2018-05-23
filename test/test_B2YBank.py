@@ -95,6 +95,7 @@ class TestB2YBank(TestCase):
 
     def test_fix_row(self):
         """ check output row is the same across different formats """
+        # todo: something where the row format is invalid
         # if you need more tests, add sections to test.conf & specify them here
         for section_name in [
             "test_row_format_default",
@@ -123,10 +124,7 @@ class TestB2YBank(TestCase):
                         ])
                 ]:
                     result_row = output_data[row]
-                    print("{}: {}\nResult:\n{}\nExpect:\n{}\n".format(
-                        section_name, f, result_row, expected_row
-                    ))  # debug
-                    
+                                        
                     if(self.py2):
                         self.assertItemsEqual(expected_row, result_row)
                     else:
@@ -143,6 +141,9 @@ class TestB2YBank(TestCase):
         # todo
 
     def test_fix_date(self):
+        # todo
+        
+    def test_fix_outflow(self):
         # todo
 
     def test_cd_flag_process():

@@ -383,8 +383,10 @@ class B2YBank(object):
                     # check if we need to fix the date format
                     if date_format:
                         row = self._fix_date(row, date_format)
-                    # add new row to output list
-                    fixed_row = self._auto_memo(self._fix_row(row))
+                    # create our output_row
+                    fixed_row = self._fix_row(row)
+                    # fill in blank memo fields
+                    fixed_row = self._auto_memo(fixed_row)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)

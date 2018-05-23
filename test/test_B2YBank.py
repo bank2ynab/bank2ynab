@@ -93,12 +93,42 @@ class TestB2YBank(TestCase):
         missingconf = fix_conf_params(self.cp, "test_plugin_missing")
         self.assertRaises(ImportError, build_bank, missingconf)
 
-    def test_preprocess_file(self):
-        # todo
-
     def test_fix_row(self):
-        # todo
+        """ check output row is the same across different formats """
+        # if you need more tests, add sections to test.conf & specify them here
+        for section_name in [
+            "test_row_format_default",
+            "test_row_format_neg_inflow",
+            "test_row_format_CD_flag",
+            "test_row_format_invalid"
+        ]:
+            config = fix_conf_params(self.cp, section_name)
+            b = B2YBank(config, self.py2)
+            for f in b.get_files():
+                output_data = b.read_data(f)
+                # test the same two rows in each scenario
+                for row, expected_row in [
+                    (23, [
+                            "28.09.2017",
+                            "HOFER DANKT  0527  K2   28.09. 17:17",
+                            "",
+                            "HOFER DANKT  0527  K2   28.09. 17:17",
+                            "44,96", ""
+                        ]),
+                    (24, [
+                            "28.09.2017", "SOFTWARE Wien",
+                            "",
+                            "SOFTWARE Wien",
+                            "", "307,67"
+                        ])
+                ]:
+                    result_row = output_data[row]
+                    print("{}: {}\nResult:\n{}\nExpect:\n{}\n".format(
+                        section_name, f, result_row, expected_row
+                    ))  # debug
+                    self.assertCountEqual(expected_row, result_row)
 
+    """
     def test_valid_row(self):
         # todo
 
@@ -114,3 +144,6 @@ class TestB2YBank(TestCase):
     def test_cd_flag_process():
         # todo
 
+    def test_preprocess_file(self):
+        # todo
+    """

@@ -385,6 +385,8 @@ class B2YBank(object):
                         row = self._fix_date(row, date_format)
                     # create our output_row
                     fixed_row = self._fix_row(row)
+                    # convert negative inflows to standard outflows
+                    fixed_row = self._fix_outflow(fixed_row)
                     # fill in blank memo fields
                     fixed_row = self._auto_memo(fixed_row)
                     # check our row isn't a null transaction
@@ -421,7 +423,21 @@ class B2YBank(object):
                 cell = ""
             output.append(cell)
         return output
-
+        
+    def _fix_outflow(self, row):
+        """
+        convert negative inflow into positive outflow
+        :param row: list of values
+        :return: list of values with corrected outflow column
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        inflow = row[inflow_index]
+        if(inflow.startswith("-")):
+            row[inflow_index] = ""
+            row[outflow_index] = inflow[1:]
+        return row
+        
     def _valid_row(self, row):
         """ if our row doesn't have an inflow or outflow, mark as invalid
         :param row: list of values

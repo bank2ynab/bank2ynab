@@ -124,7 +124,7 @@ class TestB2YBank(TestCase):
                         ])
                 ]:
                     result_row = output_data[row]
-                                        
+
                     if(self.py2):
                         self.assertItemsEqual(expected_row, result_row)
                     else:
@@ -142,7 +142,7 @@ class TestB2YBank(TestCase):
 
     def test_fix_date(self):
         # todo
-        
+
     def test_fix_outflow(self):
         # todo
 

@@ -423,7 +423,7 @@ class B2YBank(object):
                 cell = ""
             output.append(cell)
         return output
-        
+
     def _fix_outflow(self, row):
         """
         convert negative inflow into positive outflow
@@ -437,7 +437,7 @@ class B2YBank(object):
             row[inflow_index] = ""
             row[outflow_index] = inflow[1:]
         return row
-        
+
     def _valid_row(self, row):
         """ if our row doesn't have an inflow or outflow, mark as invalid
         :param row: list of values

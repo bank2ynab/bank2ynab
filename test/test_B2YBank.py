@@ -53,6 +53,7 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(files), num_files)
 
     def test_read_data(self):
+        """ Test that the right number of rows are read from the test files """
         # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_records, fpath in [
                 ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
@@ -64,6 +65,11 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(records), num_records)
 
     def test_write_data(self):
+        """
+        Test that the right amount of files are created
+        and that the file paths end up where we expect
+        # to do - make sure file contents are what we expect
+        """
         # if you need more tests, add sections to test.conf & specify them here
         # todo: incorporate multiple-file scenarios
         # todo: allow incremental file suffixes when files named the same
@@ -94,7 +100,7 @@ class TestB2YBank(TestCase):
         self.assertRaises(ImportError, build_bank, missingconf)
 
     def test_fix_row(self):
-        """ check output row is the same across different formats """
+        """ Check output row is the same across different formats """
         # todo: something where the row format is invalid
         # if you need more tests, add sections to test.conf & specify them here
         for section_name in [
@@ -115,13 +121,15 @@ class TestB2YBank(TestCase):
                             "",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
                             "44,96", ""
-                        ]),
+                        ]
+                    ),
                     (24, [
                             "28.09.2017", "SOFTWARE Wien",
                             "",
                             "SOFTWARE Wien",
                             "", "307,67"
-                        ])
+                        ]
+                    )
                 ]:
                     result_row = output_data[row]
 

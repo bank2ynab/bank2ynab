@@ -126,7 +126,11 @@ class TestB2YBank(TestCase):
                     print("{}: {}\nResult:\n{}\nExpect:\n{}\n".format(
                         section_name, f, result_row, expected_row
                     ))  # debug
-                    self.assertCountEqual(expected_row, result_row)
+                    
+                    if(self.py2):
+                        self.assertItemsEqual(expected_row, result_row)
+                    else:
+                        self.assertCountEqual(expected_row, result_row)
 
     """
     def test_valid_row(self):

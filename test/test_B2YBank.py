@@ -136,13 +136,20 @@ class TestB2YBank(TestCase):
                     else:
                         self.assertCountEqual(expected_row, result_row)
 
+    def test_valid_row(self):
+        """ Test making sure row has an outflow or an inflow """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config, self.py2)
+
+        for row, row_validity in [
+            (["28.09.2017", "Me", "", "", "300", ""], True),  # missing inflow
+            (["28.09.2017", "Me", "", "", "", "400"], True),  # missing outflow
+            (["28.09.2017", "Me", "", "", "", ""], False)     # missing both
+        ]:
+            is_valid = b._valid_row(row)
+            self.assertEqual(is_valid, row_validity)
+
     """
-    def test_valid_row(self):
-        # todo
-
-    def test_valid_row(self):
-        # todo
-
     def test_auto_memo(self):
         # todo
 

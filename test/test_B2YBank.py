@@ -142,17 +142,27 @@ class TestB2YBank(TestCase):
         b = B2YBank(config, self.py2)
 
         for row, row_validity in [
-            (["28.09.2017", "Me", "", "", "300", ""], True),  # missing inflow
-            (["28.09.2017", "Me", "", "", "", "400"], True),  # missing outflow
-            (["28.09.2017", "Me", "", "", "", ""], False)     # missing both
+            (["28.09.2017", "Payee", "", "", "300", ""], True),
+            (["28.09.2017", "Payee", "", "", "", "400"], True),
+            (["28.09.2017", "Payee", "", "", "", ""], False)
         ]:
             is_valid = b._valid_row(row)
             self.assertEqual(is_valid, row_validity)
 
-    """
     def test_auto_memo(self):
-        # todo
+        """ Test auto-filling empty memo field with payee data """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config, self.py2)
+        memo_index = b.config["output_columns"].index("Memo")
 
+        for row, test_memo in [
+            (["28.09.2017", "Payee", "", "", "300", ""], "Payee"),
+            (["28.09.2017", "Payee", "", "Memo", "", "400"], "Memo")
+        ]:
+            new_memo = b._auto_memo(row)[memo_index]
+            self.assertEqual(test_memo, new_memo)
+
+    """
     def test_fix_date(self):
         # todo
 

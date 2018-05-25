@@ -395,7 +395,6 @@ class B2YBank(object):
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
         # add in column headers
-        #print("Parsed {} lines".format(len(output_data)))
         logging.info("Parsed {} lines".format(len(output_data)))
         output_data.insert(0, output_columns)
         return output_data
@@ -551,17 +550,17 @@ class Bank2Ynab(object):
         for bank in self.banks:
             # find all applicable files
             files = bank.get_files()
-            for original_file_path in files:
-                logging.info("\nParsing input file:  {}".format(original_file_path))
+            for src_file in files:
+                logging.info("\nParsing input file:  {}".format(src_file))
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file
-                output = bank.read_data(original_file_path)
-                bank.write_data(original_file_path, output)
+                output = bank.read_data(src_file)
+                bank.write_data(src_file, output)
                 # delete original csv file
                 if bank.config["delete_original"] is True:
-                    logging.info("Removing input file: {}".format(original_file_path))
-                    os.remove(original_file_path)
+                    logging.info("Removing input file: {}".format(src_file))
+                    os.remove(src_file)
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 

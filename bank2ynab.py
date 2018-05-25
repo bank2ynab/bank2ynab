@@ -24,7 +24,9 @@ import importlib
 import re
 from datetime import datetime
 import logging
-logging.basicConfig(format="%(message)s", level=logging.INFO)
+
+# configure our logger
+logging.basicConfig(format="%(levelname)s %(message)s", level=logging.INFO)
 
 # main Python2 switch
 # any module with different naming should be handled here

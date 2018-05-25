@@ -397,7 +397,7 @@ class B2YBank(object):
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
         # add in column headers
-        logging.info("Parsed {} lines".format(len(output_data)))
+        logging.debug("Parsed {} lines".format(len(output_data)))
         output_data.insert(0, output_columns)
         return output_data
 

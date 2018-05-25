@@ -185,8 +185,6 @@ class TestB2YBank(TestCase):
     def test_fix_date(self):
         # todo
 
-    
-
     def test_cd_flag_process():
         # todo
 

@@ -23,6 +23,7 @@ import os
 import importlib
 import re
 from datetime import datetime
+import logging
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -564,5 +565,6 @@ class Bank2Ynab(object):
 
 # Let's run this thing!
 if __name__ == "__main__":
+    logging.basicConfig(format='%(message)s', level=logging.DEBUG)
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()

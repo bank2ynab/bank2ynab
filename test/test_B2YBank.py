@@ -168,21 +168,27 @@ class TestB2YBank(TestCase):
         """ Test conversion of negative Inflow into Outflow """
         config = fix_conf_params(self.cp, "test_row_format_default")
         b = B2YBank(config, self.py2)
-        
+
         for row, expected_row in [
-            (["28.09.2017", "Payee", "", "", "300", ""], 
-            ["28.09.2017", "Payee", "", "", "300", ""]), 
-            (["28.09.2017", "Payee", "", "", "", "-300"], 
-            ["28.09.2017", "Payee", "", "", "300", ""]), 
-            (["28.09.2017", "Payee", "", "", "", "300"], 
-            ["28.09.2017", "Payee", "", "", "", "300"])
+            (
+                ["28.09.2017", "Payee", "", "", "300", ""],
+                ["28.09.2017", "Payee", "", "", "300", ""]
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "-300"],
+                ["28.09.2017", "Payee", "", "", "300", ""]
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "300"],
+                ["28.09.2017", "Payee", "", "", "", "300"]
+            )
         ]:
             result_row = b._fix_outflow(row)
             if(self.py2):
                 self.assertItemsEqual(expected_row, result_row)
             else:
                 self.assertCountEqual(expected_row, result_row)
-        
+
     """
     def test_fix_date(self):
         # todo

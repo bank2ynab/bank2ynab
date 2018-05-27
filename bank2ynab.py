@@ -507,7 +507,7 @@ class B2YBank(object):
                 self.config["fixed_prefix"],
                 target_fname)
         while os.path.isfile(new_filename):
-            counter = 0
+            counter = 1
             new_filename = "{}{}_{}.csv".format(
                 self.config["fixed_prefix"],
                 target_fname, counter)

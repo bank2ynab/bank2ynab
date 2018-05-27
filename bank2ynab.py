@@ -235,6 +235,7 @@ def fix_conf_params(conf_obj, section_name):
             "date_format": ["Date Format", False, ""],
             "delete_original": ["Delete Source File", True, ""],
             "cd_flags": ["Inflow or Outflow Indicator", False, ","],
+            "payee_to_memo": ["Use Payee for Memo", True, ""],
             "plugin": ["Plugin", False, ""]}
 
     # Bank Download = False
@@ -359,6 +360,7 @@ class B2YBank(object):
         footer_rows = int(self.config["footer_rows"])
         cd_flags = self.config["cd_flags"]
         date_format = self.config["date_format"]
+        fill_memo = self.config["payee_to_memo"]
         output_data = []
 
         # give plugins a chance to pre-process the file
@@ -392,7 +394,7 @@ class B2YBank(object):
                     # convert negative inflows to standard outflows
                     fixed_row = self._fix_outflow(fixed_row)
                     # fill in blank memo fields
-                    fixed_row = self._auto_memo(fixed_row)
+                    fixed_row = self._auto_memo(fixed_row, fill_memo)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
@@ -452,14 +454,16 @@ class B2YBank(object):
             return False
         return True
 
-    def _auto_memo(self, row):
+    def _auto_memo(self, row, fill_memo):
         """ auto fill empty memo field with payee info
         :param row: list of values
+        :param fill_memo: boolean
         """
-        payee_index = self.config["output_columns"].index("Payee")
-        memo_index = self.config["output_columns"].index("Memo")
-        if row[memo_index] == "":
-            row[memo_index] = row[payee_index]
+        if fill_memo:
+            payee_index = self.config["output_columns"].index("Payee")
+            memo_index = self.config["output_columns"].index("Memo")
+            if row[memo_index] == "":
+                row[memo_index] = row[payee_index]
         return row
 
     def _fix_date(self, row, date_format):

@@ -385,9 +385,8 @@ class B2YBank(object):
                         continue
                     # process Inflow or Outflow flags
                     row = self._cd_flag_process(row, cd_flags)
-                    # check if we need to fix the date format
-                    if date_format:
-                        row = self._fix_date(row, date_format)
+                    # fix the date format
+                    row = self._fix_date(row, date_format)
                     # create our output_row
                     fixed_row = self._fix_row(row)
                     # convert negative inflows to standard outflows
@@ -469,16 +468,17 @@ class B2YBank(object):
         """ fix date format when required
         convert date to DD/MM/YYYY
         :param row: list of values
-        : param date_format: date format string
+        :param date_format: date format string
         """
-        date_col = self.config["input_columns"].index("Date")
-        if row[date_col] == "":
-            return row
-        # parse our date according to provided formatting string
-        input_date = datetime.strptime(row[date_col], date_format)
-        # do our actual date processing
-        output_date = datetime.strftime(input_date, "%d/%m/%Y")
-        row[date_col] = output_date
+        if date_format:
+            date_col = self.config["input_columns"].index("Date")
+            if row[date_col] == "":
+                return row
+            # parse our date according to provided formatting string
+            input_date = datetime.strptime(row[date_col], date_format)
+            # do our actual date processing
+            output_date = datetime.strftime(input_date, "%d/%m/%Y")
+            row[date_col] = output_date
         return row
 
     def _cd_flag_process(self, row, cd_flags):

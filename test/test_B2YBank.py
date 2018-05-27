@@ -155,11 +155,13 @@ class TestB2YBank(TestCase):
         b = B2YBank(config, self.py2)
         memo_index = b.config["output_columns"].index("Memo")
 
-        for row, test_memo in [
-            (["28.09.2017", "Payee", "", "", "300", ""], "Payee"),
-            (["28.09.2017", "Payee", "", "Memo", "", "400"], "Memo")
+        for row, test_memo, fill_memo in [
+            (["28.09.2017", "Payee", "", "", "300", ""], "", False),
+            (["28.09.2017", "Payee", "", "Memo", "300", ""], "Memo", False),
+            (["28.09.2017", "Payee", "", "", "300", ""], "Payee", True),
+            (["28.09.2017", "Payee", "", "Memo", "", "400"], "Memo", True)
         ]:
-            new_memo = b._auto_memo(row)[memo_index]
+            new_memo = b._auto_memo(row, fill_memo)[memo_index]
             self.assertEqual(test_memo, new_memo)
 
     def test_fix_outflow(self):

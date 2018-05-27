@@ -383,12 +383,10 @@ class B2YBank(object):
                     # skip blank rows
                     if len(row) == 0:
                         continue
-                    # check if we need to process Inflow or Outflow flags
-                    if len(cd_flags) == 3:
-                        row = self._cd_flag_process(row)
-                    # check if we need to fix the date format
-                    if date_format:
-                        row = self._fix_date(row, date_format)
+                    # process Inflow or Outflow flags
+                    row = self._cd_flag_process(row, cd_flags)
+                    # fix the date format
+                    row = self._fix_date(row, date_format)
                     # create our output_row
                     fixed_row = self._fix_row(row)
                     # convert negative inflows to standard outflows
@@ -470,30 +468,32 @@ class B2YBank(object):
         """ fix date format when required
         convert date to DD/MM/YYYY
         :param row: list of values
-        : param date_format: date format string
+        :param date_format: date format string
         """
-        date_col = self.config["input_columns"].index("Date")
-        if row[date_col] == "":
-            return row
-        # parse our date according to provided formatting string
-        input_date = datetime.strptime(row[date_col], date_format)
-        # do our actual date processing
-        output_date = datetime.strftime(input_date, "%d/%m/%Y")
-        row[date_col] = output_date
+        if date_format:
+            date_col = self.config["input_columns"].index("Date")
+            if row[date_col] == "":
+                return row
+            # parse our date according to provided formatting string
+            input_date = datetime.strptime(row[date_col], date_format)
+            # do our actual date processing
+            output_date = datetime.strftime(input_date, "%d/%m/%Y")
+            row[date_col] = output_date
         return row
 
-    def _cd_flag_process(self, row):
+    def _cd_flag_process(self, row, cd_flags):
         """ fix rows where inflow or outflow is indicated by
         a flag in a separate column
         :param row: list of values
+        :param cd_flags: list of parameters for applying indicators
         """
-        cd_flags = self.config["cd_flags"]
-        indicator_col = int(cd_flags[0])
-        outflow_flag = cd_flags[2]
-        inflow_col = self.config["input_columns"].index("Inflow")
-        # if this row is indicated to be outflow, make inflow negative
-        if row[indicator_col] == outflow_flag:
-            row[inflow_col] = "-" + row[inflow_col]
+        if len(cd_flags) == 3:
+            indicator_col = int(cd_flags[0])
+            outflow_flag = cd_flags[2]
+            inflow_col = self.config["input_columns"].index("Inflow")
+            # if this row is indicated to be outflow, make inflow negative
+            if row[indicator_col] == outflow_flag:
+                row[inflow_col] = "-" + row[inflow_col]
         return row
 
     def write_data(self, filename, data):
@@ -507,7 +507,7 @@ class B2YBank(object):
                 self.config["fixed_prefix"],
                 target_fname)
         while os.path.isfile(new_filename):
-            counter = 0
+            counter = 1
             new_filename = "{}{}_{}.csv".format(
                 self.config["fixed_prefix"],
                 target_fname, counter)

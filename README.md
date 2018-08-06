@@ -114,6 +114,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Ostseesparkasse Rostock checking
 1. DE Ostseesparkasse Rostock credit card
 1. DK Arbejdernes Landsbank (Bankernes EDB Central)
+1. DK Handelsbanken (Bankernes EDB Central)
 1. DK Merkur Andelskasse (Bankernes EDB Central)
 1. DK Nordea
 1. IE AIB Ireland

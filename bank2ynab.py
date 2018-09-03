@@ -238,11 +238,6 @@ def fix_conf_params(conf_obj, section_name):
             "payee_to_memo": ["Use Payee for Memo", True, ""],
             "plugin": ["Plugin", False, ""]}
 
-    # Bank Download = False
-    # Bank Download URL = ""
-    # Bank Download Login = ""
-    # Bank Download Auth1 = ""
-    # Bank Download Auth2 = ""
     for key in config:
         config[key] = get_config_line(conf_obj, section_name, config[key])
     config["bank_name"] = section_name

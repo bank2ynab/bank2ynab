@@ -242,6 +242,10 @@ def fix_conf_params(conf_obj, section_name):
         config[key] = get_config_line(conf_obj, section_name, config[key])
     config["bank_name"] = section_name
 
+    # quick n' dirty fix for tabs as delimiters
+    if config["input_delimiter"] == "\\t":
+        config["input_delimiter"] = "\t"
+
     return config
 
 

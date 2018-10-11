@@ -568,7 +568,10 @@ class Bank2Ynab(object):
                     os.remove(src_file)
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
-
+class YNAB_API(object): # in progress
+    """ Class used to access the YNAB API """
+    
+    
 # Let's run this thing!
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)

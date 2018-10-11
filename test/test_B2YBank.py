@@ -57,7 +57,8 @@ class TestB2YBank(TestCase):
         # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_records, fpath in [
                 ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
-                ("test_record_headers", 74, "test_headers.csv")
+                ("test_record_headers", 74, "test_headers.csv"),
+                ("test_delimiter_tab", 74, "test_delimiter_tab.csv")
                 ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)

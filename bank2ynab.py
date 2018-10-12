@@ -384,12 +384,12 @@ class B2YBank(object):
                         continue
                     # process Inflow or Outflow flags
                     row = self._cd_flag_process(row, cd_flags)
+                    # remove quotation marks
+                    fixed_row = self._remove_quotationmarks(row)
                     # fix the date format
                     row = self._fix_date(row, date_format)
                     # create our output_row
                     fixed_row = self._fix_row(row)
-                    # remove quotation marks
-                    fixed_row = self._remove_quotationmarks(fixed_row)
                     # convert negative inflows to standard outflows
                     fixed_row = self._fix_outflow(fixed_row)
                     # fill in blank memo fields

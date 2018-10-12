@@ -483,7 +483,7 @@ class B2YBank(object):
         return row
 
     def _remove_quotationmarks(self, row):
-        """ remove the qoutations before and after an inflow or outflow
+        """ remove the quotations before and after an inflow or outflow
         :param row: list of values
         :return row
         """

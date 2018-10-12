@@ -388,6 +388,8 @@ class B2YBank(object):
                     row = self._fix_date(row, date_format)
                     # create our output_row
                     fixed_row = self._fix_row(row)
+                    # remove quotation marks
+                    fixed_row = self._remove_qoutationmarks(fixed_row)
                     # convert negative inflows to standard outflows
                     fixed_row = self._fix_outflow(fixed_row)
                     # fill in blank memo fields
@@ -478,6 +480,25 @@ class B2YBank(object):
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%d/%m/%Y")
             row[date_col] = output_date
+        return row
+
+    def _remove_qoutationmarks(self, row):
+        """ remove the qoutations before and after an inflow or outflow
+        :param row: list of values
+        :return row
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+
+        inflow = row[inflow_index]
+        outflow = row[outflow_index]
+
+        """ checks for quotation marks, removes them"""
+        if inflow.startswith("\""):
+            row[inflow_index] = inflow.replace("\"", "")
+        if outflow.startswith("\""):
+            row[outflow_index] = inflow.replace("\"", "")
+
         return row
 
     def _cd_flag_process(self, row, cd_flags):

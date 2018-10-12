@@ -384,8 +384,6 @@ class B2YBank(object):
                         continue
                     # process Inflow or Outflow flags
                     row = self._cd_flag_process(row, cd_flags)
-                    # remove quotation marks
-                    fixed_row = self._remove_quotationmarks(row)
                     # fix the date format
                     row = self._fix_date(row, date_format)
                     # create our output_row
@@ -480,25 +478,6 @@ class B2YBank(object):
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%d/%m/%Y")
             row[date_col] = output_date
-        return row
-
-    def _remove_quotationmarks(self, row):
-        """ remove the quotations before and after an inflow or outflow
-        :param row: list of values
-        :return row
-        """
-        inflow_index = self.config["output_columns"].index("Inflow")
-        outflow_index = self.config["output_columns"].index("Outflow")
-
-        inflow = row[inflow_index]
-        outflow = row[outflow_index]
-
-        """ checks for quotation marks, removes them"""
-        if inflow.startswith("\""):
-            row[inflow_index] = inflow.replace("\"", "")
-        if outflow.startswith("\""):
-            row[outflow_index] = inflow.replace("\"", "")
-
         return row
 
     def _cd_flag_process(self, row, cd_flags):

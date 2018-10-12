@@ -389,7 +389,7 @@ class B2YBank(object):
                     # create our output_row
                     fixed_row = self._fix_row(row)
                     # remove quotation marks
-                    fixed_row = self._remove_qoutationmarks(fixed_row)
+                    fixed_row = self._remove_quotationmarks(fixed_row)
                     # convert negative inflows to standard outflows
                     fixed_row = self._fix_outflow(fixed_row)
                     # fill in blank memo fields
@@ -482,7 +482,7 @@ class B2YBank(object):
             row[date_col] = output_date
         return row
 
-    def _remove_qoutationmarks(self, row):
+    def _remove_quotationmarks(self, row):
         """ remove the qoutations before and after an inflow or outflow
         :param row: list of values
         :return row

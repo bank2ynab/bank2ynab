@@ -6,15 +6,15 @@
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
 Development:
-[![GitHub issues by-label](https://img.shields.io/github/issues-raw/torbengb/bank2ynab/bug.svg)](https://github.com/torbengb/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
-[![GitHub open issues](https://img.shields.io/github/issues-raw/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/issues)
-[![GitHub last commit](https://img.shields.io/github/last-commit/torbengb/bank2ynab.svg)](https://github.com/torbengb/bank2ynab/commits/develop)
+[![GitHub issues by-label](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab/bug.svg)](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+[![GitHub open issues](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/commits/develop)
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
 
 Testing:
-[![Travis status](https://api.travis-ci.org/torbengb/bank2ynab.svg?branch=develop)](https://travis-ci.org/torbengb/bank2ynab)
-[![Coverage Status](https://coveralls.io/repos/github/torbengb/bank2ynab/badge.svg?branch=develop)](https://coveralls.io/github/torbengb/bank2ynab?branch=develop)
-[![Code Climate issues](https://img.shields.io/codeclimate/issues/github/torbengb/bank2ynab.svg)](https://codeclimate.com/github/torbengb/bank2ynab/issues)
+[![Travis status](https://api.travis-ci.org/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.org/bank2ynab/bank2ynab)
+[![Coverage Status](https://coveralls.io/repos/github/bank2ynab/bank2ynab/badge.svg?branch=develop)](https://coveralls.io/github/bank2ynab/bank2ynab?branch=develop)
+[![Code Climate issues](https://img.shields.io/codeclimate/issues/github/bank2ynab/bank2ynab.svg)](https://codeclimate.com/github/bank2ynab/bank2ynab/issues)
 
 - [What? (Features)](#what)
   - [Wish List](#wishlist)
@@ -50,17 +50,17 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 - If you're "just a user":
   - [tell us your import format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can create a converter - for you and for everyone else!
-  - use the converter provided here and [give us feedback](https://github.com/torbengb/bank2ynab/issues/new) - or participate!
+  - use the converter provided here and [give us feedback](https://github.com/bank2ynab/bank2ynab/issues/new) - or participate!
 - If you've already built a YNAB converter:
   - take advantage of this project to get more import formats.
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
-- Add a brainstorming item as a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
+- Add a brainstorming item as a [new issue](https://github.com/bank2ynab/bank2ynab/issues/new).
 - Join the chat over at https://gitter.im/bank2ynab/Lobby
-- See also: [the wiki](https://github.com/torbengb/bank2ynab/wiki), perhaps most importantly [this page about import formats](https://github.com/torbengb/bank2ynab/wiki/ImportFormats).
+- See also: [the wiki](https://github.com/bank2ynab/bank2ynab/wiki), perhaps most importantly [this page about import formats](https://github.com/bank2ynab/bank2ynab/wiki/ImportFormats).
 
 ## <a name=install></a>Installation Instructions
 
-- Download [this ZIP file](https://github.com/torbengb/bank2ynab/archive/master.zip)
+- Download [this ZIP file](https://github.com/bank2ynab/bank2ynab/archive/master.zip)
 - Note the [Requirements](#requirements) for additional details!
 - When you're done, refer to the [User Guide](#userguide) below.
 
@@ -91,11 +91,11 @@ Using `bank2ynab` is easy:
 
 ## <a name="knownbugs"></a>Known Bugs
 
-For details, please see our [issue list labeled "Bug"](https://github.com/torbengb/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug).
+For details, please see our [issue list labeled "Bug"](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug).
 
 ## <a name="formats"></a>List of Supported Banks
 
-Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/torbengb/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
+Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
 
 1. AT Raiffeisen Bank checking
 1. AT Raiffeisen Bank VISA card
@@ -144,4 +144,4 @@ Here is a list of the banks and their formats that we already support. Note that
 
 ----
 
-*Disclaimer: Please use at your own risk. This tool is neither officially supported by YNAB (the company) nor by YNAB (the software) in any way. Use of this tool could introduce problems into your budget that YNAB, through its official support channels, will not be able to troubleshoot or fix. See also the full [MIT licence](https://raw.githubusercontent.com/torbengb/bank2ynab/master/LICENSE).*
+*Disclaimer: Please use at your own risk. This tool is neither officially supported by YNAB (the company) nor by YNAB (the software) in any way. Use of this tool could introduce problems into your budget that YNAB, through its official support channels, will not be able to troubleshoot or fix. See also the full [MIT licence](https://raw.githubusercontent.com/bank2ynab/bank2ynab/master/LICENSE).*

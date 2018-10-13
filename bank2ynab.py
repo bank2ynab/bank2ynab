@@ -570,11 +570,28 @@ class Bank2Ynab(object):
                     os.remove(src_file)
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
-class YNAB_API(object): # in progress
+
+class YNAB_API(object):  # in progress
     """ Class used to access the YNAB API """
-    
-    
+    # uses Implicit Flow
+    # access token expires after 2 hours
+    def __init__(self):
+        client_id = (
+                    "02b3cc30001991a3bb82652c6ecef50"
+                    "e6a1126df052f14fc725fc8a39639bb6c")
+        redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
+        self.auth_url = (
+                    "https://app.youneedabudget.com/oauth/authorize?"
+                    "client_id={}&redirect_uri={}&response_type=token"
+                    ).format(client_id, redirect_uri)
+
+    def run(self):
+        print(self.auth_url)
+
+
 # Let's run this thing!
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
+    api = YNAB_API()
+    api.run()

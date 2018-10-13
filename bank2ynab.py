@@ -24,6 +24,9 @@ import importlib
 import re
 from datetime import datetime
 import logging
+# API testing stuff
+import urllib
+import webbrowser
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s %(message)s", level=logging.INFO)
@@ -576,19 +579,56 @@ class YNAB_API(object):  # in progress
     # uses Implicit Flow
     # access token expires after 2 hours
     def __init__(self):
+        something = 2+2
+
+    def get_auth_token(self):
+        # use client ID to obtain access token from YNAB
         client_id = (
                     "02b3cc30001991a3bb82652c6ecef50"
                     "e6a1126df052f14fc725fc8a39639bb6c")
-        redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
-        self.auth_url = (
+        redirect_uri = "http://localhost:8000/"#"urn:ietf:wg:oauth:2.0:oob"
+        auth_url = (
                     "https://app.youneedabudget.com/oauth/authorize?"
                     "client_id={}&redirect_uri={}&response_type=token"
                     ).format(client_id, redirect_uri)
-
-    def run(self):
-        print(self.auth_url)
-
-
+                    
+        # go to the authorisation page
+        # if we have authorisation it goes to redirect uri
+        webbrowser.open(auth_url)
+        # after authorisation it goes to redirect uri with token at end
+        # how do we get the information from that page back into the script?
+    
+    def run(self): # test run
+        # Oauth implicit flow 
+        token = self.get_auth_token()
+        
+    def post_transactions:
+        """
+        reference: 
+        https://api.youneedabudget.com/v1#/Transactions/createTransaction
+        """
+        """
+        https://api.youneedabudget.com/v1/budgets/{budget_id}/transactions/createTransaction?access_token=<ACCESS_TOKEN>
+        """
+        """
+        {
+            "transactions": [
+            {
+              "account_id": "string",
+              "date": "string",
+              "amount": 40,
+              "payee_id": "string",
+              "payee_name": "string",
+              "category_id": "string",
+              "memo": "string",
+              "cleared": "cleared",
+              "approved": true,
+              "flag_color": "red",
+              "import_id": "string"
+            }
+          ]
+      }
+    """
 # Let's run this thing!
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)

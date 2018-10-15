@@ -12,7 +12,7 @@ Development:
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
 
 Testing:
-[![Travis status](https://api.travis-ci.org/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.org/bank2ynab/bank2ynab)
+[![Travis status](https://travis-ci.org/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.org/bank2ynab/bank2ynab)
 [![Coverage Status](https://coveralls.io/repos/github/bank2ynab/bank2ynab/badge.svg?branch=develop)](https://coveralls.io/github/bank2ynab/bank2ynab?branch=develop)
 [![Code Climate issues](https://img.shields.io/codeclimate/issues/github/bank2ynab/bank2ynab.svg)](https://codeclimate.com/github/bank2ynab/bank2ynab/issues)
 

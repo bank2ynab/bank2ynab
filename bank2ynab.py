@@ -557,7 +557,8 @@ class Bank2Ynab(object):
             files = bank.get_files()
             bank_name = bank.name
             for src_file in files:
-                logging.info("\nParsing input file:  {} (format: {})".format(src_file, bank_name))
+                logging.info("\nParsing input file:  {} (format: {})".format(
+                            src_file, bank_name))
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file

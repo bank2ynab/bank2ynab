@@ -4,9 +4,9 @@
 #
 # Searches specified folder or default download folder for exported
 # bank transaction file (.csv format) & adjusts format for YNAB import
-# Please see here for details: https://github.com/torbengb/bank2ynab
+# Please see here for details: https://github.com/bank2ynab/bank2ynab
 #
-# MIT License: https://github.com/torbengb/bank2ynab/blob/master/LICENSE
+# MIT License: https://github.com/bank2ynab/bank2ynab/blob/master/LICENSE
 #
 # DISCLAIMER: Please use at your own risk. This tool is neither officially
 # supported by YNAB (the company) nor by YNAB (the software) in any way.

@@ -2,7 +2,7 @@
 
 :+1::tada: First off, thanks for taking the time to contribute! :tada::+1:
 
-The following is a set of guidelines for contributing to `bank2ynab`. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document. This project is hosted by the user [torbengb](https://github.com/torbengb) who hereby expressly does not claim sole ownership and warmly welcomes all contributors.
+The following is a set of guidelines for contributing to `bank2ynab`. These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document. This project is hosted by the organisation [bank2ynab](https://github.com/bank2ynab) which hereby expressly does not claim sole ownership and warmly welcomes all contributors.
 
 -----
 ### Table Of Contents
@@ -46,11 +46,11 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### Before Submitting A Bug Report
 
-* **Check the [debugging guide](https://github.com/torbengb/bank2ynab/wiki/Debugging-Guide).** You might be able to find the cause of the problem and fix things yourself. Most importantly, check if you're using [the latest version of `bank2ynab`](https://github.com/torbengb/bank2ynab/archive/develop.zip) and if you can get the desired behavior by changing [`bank2ynab`'s config settings](https://github.com/torbengb/bank2ynab/wiki/userConfigs).
-* **Check the [FAQs](https://github.com/torbengb/bank2ynab/wiki/FAQ)** for a list of common questions and problems.
-* **Perform a [cursory search](https://github.com/torbengb/bank2ynab/issues)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
+* **Check the [debugging guide](https://github.com/bank2ynab/bank2ynab/wiki/Debugging-Guide).** You might be able to find the cause of the problem and fix things yourself. Most importantly, check if you're using [the latest version of `bank2ynab`](https://github.com/bank2ynab/bank2ynab/archive/develop.zip) and if you can get the desired behavior by changing [`bank2ynab`'s config settings](https://github.com/bank2ynab/bank2ynab/wiki/userConfigs).
+* **Check the [FAQs](https://github.com/bank2ynab/bank2ynab/wiki/FAQ)** for a list of common questions and problems.
+* **Perform a [cursory search](https://github.com/bank2ynab/bank2ynab/issues)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
-If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/torbengb/bank2ynab/issues/new). 
+If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/bank2ynab/bank2ynab/issues/new). 
 * If possible, use the template to create the issue.
 * **Use a clear and descriptive title** for the issue to identify the problem, and include a **clear description** with as much relevant information as possible. If you can, please include **test data** (anonymized) that causes the problem.
 * [Assign labels](#using-labels) to the issue. Make a best guess if you're in doubt.
@@ -59,7 +59,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 
 #### **Do you have questions about the source code?**
 
-* Ask any question about how to use `bank2ynab` by submitting a [new issue](https://github.com/torbengb/bank2ynab/issues/new).
+* Ask any question about how to use `bank2ynab` by submitting a [new issue](https://github.com/bank2ynab/bank2ynab/issues/new).
 
 #### **Did you write a patch that fixes a bug?**
 
@@ -81,10 +81,10 @@ Before creating enhancement suggestions, please check [this list](#before-submit
 
 #### Before Submitting An Enhancement Suggestion
 
-* **Check the [debugging guide](https://github.com/torbengb/bank2ynab/wiki/Debugging-Guide)** for tips — you might discover that the enhancement is already available. Most importantly, check if you're using [the latest version of `bank2ynab`](https://github.com/torbengb/bank2ynab/archive/develop.zip) and if you can get the desired behavior by changing [`bank2ynab`'s config settings](https://github.com/torbengb/bank2ynab/wiki/userConfigs).
-* **Perform a [cursory search](https://github.com/torbengb/bank2ynab/issues)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
+* **Check the [debugging guide](https://github.com/bank2ynab/bank2ynab/wiki/Debugging-Guide)** for tips — you might discover that the enhancement is already available. Most importantly, check if you're using [the latest version of `bank2ynab`](https://github.com/bank2ynab/bank2ynab/archive/develop.zip) and if you can get the desired behavior by changing [`bank2ynab`'s config settings](https://github.com/bank2ynab/bank2ynab/wiki/userConfigs).
+* **Perform a [cursory search](https://github.com/bank2ynab/bank2ynab/issues)** to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
 
-If you're unable to find an open issue addressing your suggestion, [open a new one](https://github.com/torbengb/bank2ynab/issues/new).
+If you're unable to find an open issue addressing your suggestion, [open a new one](https://github.com/bank2ynab/bank2ynab/issues/new).
 * **Use a clear and descriptive title** for your suggestion, and include a **clear description** with as much relevant information as possible. If you can, please include **test data** (anonymized) that demonstrates the enhancement.
 
 
@@ -92,10 +92,10 @@ If you're unable to find an open issue addressing your suggestion, [open a new o
 
 Unsure where to begin contributing? You can start by looking through these issues:
 
-* [Beginner issues](https://github.com/torbengb/bank2ynab/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) - issues which should only require a few lines of code, and a test or two.
-* [Help wanted issues](https://github.com/torbengb/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) - issues which should be a bit more involved than `beginner` issues.
+* [Beginner issues](https://github.com/bank2ynab/bank2ynab/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) - issues which should only require a few lines of code, and a test or two.
+* [Help wanted issues](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) - issues which should be a bit more involved than `beginner` issues.
 
-Note our wiki pages, especially the [Branching Strategy](https://github.com/torbengb/bank2ynab/wiki/BranchingStrategy)!
+Note our wiki pages, especially the [Branching Strategy](https://github.com/bank2ynab/bank2ynab/wiki/BranchingStrategy)!
 
 -----
 ## Style Guide
@@ -107,7 +107,7 @@ Start reading our code and you'll get the hang of it.
 
 * We optimize for readability.
 * We indent using four spaces (soft tabs).
-* We use [Travis](https://travis-ci.org/torbengb/bank2ynab/branches) for automated testing. Don't break it, keep Travis happy.
+* We use [Travis](https://travis-ci.org/bank2ynab/bank2ynab/branches) for automated testing. Don't break it, keep Travis happy.
 * This is open source software. Consider the people who will read your code, and make it look nice for them.
 * (More to be added later?)
 
@@ -156,7 +156,7 @@ This section lists the labels we use to help us track and manage issues. Labels 
 | `workaround exists`          | The user can work around the problem for now, but a proper solution is needed. |
 
 -----
-`bank2ynab` is a volunteer effort. We encourage you to pitch in and join [the team](https://github.com/torbengb/bank2ynab/graphs/contributors)!
+`bank2ynab` is a volunteer effort. We encourage you to pitch in and join [the team](https://github.com/bank2ynab/bank2ynab/graphs/contributors)!
 
 Thanks! :heart: :heart: :heart:
 

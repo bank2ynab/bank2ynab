@@ -4,7 +4,9 @@ repos:
     rev: v2.0.0
     hooks:
     -    id: trailing-whitespace
+         exclude: ^test-data/
     -    id: end-of-file-fixer
+         exclude: ^test-data/
     -    id: flake8
     -    id: requirements-txt-fixer
 

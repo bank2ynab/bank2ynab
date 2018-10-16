@@ -13,7 +13,7 @@ Development:
 
 Testing:
 [![Travis status](https://travis-ci.org/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.org/bank2ynab/bank2ynab)
-[![Coverage Status](https://coveralls.io/repos/github/bank2ynab/bank2ynab/badge.svg?branch=develop)](https://coveralls.io/github/bank2ynab/bank2ynab?branch=develop)
+[![Coverage Status](https://codecov.io/gh/bank2ynab/bank2ynab/branch/develop/graph/badge.svg)](https://codecov.io/gh/bank2ynab/bank2ynab)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a9bbb651ef51fc1d9f4f/maintainability)](https://codeclimate.com/github/bank2ynab/bank2ynab/maintainability)
 
 - [What? (Features)](#what)

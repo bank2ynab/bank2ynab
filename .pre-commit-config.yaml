@@ -3,14 +3,19 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.0.0
     hooks:
+        # removes trailing whitespace from lines in code (exclude test data)
     -    id: trailing-whitespace
          exclude: ^test-data/
+        # makes sure files end with a newline character (exclude test data)
     -    id: end-of-file-fixer
          exclude: ^test-data/
+         # run flake8 checked for code standards
     -    id: flake8
+        # Sorts entries in requirements.txt
     -    id: requirements-txt-fixer
 
 -   repo: https://github.com/pre-commit/mirrors-autopep8
     rev: v1.4
     hooks:
+        # run autopep8 code fixer for code standards
     -    id: autopep8

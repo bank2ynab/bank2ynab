@@ -22,7 +22,7 @@ Header Rows = 1
 Footer Rows = 0
 Input Columns = Date,Payee,Outflow,Inflow,Running Balance
 Date Format = 
-# (see https://docs.python.org/2/library/datetime.html#id1 for date format strings)
+# (see http://strftime.org/ for date format strings)
 Inflow or Outflow Indicator =
 Output Columns = Date,Payee,Category,Memo,Outflow,Inflow
 Output Filename Prefix = fixed_

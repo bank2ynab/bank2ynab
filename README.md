@@ -106,6 +106,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. CZ Ceska Sporitelna
 1. CZ Raiffeisen bank
 1. DE Commerzbank checking
+1. DE Consorsbank checking
 1. DE Deutsche Bank
 1. DE Deutsche Kreditbank checking
 1. DE Deutsche Kreditbank credit card

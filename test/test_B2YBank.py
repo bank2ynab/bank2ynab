@@ -53,10 +53,12 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(files), num_files)
 
     def test_read_data(self):
+        """ Test that the right number of rows are read from the test files """
         # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_records, fpath in [
                 ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
-                ("test_record_headers", 74, "test_headers.csv")
+                ("test_record_headers", 74, "test_headers.csv"),
+                ("test_delimiter_tab", 74, "test_delimiter_tab.csv")
                 ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)
@@ -64,8 +66,14 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(records), num_records)
 
     def test_write_data(self):
+        """
+        Test that the right amount of files are created
+        and that the file paths end up where we expect
+        # to do - make sure file contents are what we expect
+        """
         # if you need more tests, add sections to test.conf & specify them here
         # todo: incorporate multiple-file scenarios
+        # todo: allow incremental file suffixes when files named the same
         for section_name, num_records, fpath in [
             ("test_record_i18n", 74, "fixed_test_raiffeisen_01.csv"),
             ("test_record_headers", 74, "fixed_test_headers.csv")
@@ -91,3 +99,104 @@ class TestB2YBank(TestCase):
         self.assertIsInstance(nullb, NullBank)
         missingconf = fix_conf_params(self.cp, "test_plugin_missing")
         self.assertRaises(ImportError, build_bank, missingconf)
+
+    def test_fix_row(self):
+        """ Check output row is the same across different formats """
+        # todo: something where the row format is invalid
+        # if you need more tests, add sections to test.conf & specify them here
+        for section_name in [
+            "test_row_format_default",
+            "test_row_format_neg_inflow",
+            "test_row_format_CD_flag",
+            "test_row_format_invalid"
+        ]:
+            config = fix_conf_params(self.cp, section_name)
+            b = B2YBank(config, self.py2)
+            for f in b.get_files():
+                output_data = b.read_data(f)
+                # test the same two rows in each scenario
+                for row, expected_row in [
+                    (23, [
+                            "28.09.2017",
+                            "HOFER DANKT  0527  K2   28.09. 17:17",
+                            "",
+                            "HOFER DANKT  0527  K2   28.09. 17:17",
+                            "44,96", ""
+                        ]),
+                    (24, [
+                            "28.09.2017", "SOFTWARE Wien",
+                            "",
+                            "SOFTWARE Wien",
+                            "", "307,67"
+                        ])
+                ]:
+                    result_row = output_data[row]
+
+                    if(self.py2):
+                        self.assertItemsEqual(expected_row, result_row)
+                    else:
+                        self.assertCountEqual(expected_row, result_row)
+
+    def test_valid_row(self):
+        """ Test making sure row has an outflow or an inflow """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config, self.py2)
+
+        for row, row_validity in [
+            (["28.09.2017", "Payee", "", "", "300", ""], True),
+            (["28.09.2017", "Payee", "", "", "", "400"], True),
+            (["28.09.2017", "Payee", "", "", "", ""], False)
+        ]:
+            is_valid = b._valid_row(row)
+            self.assertEqual(is_valid, row_validity)
+
+    def test_auto_memo(self):
+        """ Test auto-filling empty memo field with payee data """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config, self.py2)
+        memo_index = b.config["output_columns"].index("Memo")
+
+        for row, test_memo, fill_memo in [
+            (["28.09.2017", "Payee", "", "", "300", ""], "", False),
+            (["28.09.2017", "Payee", "", "Memo", "300", ""], "Memo", False),
+            (["28.09.2017", "Payee", "", "", "300", ""], "Payee", True),
+            (["28.09.2017", "Payee", "", "Memo", "", "400"], "Memo", True)
+        ]:
+            new_memo = b._auto_memo(row, fill_memo)[memo_index]
+            self.assertEqual(test_memo, new_memo)
+
+    def test_fix_outflow(self):
+        """ Test conversion of negative Inflow into Outflow """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config, self.py2)
+
+        for row, expected_row in [
+            (
+                ["28.09.2017", "Payee", "", "", "300", ""],
+                ["28.09.2017", "Payee", "", "", "300", ""]
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "-300"],
+                ["28.09.2017", "Payee", "", "", "300", ""]
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "300"],
+                ["28.09.2017", "Payee", "", "", "", "300"]
+            )
+        ]:
+            result_row = b._fix_outflow(row)
+            if(self.py2):
+                self.assertItemsEqual(expected_row, result_row)
+            else:
+                self.assertCountEqual(expected_row, result_row)
+
+    """
+    def test_fix_date(self):
+        # todo
+
+    def test_cd_flag_process():
+        # todo
+
+    def test_preprocess_file(self):
+        # todo
+    """

@@ -1,0 +1,18 @@
+plugins:
+  pep8:
+    enabled: true
+  radon: 
+    enabled: true
+  sonar-python:
+    enabled: true
+    config:
+      tests_patterns:
+        - test/**
+exclude_patterns:
+  - "docs/"
+  - "test/"
+  - "test-data/"
+  - "plugins/__init__.py"
+  - "plugins/null.py"
+  - "plugins/plugin-template.py"
+  

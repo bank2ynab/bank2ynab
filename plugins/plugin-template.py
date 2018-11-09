@@ -1,4 +1,4 @@
-# Step 1: See https://github.com/torbengb/bank2ynab/wiki/WorkingWithPlugins
+# Step 1: See https://github.com/bank2ynab/bank2ynab/wiki/WorkingWithPlugins
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
 

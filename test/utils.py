@@ -12,7 +12,7 @@ def get_test_confparser():
     except ImportError:
         import ConfigParser as configparser
         py2 = True
-    cp = configparser.ConfigParser()
+    cp = configparser.RawConfigParser()
     # first read prod to get all defaults
     cp.read([PRODPATH])
     for section in cp.sections():

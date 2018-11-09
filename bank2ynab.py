@@ -23,6 +23,10 @@ import os
 import importlib
 import re
 from datetime import datetime
+import logging
+
+# configure our logger
+logging.basicConfig(format="%(levelname)s %(message)s", level=logging.INFO)
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -195,10 +199,10 @@ class UnicodeWriter:
 # Generic utilities
 def get_configs():
     """ Retrieve all configuration parameters."""
-    conf_files = [f for f in os.listdir(".") if f.endswith(".conf")]
-    if conf_files == []:
-        print("\nError: Can't find configuration file: bank2ynab.conf")
-    config = configparser.ConfigParser()
+    conf_files = ["bank2ynab.conf", "user_configuration.conf"]
+    if not os.path.exists("bank2ynab.conf"):
+        logging.error("\nError: Can't find configuration file: bank2ynab.conf")
+    config = configparser.RawConfigParser()
     if __PY2:
         config.read(conf_files)
     else:
@@ -231,16 +235,16 @@ def fix_conf_params(conf_obj, section_name):
             "date_format": ["Date Format", False, ""],
             "delete_original": ["Delete Source File", True, ""],
             "cd_flags": ["Inflow or Outflow Indicator", False, ","],
+            "payee_to_memo": ["Use Payee for Memo", True, ""],
             "plugin": ["Plugin", False, ""]}
 
-    # Bank Download = False
-    # Bank Download URL = ""
-    # Bank Download Login = ""
-    # Bank Download Auth1 = ""
-    # Bank Download Auth2 = ""
     for key in config:
         config[key] = get_config_line(conf_obj, section_name, config[key])
     config["bank_name"] = section_name
+
+    # quick n' dirty fix for tabs as delimiters
+    if config["input_delimiter"] == "\\t":
+        config["input_delimiter"] = "\t"
 
     return config
 
@@ -328,16 +332,20 @@ class B2YBank(object):
                 directory_list = os.listdir(".")
             if regex_active is True:
                 files = [join(path, f)
-                         for f in directory_list if f.endswith(ext)
-                         if re.search(file_pattern, f) if prefix not in f]
+                         for f in directory_list
+                         if f.endswith(ext)
+                         if re.match(file_pattern + ".*\.", f)
+                         if prefix not in f]
             else:
                 files = [join(path, f)
-                         for f in directory_list if f.endswith(ext)
-                         if file_pattern in f if prefix not in f]
+                         for f in directory_list
+                         if f.endswith(ext)
+                         if f.startswith(file_pattern)
+                         if prefix not in f]
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
                      "\nTrying default path instead:\t {}")
-                print(s.format(self.name, try_path, path))
+                logging.error(s.format(self.name, try_path, path))
         return files
 
     def read_data(self, file_path):
@@ -351,6 +359,7 @@ class B2YBank(object):
         footer_rows = int(self.config["footer_rows"])
         cd_flags = self.config["cd_flags"]
         date_format = self.config["date_format"]
+        fill_memo = self.config["payee_to_memo"]
         output_data = []
 
         # give plugins a chance to pre-process the file
@@ -370,19 +379,24 @@ class B2YBank(object):
                 line = transaction_reader.line_num
                 # skip header & footer rows
                 if header_rows < line <= (row_count - footer_rows):
-                    # check if we need to process Inflow or Outflow flags
-                    if len(cd_flags) == 3:
-                        row = self._cd_flag_process(row)
-                    # check if we need to fix the date format
-                    if date_format:
-                        row = self._fix_date(row, date_format)
-                    # add new row to output list
-                    fixed_row = self._auto_memo(self._fix_row(row))
+                    # skip blank rows
+                    if len(row) == 0:
+                        continue
+                    # process Inflow or Outflow flags
+                    row = self._cd_flag_process(row, cd_flags)
+                    # fix the date format
+                    row = self._fix_date(row, date_format)
+                    # create our output_row
+                    fixed_row = self._fix_row(row)
+                    # convert negative inflows to standard outflows
+                    fixed_row = self._fix_outflow(fixed_row)
+                    # fill in blank memo fields
+                    fixed_row = self._auto_memo(fixed_row, fill_memo)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
         # add in column headers
-        print("Parsed {} lines".format(len(output_data)))
+        logging.info("Parsed {} lines".format(len(output_data)))
         output_data.insert(0, output_columns)
         return output_data
 
@@ -413,6 +427,20 @@ class B2YBank(object):
             output.append(cell)
         return output
 
+    def _fix_outflow(self, row):
+        """
+        convert negative inflow into positive outflow
+        :param row: list of values
+        :return: list of values with corrected outflow column
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        inflow = row[inflow_index]
+        if(inflow.startswith("-")):
+            row[inflow_index] = ""
+            row[outflow_index] = inflow[1:]
+        return row
+
     def _valid_row(self, row):
         """ if our row doesn't have an inflow or outflow, mark as invalid
         :param row: list of values
@@ -423,42 +451,48 @@ class B2YBank(object):
             return False
         return True
 
-    def _auto_memo(self, row):
+    def _auto_memo(self, row, fill_memo):
         """ auto fill empty memo field with payee info
         :param row: list of values
+        :param fill_memo: boolean
         """
-        payee_index = self.config["output_columns"].index("Payee")
-        memo_index = self.config["output_columns"].index("Memo")
-        if row[memo_index] == "":
-            row[memo_index] = row[payee_index]
+        if fill_memo:
+            payee_index = self.config["output_columns"].index("Payee")
+            memo_index = self.config["output_columns"].index("Memo")
+            if row[memo_index] == "":
+                row[memo_index] = row[payee_index]
         return row
 
     def _fix_date(self, row, date_format):
         """ fix date format when required
         convert date to DD/MM/YYYY
         :param row: list of values
-        : param date_format: date format string
+        :param date_format: date format string
         """
-        date_col = self.config["input_columns"].index("Date")
-        # parse our date according to provided formatting string
-        input_date = datetime.strptime(row[date_col], date_format)
-        # do our actual date processing
-        output_date = datetime.strftime(input_date, "%d/%m/%Y")
-        row[date_col] = output_date
+        if date_format:
+            date_col = self.config["input_columns"].index("Date")
+            if row[date_col] == "":
+                return row
+            # parse our date according to provided formatting string
+            input_date = datetime.strptime(row[date_col], date_format)
+            # do our actual date processing
+            output_date = datetime.strftime(input_date, "%d/%m/%Y")
+            row[date_col] = output_date
         return row
 
-    def _cd_flag_process(self, row):
+    def _cd_flag_process(self, row, cd_flags):
         """ fix rows where inflow or outflow is indicated by
         a flag in a separate column
         :param row: list of values
+        :param cd_flags: list of parameters for applying indicators
         """
-        cd_flags = self.config["cd_flags"]
-        indicator_col = int(cd_flags[0])
-        outflow_flag = cd_flags[2]
-        inflow_col = self.config["input_columns"].index("Inflow")
-        # if this row is indicated to be outflow, multiply Inflow by -1
-        if row[indicator_col] == outflow_flag:
-            row[inflow_col] = str(-1 * float(row[inflow_col]))
+        if len(cd_flags) == 3:
+            indicator_col = int(cd_flags[0])
+            outflow_flag = cd_flags[2]
+            inflow_col = self.config["input_columns"].index("Inflow")
+            # if this row is indicated to be outflow, make inflow negative
+            if row[indicator_col] == outflow_flag:
+                row[inflow_col] = "-" + row[inflow_col]
         return row
 
     def write_data(self, filename, data):
@@ -467,10 +501,18 @@ class B2YBank(object):
         :param data: cleaned data ready to output
         """
         target_dir = dirname(filename)
-        target_fname = basename(filename)[:-4] + ".csv"
-        new_filename = self.config["fixed_prefix"] + target_fname
+        target_fname = basename(filename)[:-4]
+        new_filename = "{}{}.csv".format(
+                self.config["fixed_prefix"],
+                target_fname)
+        while os.path.isfile(new_filename):
+            counter = 1
+            new_filename = "{}{}_{}.csv".format(
+                self.config["fixed_prefix"],
+                target_fname, counter)
+            counter += 1
         target_filename = join(target_dir, new_filename)
-        print("Writing output file: {}".format(target_filename))
+        logging.info("Writing output file: {}".format(target_filename))
         with CrossversionCsvWriter(target_filename, self._is_py2) as writer:
             for row in data:
                 writer.writerow(row)
@@ -513,18 +555,20 @@ class Bank2Ynab(object):
         for bank in self.banks:
             # find all applicable files
             files = bank.get_files()
-            for original_file_path in files:
-                print("\nParsing input file:  {}".format(original_file_path))
+            bank_name = bank.name
+            for src_file in files:
+                logging.info("\nParsing input file:  {} (format: {})".format(
+                            src_file, bank_name))
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file
-                output = bank.read_data(original_file_path)
-                bank.write_data(original_file_path, output)
+                output = bank.read_data(src_file)
+                bank.write_data(src_file, output)
                 # delete original csv file
                 if bank.config["delete_original"] is True:
-                    print("Removing input file: {}".format(original_file_path))
-                    os.remove(original_file_path)
-        print("\nDone! {} files processed.\n".format(files_processed))
+                    logging.info("Removing input file: {}".format(src_file))
+                    os.remove(src_file)
+        logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 
 # Let's run this thing!

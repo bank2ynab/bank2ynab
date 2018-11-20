@@ -77,7 +77,7 @@ Using `bank2ynab` is easy:
 1. Download some bank statements from your banking website.
    - Make sure to choose CSV format. Save with the default suggested filename so that the converter can find it.
    - It's okay if the statements contain data that you already have in YNAB. YNAB will detect and skip these.
-1. Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
+1. Check the `[DEFAULT]` configuration in `user_configuration.conf`. *You only need to do this once.* Specifically:
    - `Source Path = c:\users\example-username\Downloads` Specify where you save your downloaded CSV files.
    - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
 1. Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
@@ -139,6 +139,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. US BB&T
 1. US Schwab
 1. US TB Bank
+1. (software) Mint
 1. (software) Personal Capital
 
 ----

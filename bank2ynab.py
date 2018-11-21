@@ -25,8 +25,8 @@ import re
 from datetime import datetime
 import logging
 # API testing stuff
-import urllib
-import webbrowser
+import requests
+import json
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s %(message)s", level=logging.INFO)
@@ -580,13 +580,17 @@ class YNAB_API(object):  # in progress
     """ Class used to access the YNAB API """
     # uses Personal Access Token
     def __init__(self):
-        something = 2+2    
-    
-    def run(self): # test run
-        # something
-        something = 2+2
+        something = 4  # just to have something in init
+
+    def run(self):
+        api_token = "censored"
+        url = "https://api.youneedabudget.com/v1/budgets?access_token={}".format(api_token)
+        response = requests.get(url)
+        data = response.json()
+        print(json.dumps(data))
         
-    def post_transactions:
+            
+    def post_transactions(self):
         """
         reference: 
         https://api.youneedabudget.com/v1#/Transactions/createTransaction

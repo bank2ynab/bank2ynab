@@ -106,3 +106,6 @@ venv.bak/
 
 # visual studio code workspace
 *.code-workspace
+
+# bank2ynab user configuration file
+user_configuration.conf

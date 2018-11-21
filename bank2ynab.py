@@ -239,7 +239,9 @@ def fix_conf_params(conf_obj, section_name):
             "delete_original": ["Delete Source File", True, ""],
             "cd_flags": ["Inflow or Outflow Indicator", False, ","],
             "payee_to_memo": ["Use Payee for Memo", True, ""],
-            "plugin": ["Plugin", False, ""]}
+            "plugin": ["Plugin", False, ""],
+            "api_token": ["YNAB API Access Token", False, ""]
+            }
 
     for key in config:
         config[key] = get_config_line(conf_obj, section_name, config[key])

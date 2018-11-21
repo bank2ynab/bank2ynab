@@ -576,31 +576,13 @@ class Bank2Ynab(object):
 
 class YNAB_API(object):  # in progress
     """ Class used to access the YNAB API """
-    # uses Implicit Flow
-    # access token expires after 2 hours
+    # uses Personal Access Token
     def __init__(self):
-        something = 2+2
-
-    def get_auth_token(self):
-        # use client ID to obtain access token from YNAB
-        client_id = (
-                    "02b3cc30001991a3bb82652c6ecef50"
-                    "e6a1126df052f14fc725fc8a39639bb6c")
-        redirect_uri = "http://localhost:8000/"#"urn:ietf:wg:oauth:2.0:oob"
-        auth_url = (
-                    "https://app.youneedabudget.com/oauth/authorize?"
-                    "client_id={}&redirect_uri={}&response_type=token"
-                    ).format(client_id, redirect_uri)
-                    
-        # go to the authorisation page
-        # if we have authorisation it goes to redirect uri
-        webbrowser.open(auth_url)
-        # after authorisation it goes to redirect uri with token at end
-        # how do we get the information from that page back into the script?
+        something = 2+2    
     
     def run(self): # test run
-        # Oauth implicit flow 
-        token = self.get_auth_token()
+        # something
+        something = 2+2
         
     def post_transactions:
         """

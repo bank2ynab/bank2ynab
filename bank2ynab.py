@@ -307,6 +307,27 @@ class B2YBank(object):
         self.config = config_object
         self._is_py2 = is_py2
 
+    def resolve_path(self):
+        """Resolve (path, missing_dir) once, return cache result.
+
+        Expose: self.path, self.missing_dir, self.try_path
+        """
+        # return cached result
+        if hasattr(self, 'path') and hasattr(self, 'missing_dir'):
+            return self.path, self.missing_dir
+
+        missing_dir = False
+        self.try_path = self.config["path"]
+        try:
+            path = find_directory(self.try_path)  # specified dir
+        except FileNotFoundError:
+            missing_dir = True
+            path = find_directory("")  # default dir
+
+        self.path = abspath(path)
+        self.missing_dir = missing_dir
+        return self.path, self.missing_dir
+
     def get_files(self):
         """ find the transaction file
         :return: list of matching files found
@@ -316,16 +337,8 @@ class B2YBank(object):
         prefix = self.config["fixed_prefix"]
         regex_active = self.config["regex"]
         files = list()
-        missing_dir = False
-        try_path = self.config["path"]
-        path = ""
         if file_pattern is not "":
-            try:
-                path = find_directory(try_path)
-            except FileNotFoundError:
-                missing_dir = True
-                path = find_directory("")
-            path = abspath(path)
+            path, missing_dir = self.resolve_path()
             try:
                 directory_list = os.listdir(path)
             except FileNotFoundError:
@@ -568,7 +581,14 @@ class Bank2Ynab(object):
                 if bank.config["delete_original"] is True:
                     logging.info("Removing input file: {}".format(src_file))
                     os.remove(src_file)
-        logging.info("\nDone! {} files processed.\n".format(files_processed))
+
+        if files_processed == 0:
+            if bank.missing_dir:
+                logging.info('"%s" directory not found, used default directory: "%s"',
+                    bank.try_path, bank.path)
+            logging.info('%s files found in %s', files_processed, bank.path)
+        else:
+            logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 
 # Let's run this thing!

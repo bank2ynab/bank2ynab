@@ -13,7 +13,7 @@ Development:
 
 Testing:
 [![Travis status](https://travis-ci.org/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.org/bank2ynab/bank2ynab)
-[![Coverage Status](https://coveralls.io/repos/github/bank2ynab/bank2ynab/badge.svg?branch=develop)](https://coveralls.io/github/bank2ynab/bank2ynab?branch=develop)
+[![Coverage Status](https://codecov.io/gh/bank2ynab/bank2ynab/branch/develop/graph/badge.svg)](https://codecov.io/gh/bank2ynab/bank2ynab)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a9bbb651ef51fc1d9f4f/maintainability)](https://codeclimate.com/github/bank2ynab/bank2ynab/maintainability)
 
 - [What? (Features)](#what)
@@ -77,7 +77,7 @@ Using `bank2ynab` is easy:
 1. Download some bank statements from your banking website.
    - Make sure to choose CSV format. Save with the default suggested filename so that the converter can find it.
    - It's okay if the statements contain data that you already have in YNAB. YNAB will detect and skip these.
-1. Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
+1. Check the `[DEFAULT]` configuration in `user_configuration.conf`. *You only need to do this once.* Specifically:
    - `Source Path = c:\users\example-username\Downloads` Specify where you save your downloaded CSV files.
    - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
 1. Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
@@ -97,26 +97,28 @@ For details, please see our [issue list labeled "Bug"](https://github.com/bank2y
 
 Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
 
+1. AT easybank credit card
 1. AT Raiffeisen Bank checking
 1. AT Raiffeisen Bank VISA card
 1. BE KBC checking
 1. BR Inter checking
 1. CA TD Canada Trust, checking+Visa
 1. CZ Ceska Sporitelna
-1. CZ Raiffeisen Bank
+1. CZ Raiffeisen bank
 1. DE Commerzbank checking
+1. DE Consorsbank checking
+1. DE Deutsche Bank
 1. DE Deutsche Kreditbank checking
 1. DE Deutsche Kreditbank credit card
 1. DE ING-DiBa
 1. DE Kreissparkasse
 1. DE N26
-1. DE Sparkasse Rhein-Neckar-Nord
 1. DE Ostseesparkasse Rostock checking
 1. DE Ostseesparkasse Rostock credit card
-1. DK Arbejdernes Landsbank (Bankernes EDB Central)
-1. DK Handelsbanken (Bankernes EDB Central)
-1. DK Merkur Andelskasse (Bankernes EDB Central)
+1. DE Sparkasse Rhein-Neckar-Nord
+1. DK Bankernes EDB Central
 1. DK Nordea
+1. DK Sparkassen Thy
 1. IE AIB Ireland
 1. IE Bank of Ireland
 1. MV Bank of Maldives, checking
@@ -125,18 +127,22 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL Rabobank (2017 format)
 1. NL Rabobank (2018 format)
 1. NO DNB
-1. Personal Capital (software)
 1. SE Handelsbanken
 1. SE Nordea
 1. SE Swedbank
+1. SG OCBC Bank
 1. SG POSB savings
-1. UK Co-operative Bank
-1. UK Monzo checking
 1. UK Barclaycard credit card
+1. UK Co-operative Bank
 1. UK first direct checking
+1. UK Monzo checking
+1. US Bank of America
 1. US BB&T
+1. US Chase Credit Card
 1. US Schwab
 1. US TB Bank
+1. (software) Mint
+1. (software) Personal Capital
 
 ----
 

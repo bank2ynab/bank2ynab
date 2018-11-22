@@ -584,11 +584,13 @@ class Bank2Ynab(object):
 
         if files_processed == 0:
             if bank.missing_dir:
-                logging.info('"%s" directory not found, used default directory: "%s"',
+                logging.info(
+                    '"%s" directory not found, used default directory: "%s"',
                     bank.try_path, bank.path)
             logging.info('%s files found in %s', files_processed, bank.path)
         else:
-            logging.info("\nDone! {} files processed.\n".format(files_processed))
+            logging.info(
+                "\nDone! {} files processed.\n".format(files_processed))
 
 
 # Let's run this thing!

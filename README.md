@@ -136,6 +136,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. UK Co-operative Bank
 1. UK first direct checking
 1. UK Monzo checking
+1. US Bank of America Credit Card
 1. US BB&T
 1. US Schwab
 1. US TB Bank

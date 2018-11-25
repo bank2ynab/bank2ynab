@@ -29,7 +29,7 @@ class Handelsbanken(B2YBank):
                 cells = row.split(";")
                 new_row = []
                 for cell in cells:
-                    es = re.findall('\>.*?\<', cell)
+                    es = re.findall(r"\>.*?\<", cell)
                     while ("><" in es):
                         es.remove("><")
                         for n, i in enumerate(es):

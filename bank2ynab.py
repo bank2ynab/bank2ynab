@@ -90,13 +90,13 @@ class CrossversionCsvWriter(CrossversionFileContext):
         if self.is_py2:
             self.stream = open(self.file_path, "wb")
             self.csv_object = UnicodeWriter(
-                                    self.stream,
-                                    encoding="utf-8",
-                                    **self.params)
+                self.stream,
+                encoding="utf-8",
+                **self.params)
         else:
             self.stream = open(
-                            self.file_path, "w",
-                            encoding="utf-8", newline="")
+                self.file_path, "w",
+                encoding="utf-8", newline="")
             self.csv_object = csv.writer(self.stream, **self.params)
         return self.csv_object
 
@@ -222,21 +222,21 @@ def fix_conf_params(conf_obj, section_name):
     :return: dict with all parameters
     """
     config = {
-            "input_columns": ["Input Columns", False, ","],
-            "output_columns": ["Output Columns", False, ","],
-            "input_filename": ["Source Filename Pattern", False, ""],
-            "path": ["Source Path", False, ""],
-            "ext": ["Source Filename Extension", False, ""],
-            "regex": ["Use Regex For Filename", True, ""],
-            "fixed_prefix": ["Output Filename Prefix", False, ""],
-            "input_delimiter": ["Source CSV Delimiter", False, ""],
-            "header_rows": ["Header Rows", False, ""],
-            "footer_rows": ["Footer Rows", False, ""],
-            "date_format": ["Date Format", False, ""],
-            "delete_original": ["Delete Source File", True, ""],
-            "cd_flags": ["Inflow or Outflow Indicator", False, ","],
-            "payee_to_memo": ["Use Payee for Memo", True, ""],
-            "plugin": ["Plugin", False, ""]}
+        "input_columns": ["Input Columns", False, ","],
+        "output_columns": ["Output Columns", False, ","],
+        "input_filename": ["Source Filename Pattern", False, ""],
+        "path": ["Source Path", False, ""],
+        "ext": ["Source Filename Extension", False, ""],
+        "regex": ["Use Regex For Filename", True, ""],
+        "fixed_prefix": ["Output Filename Prefix", False, ""],
+        "input_delimiter": ["Source CSV Delimiter", False, ""],
+        "header_rows": ["Header Rows", False, ""],
+        "footer_rows": ["Footer Rows", False, ""],
+        "date_format": ["Date Format", False, ""],
+        "delete_original": ["Delete Source File", True, ""],
+        "cd_flags": ["Inflow or Outflow Indicator", False, ","],
+        "payee_to_memo": ["Use Payee for Memo", True, ""],
+        "plugin": ["Plugin", False, ""]}
 
     for key in config:
         config[key] = get_config_line(conf_obj, section_name, config[key])
@@ -273,8 +273,8 @@ def find_directory(filepath):
                 import winreg
             except ImportError:
                 import _winreg as winreg
-            shell_path = ("SOFTWARE\Microsoft\Windows\CurrentVersion"
-                          "\Explorer\Shell Folders")
+            shell_path = ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
+                          "\\Explorer\\Shell Folders")
             dl_key = "{374DE290-123F-4565-9164-39C4925E467B}"
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, shell_path) as key:
                 input_dir = winreg.QueryValueEx(key, dl_key)[0]
@@ -334,7 +334,7 @@ class B2YBank(object):
                 files = [join(path, f)
                          for f in directory_list
                          if f.endswith(ext)
-                         if re.match(file_pattern + ".*\.", f)
+                         if re.match(file_pattern + r".*\.", f)
                          if prefix not in f]
             else:
                 files = [join(path, f)
@@ -503,8 +503,8 @@ class B2YBank(object):
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
         new_filename = "{}{}.csv".format(
-                self.config["fixed_prefix"],
-                target_fname)
+            self.config["fixed_prefix"],
+            target_fname)
         while os.path.isfile(new_filename):
             counter = 1
             new_filename = "{}{}_{}.csv".format(
@@ -558,7 +558,7 @@ class Bank2Ynab(object):
             bank_name = bank.name
             for src_file in files:
                 logging.info("\nParsing input file:  {} (format: {})".format(
-                            src_file, bank_name))
+                    src_file, bank_name))
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file

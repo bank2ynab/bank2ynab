@@ -41,7 +41,7 @@ class TestB2YBank(TestCase):
                 ("test_num_files_extension", 0),
                 ("test_regex", 1),
                 ("test_regex_noexist", 0)
-                ]:
+        ]:
 
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)
@@ -59,7 +59,7 @@ class TestB2YBank(TestCase):
                 ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
                 ("test_record_headers", 74, "test_headers.csv"),
                 ("test_delimiter_tab", 74, "test_delimiter_tab.csv")
-                ]:
+        ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)
             records = b.read_data(join("test-data", fpath))
@@ -117,18 +117,18 @@ class TestB2YBank(TestCase):
                 # test the same two rows in each scenario
                 for row, expected_row in [
                     (23, [
-                            "28.09.2017",
-                            "HOFER DANKT  0527  K2   28.09. 17:17",
-                            "",
-                            "HOFER DANKT  0527  K2   28.09. 17:17",
-                            "44,96", ""
-                        ]),
+                        "28.09.2017",
+                        "HOFER DANKT  0527  K2   28.09. 17:17",
+                        "",
+                        "HOFER DANKT  0527  K2   28.09. 17:17",
+                        "44,96", ""
+                    ]),
                     (24, [
-                            "28.09.2017", "SOFTWARE Wien",
-                            "",
-                            "SOFTWARE Wien",
-                            "", "307,67"
-                        ])
+                        "28.09.2017", "SOFTWARE Wien",
+                        "",
+                        "SOFTWARE Wien",
+                        "", "307,67"
+                    ])
                 ]:
                     result_row = output_data[row]
 

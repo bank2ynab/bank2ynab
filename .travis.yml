@@ -12,12 +12,9 @@ python:
   - "2.7"
 # install what's needed to run tests
 install:
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.3 ]]; then pip install virtualenv==15.2.0; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.2 ]]; then pip install virtualenv==15.2.0; fi
   - pip install flake8
-  - pip install coverage
-  - pip install codecov
-
+  - if [[ $TRAVIS_PYTHON_VERSION != 3.3]] && [[$TRAVIS_PYTHON_VERSION != 3.2]]; then pip install coverage; fi
+  - if [[ $TRAVIS_PYTHON_VERSION != 3.3]] && [[$TRAVIS_PYTHON_VERSION != 3.2]]; then pip install codecov; fi
 # command to run tests
 script:
   - python -m unittest discover -v

@@ -358,7 +358,7 @@ class B2YBank(object):
             if files != [] and missing_dir is True:
                 s = ("\nFormat: {}\n\nError: Can't find download path: {}"
                      "\nTrying default path instead:\t {}")
-                logging.error(s.format(self.name, try_path, path))
+                logging.error(s.format(self.name, self.try_path, path))
         return files
 
     def read_data(self, file_path):

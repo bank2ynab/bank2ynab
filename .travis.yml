@@ -11,17 +11,17 @@ python:
 # install what's needed to run tests
 install:
   - pip install flake8
-  - pip install coverage; fi
-  - pip install codecov; fi
+  - pip install coverage
+  - pip install codecov
 # command to run tests
 script:
   - python -m unittest discover -v
   - python bank2ynab.py
-  - flake8 --builtins=unicode; fi
-  - coverage run bank2ynab.py; fi
+  - flake8 --builtins=unicode
+  - coverage run bank2ynab.py
 after_success:
-  - codecov; fi
-  - coverage report; fi
+  - codecov
+  - coverage report
 notifications:
   email: false
   webhooks:

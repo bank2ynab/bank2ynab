@@ -277,8 +277,8 @@ def find_directory(filepath):
                 import winreg
             except ImportError:
                 import _winreg as winreg
-            shell_path = ("SOFTWARE\Microsoft\Windows\CurrentVersion"
-                          "\Explorer\Shell Folders")
+            shell_path = ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
+                          "\\Explorer\\Shell Folders")
             dl_key = "{374DE290-123F-4565-9164-39C4925E467B}"
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, shell_path) as key:
                 input_dir = winreg.QueryValueEx(key, dl_key)[0]
@@ -338,7 +338,7 @@ class B2YBank(object):
                 files = [join(path, f)
                          for f in directory_list
                          if f.endswith(ext)
-                         if re.match(file_pattern + ".*\.", f)
+                         if re.match(file_pattern + r".*\.", f)
                          if prefix not in f]
             else:
                 files = [join(path, f)

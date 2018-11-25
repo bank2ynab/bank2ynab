@@ -15,8 +15,8 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.3 ]]; then pip install virtualenv==15.2.0; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.2 ]]; then pip install virtualenv==15.2.0; fi
   - pip install flake8
-  - pip install codecov
   - pip install coverage
+  - pip install codecov
 
 # command to run tests
 script:

@@ -7,7 +7,7 @@ python:
   - "3.5-dev" # 3.5 development branch
   - "3.5"
   - "3.4"
-  - "2.7"
+#  - "2.7"
 # install what's needed to run tests
 install:
   - pip install flake8

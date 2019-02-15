@@ -50,7 +50,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 - If you're "just a user":
   - [tell us your import format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can create a converter - for you and for everyone else!
-  - use the converter provided here and [give us feedback](https://github.com/bank2ynab/bank2ynab/issues/new) - or participate!
+  - use the converter provided here and [give us feedback](https://github.com/bank2ynab/bank2ynab/issues/new/choose) - or participate!
 - If you've already built a YNAB converter:
   - take advantage of this project to get more import formats.
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).

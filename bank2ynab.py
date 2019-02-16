@@ -419,9 +419,11 @@ class B2YBank(object):
         output = []
         for header in self.config["output_columns"]:
             # find all input columns with data for this output column
-            indices = filter(lambda i: self.config["input_columns"][i]==header,
+            indices = filter(lambda i:
+                             self.config["input_columns"][i] == header,
                              range(len(self.config["input_columns"])))
-            # fetch data from those input columns if they are not empty, and merge them
+            # fetch data from those input columns if they are not empty,
+            # and merge them
             cell_parts = []
             for i in indices:
                 try:
@@ -487,7 +489,7 @@ class B2YBank(object):
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%d/%m/%Y")
             row[date_col] = output_date
-        except (ValueError,IndexError):
+        except (ValueError, IndexError):
             pass
         return row
 

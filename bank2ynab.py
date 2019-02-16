@@ -412,7 +412,7 @@ class B2YBank(object):
     def _fix_row(self, row):
         """
         rearrange a row of our file to match expected output format,
-        optionally combining multiple input columns into a single output column.
+        optionally combining multiple input columns into a single output column
         :param row: list of values
         :return: list of values in correct output format
         """

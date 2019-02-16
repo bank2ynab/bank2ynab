@@ -266,8 +266,8 @@ def get_config_line(conf_obj, section_name, args):
 def find_directory(filepath):
     """ finds the downloads folder for the active user if filepath is not set
     """
-    if filepath is "":
-        if os.name is "nt":
+    if filepath == "":
+        if os.name == "nt":
             # Windows
             try:
                 import winreg
@@ -319,7 +319,7 @@ class B2YBank(object):
         missing_dir = False
         try_path = self.config["path"]
         path = ""
-        if file_pattern is not "":
+        if file_pattern != "":
             try:
                 path = find_directory(try_path)
             except FileNotFoundError:

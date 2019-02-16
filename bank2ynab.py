@@ -419,9 +419,16 @@ class B2YBank(object):
         output = []
         for header in self.config["output_columns"]:
             # find all input columns with data for this output column
-            indices = filter(lambda i: self.config["input_columns"][i]==header, range(len(self.config["input_columns"])))
+            indices = filter(lambda i: self.config["input_columns"][i]==header,
+                             range(len(self.config["input_columns"])))
             # fetch data from those input columns if they are not empty, and merge them
-            cell_parts = filter(lambda s: bool(s), map(lambda i: row[i], indices))
+            cell_parts = []
+            for i in indices:
+                try:
+                    if row[i].lstrip():
+                        cell_parts.append(row[i].lstrip())
+                except IndexError:
+                    pass
             cell = " ".join(cell_parts)
             output.append(cell)
         return output
@@ -468,8 +475,11 @@ class B2YBank(object):
         :param row: list of values
         :param date_format: date format string
         """
-        if date_format:
-            date_col = self.config["input_columns"].index("Date")
+        if not(date_format):
+            return(row)
+
+        date_col = self.config["input_columns"].index("Date")
+        try:
             if row[date_col] == "":
                 return row
             # parse our date according to provided formatting string
@@ -477,6 +487,8 @@ class B2YBank(object):
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%d/%m/%Y")
             row[date_col] = output_date
+        except (ValueError,IndexError):
+            pass
         return row
 
     def _cd_flag_process(self, row, cd_flags):

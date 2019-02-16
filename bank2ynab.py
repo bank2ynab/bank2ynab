@@ -411,19 +411,18 @@ class B2YBank(object):
 
     def _fix_row(self, row):
         """
-        rearrange a row of our file to match expected output format
+        rearrange a row of our file to match expected output format,
+        optionally combining multiple input columns into a single output column.
         :param row: list of values
         :return: list of values in correct output format
         """
         output = []
         for header in self.config["output_columns"]:
-            try:
-                # check to see if our output header exists in input
-                index = self.config["input_columns"].index(header)
-                cell = row[index]
-            except (ValueError, IndexError):
-                # header isn't in input, default to blank cell
-                cell = ""
+            # find all input columns with data for this output column
+            indices = filter(lambda i: self.config["input_columns"][i]==header, range(len(self.config["input_columns"])))
+            # fetch data from those input columns if they are not empty, and merge them
+            cell_parts = filter(lambda s: bool(s), map(lambda i: row[i], indices))
+            cell = " ".join(cell_parts)
             output.append(cell)
         return output
 

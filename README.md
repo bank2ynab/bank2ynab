@@ -12,7 +12,7 @@ Development:
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
 
 Testing:
-[![Travis status](https://travis-ci.org/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.org/bank2ynab/bank2ynab)
+[![Travis status](https://travis-ci.com/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.com/bank2ynab/bank2ynab)
 [![Coverage Status](https://codecov.io/gh/bank2ynab/bank2ynab/branch/develop/graph/badge.svg)](https://codecov.io/gh/bank2ynab/bank2ynab)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a9bbb651ef51fc1d9f4f/maintainability)](https://codeclimate.com/github/bank2ynab/bank2ynab/maintainability)
 
@@ -50,7 +50,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 - If you're "just a user":
   - [tell us your import format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can create a converter - for you and for everyone else!
-  - use the converter provided here and [give us feedback](https://github.com/bank2ynab/bank2ynab/issues/new) - or participate!
+  - use the converter provided here and [give us feedback](https://github.com/bank2ynab/bank2ynab/issues/new/choose) - or participate!
 - If you've already built a YNAB converter:
   - take advantage of this project to get more import formats.
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
@@ -103,6 +103,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. BE KBC checking
 1. BR Inter checking
 1. CA TD Canada Trust, checking+Visa
+1. CZ AirBank checking and savings
 1. CZ Ceska Sporitelna
 1. CZ Raiffeisen bank
 1. DE Commerzbank checking
@@ -132,11 +133,14 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Swedbank
 1. SG OCBC Bank
 1. SG POSB savings
+1. SK Tatra Banka
+1. SK VUB
 1. UK Barclaycard credit card
 1. UK Co-operative Bank
 1. UK first direct checking
 1. UK Monzo checking
 1. US Bank of America
+1. US Bank of America Credit Card
 1. US BB&T
 1. US Chase Credit Card
 1. US Schwab

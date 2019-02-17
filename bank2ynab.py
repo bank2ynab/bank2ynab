@@ -271,8 +271,8 @@ def get_config_line(conf_obj, section_name, args):
 def find_directory(filepath):
     """ finds the downloads folder for the active user if filepath is not set
     """
-    if filepath is "":
-        if os.name is "nt":
+    if filepath == "":
+        if os.name == "nt":
             # Windows
             try:
                 import winreg
@@ -324,7 +324,7 @@ class B2YBank(object):
         missing_dir = False
         try_path = self.config["path"]
         path = ""
-        if file_pattern is not "":
+        if file_pattern != "":
             try:
                 path = find_directory(try_path)
             except FileNotFoundError:
@@ -416,19 +416,27 @@ class B2YBank(object):
 
     def _fix_row(self, row):
         """
-        rearrange a row of our file to match expected output format
+        rearrange a row of our file to match expected output format,
+        optionally combining multiple input columns into a single output column
         :param row: list of values
         :return: list of values in correct output format
         """
         output = []
         for header in self.config["output_columns"]:
-            try:
-                # check to see if our output header exists in input
-                index = self.config["input_columns"].index(header)
-                cell = row[index]
-            except (ValueError, IndexError):
-                # header isn't in input, default to blank cell
-                cell = ""
+            # find all input columns with data for this output column
+            indices = filter(lambda i:
+                             self.config["input_columns"][i] == header,
+                             range(len(self.config["input_columns"])))
+            # fetch data from those input columns if they are not empty,
+            # and merge them
+            cell_parts = []
+            for i in indices:
+                try:
+                    if row[i].lstrip():
+                        cell_parts.append(row[i].lstrip())
+                except IndexError:
+                    pass
+            cell = " ".join(cell_parts)
             output.append(cell)
         return output
 
@@ -474,15 +482,20 @@ class B2YBank(object):
         :param row: list of values
         :param date_format: date format string
         """
-        if date_format:
-            date_col = self.config["input_columns"].index("Date")
+        if not(date_format):
+            return(row)
+
+        date_col = self.config["input_columns"].index("Date")
+        try:
             if row[date_col] == "":
                 return row
             # parse our date according to provided formatting string
-            input_date = datetime.strptime(row[date_col], date_format)
+            input_date = datetime.strptime(row[date_col].lstrip(), date_format)
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%d/%m/%Y")
             row[date_col] = output_date
+        except (ValueError, IndexError):
+            pass
         return row
 
     def _cd_flag_process(self, row, cd_flags):

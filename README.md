@@ -133,6 +133,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Swedbank
 1. SG OCBC Bank
 1. SG POSB savings
+1. SK Tatra Banka
+1. SK VUB
 1. UK Barclaycard credit card
 1. UK Co-operative Bank
 1. UK first direct checking

@@ -24,6 +24,9 @@ import importlib
 import re
 from datetime import datetime
 import logging
+# API testing stuff
+import requests
+import json
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s %(message)s", level=logging.INFO)
@@ -236,7 +239,9 @@ def fix_conf_params(conf_obj, section_name):
         "delete_original": ["Delete Source File", True, ""],
         "cd_flags": ["Inflow or Outflow Indicator", False, ","],
         "payee_to_memo": ["Use Payee for Memo", True, ""],
-        "plugin": ["Plugin", False, ""]}
+        "plugin": ["Plugin", False, ""],
+        "api_token": ["YNAB API Access Token", False, ""]
+            }
 
     for key in config:
         config[key] = get_config_line(conf_obj, section_name, config[key])
@@ -584,7 +589,190 @@ class Bank2Ynab(object):
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 
+class YNAB_API(object):  # in progress (2)
+    """ Class used to access the YNAB API
+
+    
+    API reference: 
+    
+    https://api.youneedabudget.com/v1#/Transactions/createTransaction
+    
+    https://api.youneedabudget.com/v1/budgets/{budget_id}/transactions/createTransaction?access_token=<ACCESS_TOKEN>
+    
+    """
+    # uses Personal Access Token
+    def __init__(self, configs = None, transactions = None):
+        # TODO: get a hold of the transactions
+        self.transactions = ""
+        self.budget_ids = []
+        self.account_ids = []
+
+        # TODO: Somehow get token from configs
+        self.api_token = None #CENSORSHIP RULES!
+        self.budget_id = None
+        self.account_id = None
+
+        # TODO: Fix debug structure, so it will be used in logging instead
+        self.debug = False
+
+
+    def run(self):
+        if(self.api_token is not None):
+            logging.info("Connecting to YNAB API...")
+            
+            if(self.budget_id is None):
+
+                logging.info("No default budget set! \nPick a budget:")
+
+                self.list_budgets()
+                budget_selection = int(input(":"))
+
+                if(budget_selection < 1):
+                    print("wrong selection")
+                else:
+                    self.budget_id = self.budget_ids[budget_selection - 1]
+
+            if(self.account_id is None):
+                
+                logging.info("No default account set! \nPick an account:")
+
+                self.list_accounts()
+                account_selection = int(input(":"))
+
+                if(account_selection < 1):
+                    print("wrong selection")
+                else:
+                    self.account_id = self.account_ids[account_selection - 1]
+
+            if(self.budget_id is not None and self.account_id is not None):
+                    self.post_transactions()
+        else:
+            logging.info("No API-token provided.")
+
+
+    def post_transactions(self):
+        logging.info("Posting transactions..")
+        url = "https://api.youneedabudget.com/v1/budgets/{}/transactions?access_token={}".format(
+            self.budget_id,
+            self.api_token)
+
+        # Globals
+        account_id = self.account_id
+        payee_id = None
+        category_id = None
+        cleared = "cleared"
+        approved = False
+        flag_color = None
+        import_id = None
+
+        # TODO: use date, amount, payee and memo from transactions
+        date = "2019-01-01"
+        amount = 12000000000
+        payee_name = None
+        memo = None
+
+        data = {
+            "transactions": []
+        }
+
+        #TODO: CLEANUP, this is just a mess!
+        transaction1 = {
+                "account_id": account_id,
+                "date": date,
+                "amount": amount,
+                "payee_id": payee_id,
+                "payee_name": payee_name,
+                "category_id": category_id,
+                "memo": memo,
+                "cleared": cleared,
+                "approved": approved,
+                "flag_color": flag_color,
+                "import_id": import_id
+                }
+        #TODO: CLEANUP, this is just a mess!
+        transaction2 = {
+                "account_id": account_id,
+                "date": date,
+                "amount": 999299,
+                "payee_id": payee_id,
+                "payee_name": "woman of power",
+                "category_id": category_id,
+                "memo": memo,
+                "cleared": cleared,
+                "approved": approved,
+                "flag_color": flag_color,
+                "import_id": import_id
+                }
+
+        #TODO: should be a loop of some sort
+        data['transactions'].append(transaction1)
+        data['transactions'].append(transaction2)
+
+        post_response = requests.post(url, json=data)
+        if 'error' in json.loads(post_response.text):
+            logging.error("error while sending %s" % str(data['transactions']))
+            logging.error(json.loads(post_response.text)['error'])
+
+    def list_transactions(self):
+        
+        url = "https://api.youneedabudget.com/v1/budgets/{}/transactions?access_token={}".format(
+            self.budget_id,
+            self.api_token)
+        response = requests.get(url)
+        transactions = response.json()['data']['transactions']
+        if len(transactions) > 0:
+            logging.debug("Listing transactions:")
+            for t in transactions:
+                logging.debug(t)
+        else:
+            logging.debug("no transactions found")
+    
+    def list_accounts(self):
+        url = "https://api.youneedabudget.com/v1/budgets/{}/accounts?access_token={}".format(
+            self.budget_id,
+            self.api_token)
+        response = requests.get(url)
+        accounts = response.json()['data']['accounts']
+        if len(accounts) > 0:
+            
+            logging.info("Listing accounts:")
+            index = 0
+            for t in accounts:
+                index = index + 1
+                print("| {} | {}".format(index,t['name']))
+                self.account_ids.append(t['id'])
+                
+                logging.debug("id: {}".format(t['id']))
+                logging.debug("on_budget: {}".format(t['on_budget']))
+                logging.debug("closed: {}".format(t['closed']))
+        else:
+            logging.info("no accounts found")
+
+    def list_budgets(self):
+        url = "https://api.youneedabudget.com/v1/budgets?access_token={}".format(self.api_token)
+        response = requests.get(url)
+        budgets = response.json()['data']['budgets']
+
+        index = 0
+        for x in budgets:
+            
+            index = index + 1
+            print("| {} | {}".format(index,x['name']))
+            self.budget_ids.append(x["id"])
+            # debug messages:
+            for key, value in x.items():
+                if(type(value) is dict):
+                    logging.debug("%s: " % str(key))
+            
+                    for subkey, subvalue in value.items():
+                        logging.debug("  %s: %s" % (str(subkey),str(subvalue)))
+                else:
+                    logging.debug("%s: %s" % (str(key),str(value)))
+
+
 # Let's run this thing!
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
+    api = YNAB_API(get_configs())
+    api.run()

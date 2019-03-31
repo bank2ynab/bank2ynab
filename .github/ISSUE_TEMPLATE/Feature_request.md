@@ -21,7 +21,7 @@ Source CSV Delimiter = ,
 Header Rows = 1
 Footer Rows = 0
 Input Columns = Date,Payee,Outflow,Inflow,Running Balance
-Date Format = 
+Date Format =
 # (see http://strftime.org/ for date format strings)
 Inflow or Outflow Indicator =
 Output Columns = Date,Payee,Category,Memo,Outflow,Inflow

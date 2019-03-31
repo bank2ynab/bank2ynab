@@ -109,3 +109,4 @@ venv.bak/
 
 # bank2ynab user configuration file
 user_configuration.conf
+.pre-commit-config.yaml

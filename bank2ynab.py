@@ -739,7 +739,7 @@ class YNAB_API(object):  # in progress (2)
             index = 0
             for t in accounts:
                 index = index + 1
-                print("| {} | {}".format(index,t['name']))
+                print("| {} | {}".format(index, t['name']))
                 self.account_ids.append(t['id'])
                 
                 logging.debug("id: {}".format(t['id']))
@@ -757,17 +757,17 @@ class YNAB_API(object):  # in progress (2)
         for x in budgets:
             
             index = index + 1
-            print("| {} | {}".format(index,x['name']))
+            print("| {} | {}".format(index, x['name']))
             self.budget_ids.append(x["id"])
             # debug messages:
             for key, value in x.items():
                 if(type(value) is dict):
                     logging.debug("%s: " % str(key))
-            
+
                     for subkey, subvalue in value.items():
-                        logging.debug("  %s: %s" % (str(subkey),str(subvalue)))
+                        logging.debug("  %s: %s" % (str(subkey), str(subvalue)))
                 else:
-                    logging.debug("%s: %s" % (str(key),str(value)))
+                    logging.debug("%s: %s" % (str(key), str(value)))
 
 
 # Let's run this thing!

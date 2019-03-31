@@ -9,4 +9,5 @@ cd `dirname "$0"`
 cd ..
 #echo "The present working directory is `pwd`"
 #echo "========== bank2ynab ==========="
-python bank2ynab.py
+#python3 instead of python, due to error with python2 somehow
+python3 bank2ynab.py

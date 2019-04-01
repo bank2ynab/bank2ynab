@@ -3,7 +3,7 @@
 This one is going to be easy:
 
 - Your financial information, YNAB data, and YNAB access token is kept strictly between your computer and YNAB
-- We don't have access your data. Full stop. "We" meaning the developers of `bank2ynab` as listed on the GitHub contributors page: https://github.com/bank2ynab/bank2ynab/graphs/contributors
+- We don't have access to your data. Full stop. "We" meaning the developers of `bank2ynab` as listed on the GitHub contributors page: https://github.com/bank2ynab/bank2ynab/graphs/contributors
 - We don't store any data on any servers - we don't have any servers!
 - No, really, we cannot and do not access or store your data - it's all yours! Your data is sent only to YNAB and nowhere else.
 

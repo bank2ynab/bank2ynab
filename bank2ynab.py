@@ -594,25 +594,24 @@ class Bank2Ynab(object):
 
 class YNAB_API(object):  # in progress (2)
     """ Class used to access the YNAB API
-
-
     API reference:
-
     https://api.youneedabudget.com/v1#/Transactions/createTransaction
-
     https://api.youneedabudget.com/v1/budgets/{budget_id}/transactions/createTransaction?access_token=<ACCESS_TOKEN>
+    """
 
     """
-    # uses Personal Access Token
+    uses Personal Access Token stored in user_configuration.conf
+    (note for devs: this should be set to not be tracked by git!)
+    """
 
-    def __init__(self, configs=None, transactions=None):
+    def __init__(self, config_object, transactions=None):
         # TODO: get a hold of the transactions
         self.transactions = ""
         self.budget_ids = []
         self.account_ids = []
 
-        # TODO: Somehow get token from configs
-        self.api_token = None  # CENSORSHIP RULES!
+        self.api_token = get_config_line(config_object, "DEFAULT",
+                                         ["YNAB API Access Token", False, ""])
         self.budget_id = None
         self.account_id = None
 

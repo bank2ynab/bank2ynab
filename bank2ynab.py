@@ -601,7 +601,7 @@ class YNAB_API(object):  # in progress (2)
 
     """
     uses Personal Access Token stored in user_configuration.conf
-    (note for devs: this should be set to not be tracked by git!)
+    (note for devs: be careful not to accidentally share your API access token!)
     """
 
     def __init__(self, config_object, transactions=None):

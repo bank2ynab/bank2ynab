@@ -297,6 +297,25 @@ def find_directory(filepath):
         input_dir = filepath
     return input_dir
 
+
+def int_input(min, max, msg):
+    """
+    Makes a user select an integer between min & max stated values
+    :param  min: the minimum acceptable integer value
+    :param  max: the maximum acceptable integer value
+    :param  msg: the message to display on the input line
+    :return user_input: sanitised integer input in acceptable range
+    """
+    while True:
+        try:
+            user_input = int(input("{} (range {} - {})".format(msg, min, max)))
+            if user_input < min or user_input > max:
+                raise ValueError
+            break
+        except ValueError:
+            logging.info("This is integer is not in the acceptable range, try again!")
+    return user_input
+    
 # -- end of utilities
 
 

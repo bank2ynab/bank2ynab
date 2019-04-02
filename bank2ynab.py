@@ -652,7 +652,7 @@ class YNAB_API(object):  # in progress (2)
                     msg = "No default account set! \nPick an account"
                     self.list_accounts()  # create list of account_ids
                     account_selection = int_input(
-                        1, len(self.account_ids), msg) - 1
+                        1, len(self.account_ids), msg)
                     self.account_id = self.account_ids[account_selection - 1]
 
                 if(self.budget_id is not None and self.account_id is not None):

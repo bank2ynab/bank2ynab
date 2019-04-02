@@ -788,7 +788,7 @@ class YNAB_API(object):  # in progress (2)
                     else:
                         logging.debug("%s: %s" % (str(key), str(value)))
         except KeyError:
-            self.api_error_print(response.json()["error"])
+            return self.api_error_print(response.json()["error"])
 
     def api_error_print(self, details):
         """
@@ -799,6 +799,7 @@ class YNAB_API(object):  # in progress (2)
         name = details["name"]
         detail = details["detail"]
         logging.error("{}: {} ({})".format(detail, id, name))
+        return id
         
 
 # Let's run this thing!

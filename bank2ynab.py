@@ -757,25 +757,36 @@ class YNAB_API(object):  # in progress (2)
                "access_token={}".format(
                    self.api_token))
         response = requests.get(url)
-        budgets = response.json()['data']['budgets']
+        try:
+            budgets = response.json()['data']['budgets']
+            index = 0
+            for x in budgets:
+                index = index + 1
+                print("| {} | {}".format(index, x['name']))
+                self.budget_ids.append(x["id"])
+                # debug messages:
+                for key, value in x.items():
+                    if(type(value) is dict):
+                        logging.debug("%s: " % str(key))
 
-        index = 0
-        for x in budgets:
+                        for subkey, subvalue in value.items():
+                            logging.debug("  %s: %s" %
+                                          (str(subkey), str(subvalue)))
+                    else:
+                        logging.debug("%s: %s" % (str(key), str(value)))
+        except KeyError:
+            self.api_error_print(response.json()["error"])
 
-            index = index + 1
-            print("| {} | {}".format(index, x['name']))
-            self.budget_ids.append(x["id"])
-            # debug messages:
-            for key, value in x.items():
-                if(type(value) is dict):
-                    logging.debug("%s: " % str(key))
-
-                    for subkey, subvalue in value.items():
-                        logging.debug("  %s: %s" %
-                                      (str(subkey), str(subvalue)))
-                else:
-                    logging.debug("%s: %s" % (str(key), str(value)))
-
+    def api_error_print(self, details):
+        """
+        Prints details about errors returned by the YNAB api
+        :param: details: dictionary of returned error info from the YNAB api
+        """
+        id = details["id"]
+        name = details["name"]
+        detail = details["detail"]
+        logging.error("{}: {} ({})".format(detail, id, name))
+        
 
 # Let's run this thing!
 if __name__ == "__main__":

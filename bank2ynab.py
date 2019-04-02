@@ -813,4 +813,4 @@ if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
     api = YNAB_API(get_configs())
-    api.run()
+    api.run()  # I wonder should we call this inside the processing of each individual bank so we can access the data from each bank as it's created?

@@ -637,9 +637,9 @@ class YNAB_API(object):  # in progress (2)
         if(self.api_token is not None):
             logging.info("Connecting to YNAB API...")
 
-            error_code = self.list_budgets()  # using this function to test API token auth
-            if error_code == 401:  # TODO: need to beef this up for other error handling
-                logging.error("Invalid API token provided.")
+            error_code = self.list_budgets()  # test API token auth
+            if error_code[0] == "401":  # TODO: need to handle other errors
+                return error_code
 
             else:
                 if(self.budget_id is None):
@@ -789,29 +789,27 @@ class YNAB_API(object):  # in progress (2)
         """
         Prints details about errors returned by the YNAB api
         :param: details: dictionary of returned error info from the YNAB api
+        :return id: HTTP error ID
+        :return detail: human-understandable explanation of error
         """
-        """
-        HTTP Status	Error ID	Name	Description
-        400	400	bad_request	The request could not be understood by the API due to malformed syntax or validation errors.
-        401	401	not_authorized	This error will be returned in any of the following cases:
-        Missing access token
-        Invalid access token
-        Revoked access token
-        Expired access token
-        403	403.1	subscription_lapsed	The subscription for this account has lapsed
-        403.2	trial_expired	The trial for this account has expired
-        404	404.1	not_found	The specified URI does not exist
-        404.2	resource_not_found	This error will be returned when requesting a resource that is not found. For example, if you requested /budgets/123 and a budget with the id '123' does not exist, this error would be returned.
-        409	409	conflict	If resource cannot be saved during a PUT or POST request because it conflicts with an existing resource, this error will be returned.
-        429	429	too_many_requests	This error is returned if you make too many requests to the API in a short amount of time. Please see the Rate Limiting section. Wait a while and try again.
-        500	500	internal_server_error	This error will be returned if the API experiences an unexpected error
-        """
-        id = int(details["id"])
+        # TODO: make errors more concise
+        errors = {
+            "400": "The request could not be understood by the API due to malformed syntax or validation errors.",
+            "401": "This error will be returned in any of the following cases: Missing access token Invalid access token, Revoked access token, Expired access token",
+            "403.1": "The subscription for this account has lapsed.",
+            "403.2": "The trial for this account has expired.",
+            "404.1": "The specified URI does not exist.",
+            "404.2": "This error will be returned when requesting a resource that is not found. For example, if you requested /budgets/123 and a budget with the id '123' does not exist, this error would be returned.",
+            "409": "If resource cannot be saved during a PUT or POST request because it conflicts with an existing resource, this error will be returned.",
+            "429": "This error is returned if you make too many requests to the API in a short amount of time. Please see the Rate Limiting section. Wait a while and try again.",
+            "500": "This error will be returned if the API experiences an unexpected error"
+        }
+        id = details["id"]
         name = details["name"]
-        detail = details["detail"]
+        detail = errors[id]
         logging.error("{}: {} ({})".format(detail, id, name))
-        return id
-        
+        return [id, detail]
+
 
 # Let's run this thing!
 if __name__ == "__main__":

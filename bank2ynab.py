@@ -638,6 +638,7 @@ class YNAB_API(object):  # in progress (2)
         self.debug = False
 
     def run(self):
+    def run(self): # TODO: test if API token is actually valid before doing anything!
         if(self.api_token is not None):
             logging.info("Connecting to YNAB API...")
 

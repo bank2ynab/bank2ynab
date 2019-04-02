@@ -632,36 +632,28 @@ class YNAB_API(object):  # in progress (2)
         self.debug = False
 
     def run(self):
-    def run(self): # TODO: test if API token is actually valid before doing anything!
         if(self.api_token is not None):
             logging.info("Connecting to YNAB API...")
 
-            if(self.budget_id is None):
+            error_code = self.list_budgets()  # using this function to test API token auth
+            if error_code == 401:  # TODO: need to beef this up for other error handling
+                logging.error("Invalid API token provided.")
 
-                logging.info("No default budget set! \nPick a budget:")
-
-                self.list_budgets()
-                budget_selection = int(input(":"))
-
-                if(budget_selection < 1):
-                    print("wrong selection")
-                else:
+            else:
+                if(self.budget_id is None):
+                    msg = "No default budget set! \nPick a budget"
+                    self.list_budgets()  # create list of budget_ids
+                    budget_selection = int_input(1, len(self.budget_ids), msg)
                     self.budget_id = self.budget_ids[budget_selection - 1]
 
-            if(self.account_id is None):
-
-                logging.info("No default account set! \nPick an account:")
-
-                self.list_accounts()
-                account_selection = int(input(":"))
-
-                if(account_selection < 1):
-                    print("wrong selection")
-                else:
+                if(self.account_id is None):
+                    msg = "No default account set! \nPick an account"
+                    self.list_accounts()  # create list of account_ids
+                    account_selection = int_input(1, len(self.account_ids), msg) - 1
                     self.account_id = self.account_ids[account_selection - 1]
 
-            if(self.budget_id is not None and self.account_id is not None):
-                self.post_transactions()
+                if(self.budget_id is not None and self.account_id is not None):
+                    self.post_transactions()
         else:
             logging.info("No API-token provided.")
 
@@ -795,7 +787,23 @@ class YNAB_API(object):  # in progress (2)
         Prints details about errors returned by the YNAB api
         :param: details: dictionary of returned error info from the YNAB api
         """
-        id = details["id"]
+        """
+        HTTP Status	Error ID	Name	Description
+        400	400	bad_request	The request could not be understood by the API due to malformed syntax or validation errors.
+        401	401	not_authorized	This error will be returned in any of the following cases:
+        Missing access token
+        Invalid access token
+        Revoked access token
+        Expired access token
+        403	403.1	subscription_lapsed	The subscription for this account has lapsed
+        403.2	trial_expired	The trial for this account has expired
+        404	404.1	not_found	The specified URI does not exist
+        404.2	resource_not_found	This error will be returned when requesting a resource that is not found. For example, if you requested /budgets/123 and a budget with the id '123' does not exist, this error would be returned.
+        409	409	conflict	If resource cannot be saved during a PUT or POST request because it conflicts with an existing resource, this error will be returned.
+        429	429	too_many_requests	This error is returned if you make too many requests to the API in a short amount of time. Please see the Rate Limiting section. Wait a while and try again.
+        500	500	internal_server_error	This error will be returned if the API experiences an unexpected error
+        """
+        id = int(details["id"])
         name = details["name"]
         detail = details["detail"]
         logging.error("{}: {} ({})".format(detail, id, name))

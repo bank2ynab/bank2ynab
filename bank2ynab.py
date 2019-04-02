@@ -308,12 +308,12 @@ def int_input(min, max, msg):
     """
     while True:
         try:
-            user_input = int(input("{} (range {} - {})".format(msg, min, max)))
+            user_input = int(input("{} (range {} - {}): ".format(msg, min, max)))
             if user_input < min or user_input > max:
                 raise ValueError
             break
         except ValueError:
-            logging.info("This is integer is not in the acceptable range, try again!")
+            logging.info("This integer is not in the acceptable range, try again!")
     return user_input
     
 # -- end of utilities

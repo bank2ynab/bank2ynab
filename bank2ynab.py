@@ -792,17 +792,17 @@ class YNAB_API(object):  # in progress (2)
         :return id: HTTP error ID
         :return detail: human-understandable explanation of error
         """
-        # TODO: make errors more concise
+
         errors = {
-            "400": "The request could not be understood by the API due to malformed syntax or validation errors.",
-            "401": "This error will be returned in any of the following cases: Missing access token Invalid access token, Revoked access token, Expired access token",
+            "400": "Bad syntax or validation error",
+            "401": "API access token missing, invalid, revoked, or expired",
             "403.1": "The subscription for this account has lapsed.",
             "403.2": "The trial for this account has expired.",
             "404.1": "The specified URI does not exist.",
-            "404.2": "This error will be returned when requesting a resource that is not found. For example, if you requested /budgets/123 and a budget with the id '123' does not exist, this error would be returned.",
-            "409": "If resource cannot be saved during a PUT or POST request because it conflicts with an existing resource, this error will be returned.",
-            "429": "This error is returned if you make too many requests to the API in a short amount of time. Please see the Rate Limiting section. Wait a while and try again.",
-            "500": "This error will be returned if the API experiences an unexpected error"
+            "404.2": "Resource not found",
+            "409": "Conflict error",
+            "429": "Too many requests - rate-limited. Wait a while and try again.",
+            "500": "Unexpected error"
         }
         id = details["id"]
         name = details["name"]

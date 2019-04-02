@@ -612,12 +612,6 @@ class Bank2Ynab(object):
 
 
 class YNAB_API(object):  # in progress (2)
-    """ Class used to access the YNAB API
-    API reference:
-    https://api.youneedabudget.com/v1#/Transactions/createTransaction
-    https://api.youneedabudget.com/v1/budgets/{budget_id}/transactions/createTransaction?access_token=<ACCESS_TOKEN>
-    """
-
     """
     uses Personal Access Token stored in user_configuration.conf
     (note for devs: be careful not to accidentally share your API access token!)
@@ -736,7 +730,6 @@ class YNAB_API(object):  # in progress (2)
             logging.error(json.loads(post_response.text)['error'])
 
     def list_transactions(self):
-
         url = ("https://api.youneedabudget.com/v1/budgets/" +
                "{}/transactions?access_token={}".format(
                    self.budget_id,

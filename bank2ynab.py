@@ -308,14 +308,16 @@ def int_input(min, max, msg):
     """
     while True:
         try:
-            user_input = int(input("{} (range {} - {}): ".format(msg, min, max)))
+            user_input = int(
+                input("{} (range {} - {}): ".format(msg, min, max)))
             if user_input < min or user_input > max:
                 raise ValueError
             break
         except ValueError:
-            logging.info("This integer is not in the acceptable range, try again!")
+            logging.info(
+                "This integer is not in the acceptable range, try again!")
     return user_input
-    
+
 # -- end of utilities
 
 
@@ -614,7 +616,7 @@ class Bank2Ynab(object):
 class YNAB_API(object):  # in progress (2)
     """
     uses Personal Access Token stored in user_configuration.conf
-    (note for devs: be careful not to accidentally share your API access token!)
+    (note for devs: be careful not to accidentally share API access token!)
     """
 
     def __init__(self, config_object, transactions=None):
@@ -649,7 +651,8 @@ class YNAB_API(object):  # in progress (2)
                 if(self.account_id is None):
                     msg = "No default account set! \nPick an account"
                     self.list_accounts()  # create list of account_ids
-                    account_selection = int_input(1, len(self.account_ids), msg) - 1
+                    account_selection = int_input(
+                        1, len(self.account_ids), msg) - 1
                     self.account_id = self.account_ids[account_selection - 1]
 
                 if(self.budget_id is not None and self.account_id is not None):

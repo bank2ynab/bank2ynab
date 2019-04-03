@@ -17,7 +17,7 @@ install:
 script:
   - python -m unittest discover -v
   - python bank2ynab.py
-  - flake8 --builtins=unicode
+  - flake8
   - coverage run bank2ynab.py
 after_success:
   - codecov

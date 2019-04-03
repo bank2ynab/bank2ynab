@@ -171,7 +171,7 @@ class UnicodeReader:
 
     def next(self):
         row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]
+        return [unicode(s, "utf-8") for s in row]  # noqa
 
     def __iter__(self):
         return self
@@ -801,7 +801,7 @@ class YNAB_API(object):  # in progress (2)
             "404.1": "The specified URI does not exist.",
             "404.2": "Resource not found",
             "409": "Conflict error",
-            "429": "Too many requests - rate-limited. Wait a while and try again.",
+            "429": "Too many requests. Wait a while and try again.",
             "500": "Unexpected error"
         }
         id = details["id"]
@@ -818,7 +818,7 @@ if __name__ == "__main__":
     api = YNAB_API(get_configs())
     api.run()
     """
-    I wonder should we call this inside the processing 
+    I wonder should we call this inside the processing
     of each individual bank so we can access the data
     from each bank as it's created?
     """

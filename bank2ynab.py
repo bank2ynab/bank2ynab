@@ -748,51 +748,39 @@ class YNAB_API(object):  # in progress (2)
             logging.error(json.loads(post_response.text)['error'])
 
     def list_transactions(self):
-        url = ("https://api.youneedabudget.com/v1/budgets/" +
-               "{}/transactions?access_token={}".format(
-                   self.budget_id,
-                   self.api_token))
-        response = requests.get(url)
-        try:
-            transactions = response.json()["data"]["transactions"]
+        transactions = self.api_read(True, "transactions")
+        if transactions[0] != "ERROR":
             if len(transactions) > 0:
                 logging.debug("Listing transactions:")
                 for t in transactions:
                     logging.debug(t)
             else:
                 logging.debug("no transactions found")
-        except KeyError:
-            return self.api_error_print(response.json()["error"])
+        else:
+            return transactions
 
     def list_accounts(self):
-        url = ("https://api.youneedabudget.com/v1/budgets/" +
-               "{}/accounts?access_token={}".format(
-                   self.budget_id,
-                   self.api_token))
-        response = requests.get(url)
-        accounts = response.json()['data']['accounts']
-        if len(accounts) > 0:
+        accounts = self.api_read(True, "accounts")
+        if accounts[0] != "ERROR":
+            if len(accounts) > 0:
+                logging.info("Listing accounts:")
+                index = 0
+                for t in accounts:
+                    index = index + 1
+                    print("| {} | {}".format(index, t['name']))
+                    self.account_ids.append(t['id'])
 
-            logging.info("Listing accounts:")
-            index = 0
-            for t in accounts:
-                index = index + 1
-                print("| {} | {}".format(index, t['name']))
-                self.account_ids.append(t['id'])
-
-                logging.debug("id: {}".format(t['id']))
-                logging.debug("on_budget: {}".format(t['on_budget']))
-                logging.debug("closed: {}".format(t['closed']))
+                    logging.debug("id: {}".format(t["id"]))
+                    logging.debug("on_budget: {}".format(t["on_budget"]))
+                    logging.debug("closed: {}".format(t["closed"]))
+            else:
+                logging.info("no accounts found")
         else:
-            logging.info("no accounts found")
+            return accounts
 
     def list_budgets(self):
-        url = ("https://api.youneedabudget.com/v1/budgets?" +
-               "access_token={}".format(
-                   self.api_token))
-        response = requests.get(url)
-        try:
-            budgets = response.json()['data']['budgets']
+        budgets = self.api_read(False, "budgets")
+        if budgets[0] != "ERROR":
             index = 0
             for x in budgets:
                 index = index + 1
@@ -808,8 +796,8 @@ class YNAB_API(object):  # in progress (2)
                                           (str(subkey), str(subvalue)))
                     else:
                         logging.debug("%s: %s" % (str(key), str(value)))
-        except KeyError:
-            return self.api_error_print(response.json()["error"])
+        else:
+            return budgets
 
     def api_error_print(self, details):
         """
@@ -834,7 +822,8 @@ class YNAB_API(object):  # in progress (2)
         name = details["name"]
         detail = errors[id]
         logging.error("{}: {} ({})".format(detail, id, name))
-        return [id, detail]
+
+        return ["ERROR", id, detail]
 
 
 # Let's run this thing!

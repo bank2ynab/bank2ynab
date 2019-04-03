@@ -638,14 +638,14 @@ class YNAB_API(object):  # in progress (2)
             logging.info("Connecting to YNAB API...")
 
             # check for API token auth (and other errors)
-            error_code = self.list_budgets()
-            if len(error_code) > 0:
+            error_code = self.list_budgets(False)
+            if error_code:
                 return error_code
             else:
                 # if no default budget, build budget list and select default
                 if(self.budget_id is None):
                     msg = "No default budget set! \nPick a budget"
-                    self.list_budgets()  # create list of budget_ids
+                    self.list_budgets(True)  # create list of budget_ids
                     budget_selection = int_input(1, len(self.budget_ids), msg)
                     self.budget_id = self.budget_ids[budget_selection - 1]
 
@@ -674,9 +674,9 @@ class YNAB_API(object):  # in progress (2)
 
         if budget is False:
             # only happens when we're looking for the list of budgets
-            url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
+            url = base_url + "?access_token={}".format(api_t)
         else:
-            url = base_url + "access_token={}".format(api_t)
+            url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
 
         response = requests.get(url)
         try:
@@ -780,26 +780,27 @@ class YNAB_API(object):  # in progress (2)
         else:
             logging.info("no accounts found")
 
-    def list_budgets(self):
+    def list_budgets(self, running):
         budgets = self.api_read(False, "budgets")
         if budgets[0] == "ERROR":
             return budgets
 
-        index = 0
-        for x in budgets:
-            index = index + 1
-            print("| {} | {}".format(index, x['name']))
-            self.budget_ids.append(x["id"])
-            # debug messages:
-            for key, value in x.items():
-                if(type(value) is dict):
-                    logging.debug("%s: " % str(key))
+        if running is True:
+            index = 0
+            for x in budgets:
+                index = index + 1
+                print("| {} | {}".format(index, x["name"]))
+                self.budget_ids.append(x["id"])
+                # debug messages:
+                for key, value in x.items():
+                    if(type(value) is dict):
+                        logging.debug("%s: " % str(key))
 
-                    for subkey, subvalue in value.items():
-                        logging.debug("  %s: %s" %
-                                      (str(subkey), str(subvalue)))
-                else:
-                    logging.debug("%s: %s" % (str(key), str(value)))
+                        for subkey, subvalue in value.items():
+                            logging.debug("  %s: %s" %
+                                          (str(subkey), str(subvalue)))
+                    else:
+                        logging.debug("%s: %s" % (str(key), str(value)))
 
     def api_error_print(self, details):
         """

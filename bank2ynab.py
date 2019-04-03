@@ -749,55 +749,55 @@ class YNAB_API(object):  # in progress (2)
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")
-        if transactions[0] != "ERROR":
-            if len(transactions) > 0:
-                logging.debug("Listing transactions:")
-                for t in transactions:
-                    logging.debug(t)
-            else:
-                logging.debug("no transactions found")
-        else:
+        if transactions[0] == "ERROR":
             return transactions
+
+        if len(transactions) > 0:
+            logging.debug("Listing transactions:")
+            for t in transactions:
+                logging.debug(t)
+        else:
+            logging.debug("no transactions found")
 
     def list_accounts(self):
         accounts = self.api_read(True, "accounts")
-        if accounts[0] != "ERROR":
-            if len(accounts) > 0:
-                logging.info("Listing accounts:")
-                index = 0
-                for t in accounts:
-                    index = index + 1
-                    print("| {} | {}".format(index, t['name']))
-                    self.account_ids.append(t['id'])
-
-                    logging.debug("id: {}".format(t["id"]))
-                    logging.debug("on_budget: {}".format(t["on_budget"]))
-                    logging.debug("closed: {}".format(t["closed"]))
-            else:
-                logging.info("no accounts found")
-        else:
+        if accounts[0] == "ERROR":
             return accounts
+
+        if len(accounts) > 0:
+            logging.info("Listing accounts:")
+            index = 0
+            for t in accounts:
+                index = index + 1
+                print("| {} | {}".format(index, t['name']))
+                self.account_ids.append(t['id'])
+
+                logging.debug("id: {}".format(t["id"]))
+                logging.debug("on_budget: {}".format(t["on_budget"]))
+                logging.debug("closed: {}".format(t["closed"]))
+        else:
+            logging.info("no accounts found")
 
     def list_budgets(self):
         budgets = self.api_read(False, "budgets")
-        if budgets[0] != "ERROR":
-            index = 0
-            for x in budgets:
-                index = index + 1
-                print("| {} | {}".format(index, x['name']))
-                self.budget_ids.append(x["id"])
-                # debug messages:
-                for key, value in x.items():
-                    if(type(value) is dict):
-                        logging.debug("%s: " % str(key))
-
-                        for subkey, subvalue in value.items():
-                            logging.debug("  %s: %s" %
-                                          (str(subkey), str(subvalue)))
-                    else:
-                        logging.debug("%s: %s" % (str(key), str(value)))
-        else:
+        if budgets[0] == "ERROR":
             return budgets
+
+        index = 0
+        for x in budgets:
+            index = index + 1
+            print("| {} | {}".format(index, x['name']))
+            self.budget_ids.append(x["id"])
+            # debug messages:
+            for key, value in x.items():
+                if(type(value) is dict):
+                    logging.debug("%s: " % str(key))
+
+                    for subkey, subvalue in value.items():
+                        logging.debug("  %s: %s" %
+                                      (str(subkey), str(subvalue)))
+                else:
+                    logging.debug("%s: %s" % (str(key), str(value)))
 
     def api_error_print(self, details):
         """

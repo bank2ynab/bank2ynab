@@ -664,9 +664,9 @@ class YNAB_API(object):  # in progress (2)
     def api_read(self, budget, kwd):
         """
         General function for reading data from YNAB API
-        :param  budget:         boolean indicating if there's a default budget
-        :param  kwd:            keyword for data type, e.g. transactions
-        :return error_codes:    if it fails we return our error
+        :param  budget: boolean indicating if there's a default budget
+        :param  kwd: keyword for data type, e.g. transactions
+        :return error_codes: if it fails we return our error
         """
         id = self.budget_id
         api_t = self.api_token
@@ -691,6 +691,7 @@ class YNAB_API(object):  # in progress (2)
         Add each transaction to this object's transaction list
         while the main bank2ynab process is running
         """
+        # we should probably move the transaction template compilation here
         self.transactions.append(transaction)
 
     def post_transactions(self):
@@ -700,62 +701,53 @@ class YNAB_API(object):  # in progress (2)
                    self.budget_id,
                    self.api_token))
 
-        # Globals
-        account_id = self.account_id
-        payee_id = None
-        category_id = None
-        cleared = "cleared"
-        approved = False
-        flag_color = None
-        import_id = None
+        # this is the transaction template to insert obtained values into
+        default_transaction = {
+            "account_id": self.account_id,
+            "payee_id": None,
+            "category_id": None,
+            "cleared": "cleared",
+            "approved": False,
+            "flag_color": None,
+            "import_id": None
+        }
 
         # TODO: use date, amount, payee and memo from transactions
+        # start of debugging sample transaction bit
         date = "2019-01-01"
         amount = 12000000000
         payee_name = None
         memo = None
 
+        transaction1 = default_transaction
+        transaction1["date"] = date
+        transaction1["amount"] = amount
+        transaction1["payee_name"] = payee_name
+        transaction1["memo"] = memo
+
+        transaction2 = default_transaction
+        transaction2["date"] = date
+        transaction2["amount"] = 999299
+        transaction2["payee_name"] = "woman of power"
+        transaction2["memo"] = memo
+
+        transactions = [transaction1, transaction2]
+        # end of debugging sample transaction bit
+
+        # compile our data to post
         data = {
             "transactions": []
         }
+        for transaction in transactions:
+            data["transactions"].append(transaction)
 
-        # TODO: CLEANUP, this is just a mess!
-        transaction1 = {
-            "account_id": account_id,
-            "date": date,
-            "amount": amount,
-            "payee_id": payee_id,
-            "payee_name": payee_name,
-            "category_id": category_id,
-            "memo": memo,
-            "cleared": cleared,
-            "approved": approved,
-            "flag_color": flag_color,
-            "import_id": import_id
-        }
-        # TODO: CLEANUP, this is just a mess!
-        transaction2 = {
-            "account_id": account_id,
-            "date": date,
-            "amount": 999299,
-            "payee_id": payee_id,
-            "payee_name": "woman of power",
-            "category_id": category_id,
-            "memo": memo,
-            "cleared": cleared,
-            "approved": approved,
-            "flag_color": flag_color,
-            "import_id": import_id
-        }
-
-        # TODO: should be a loop of some sort
-        data['transactions'].append(transaction1)
-        data['transactions'].append(transaction2)
-
+        # send our data to API
         post_response = requests.post(url, json=data)
-        if 'error' in json.loads(post_response.text):
-            logging.error("error while sending %s" % str(data['transactions']))
-            logging.error(json.loads(post_response.text)['error'])
+
+        # error handling
+        if "error" in json.loads(post_response.text):
+            logging.error("error while sending %s" % str(data["transactions"]))
+            logging.error(json.loads(post_response.text)["error"])
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")
@@ -840,10 +832,5 @@ class YNAB_API(object):  # in progress (2)
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
-    api = YNAB_API(get_configs())
+    api = YNAB_API(get_configs())  # rearrange this flow to call api caching
     api.run()
-    """
-    I wonder should we call the API inside the processing
-    of each individual bank so we can access the data
-    from each bank as it's created?
-    """

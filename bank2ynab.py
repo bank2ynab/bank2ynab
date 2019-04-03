@@ -621,7 +621,7 @@ class YNAB_API(object):  # in progress (2)
 
     def __init__(self, config_object, transactions=None):
         # TODO: get a hold of the transactions
-        self.transactions = ""
+        self.transactions = []
         self.budget_ids = []
         self.account_ids = []
 
@@ -661,10 +661,10 @@ class YNAB_API(object):  # in progress (2)
         else:
             logging.info("No API-token provided.")
 
-    def api_read(self, budget, kwd):  # in progress
+    def api_read(self, budget, kwd):
         """
         General function for reading data from YNAB API
-        :param  budget:         boolean indicating if there's a budget or not
+        :param  budget:         boolean indicating if there's a default budget
         :param  kwd:            keyword for data type, e.g. transactions
         :return error_codes:    if it fails we return our error
         """
@@ -673,15 +673,25 @@ class YNAB_API(object):  # in progress (2)
         base_url = "https://api.youneedabudget.com/v1/budgets/"
 
         if budget is False:
+            # only happens when we're looking for the list of budgets
             url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
         else:
             url = base_url + "access_token={}".format(api_t)
+
         response = requests.get(url)
         try:
             read_data = response.json()["data"][kwd]
         except KeyError:
+            # the API has returned an error so let's handle it
             return self.api_error_print(response.json()["error"])
         return read_data
+
+    def cache_transaction(self, transaction):  # TODO
+        """
+        Add each transaction to this object's transaction list
+        while the main bank2ynab process is running
+        """
+        self.transactions.append(transaction)
 
     def post_transactions(self):
         logging.info("Posting transactions..")

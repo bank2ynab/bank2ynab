@@ -731,13 +731,16 @@ class YNAB_API(object):  # in progress (2)
                    self.budget_id,
                    self.api_token))
         response = requests.get(url)
-        transactions = response.json()['data']['transactions']
-        if len(transactions) > 0:
-            logging.debug("Listing transactions:")
-            for t in transactions:
-                logging.debug(t)
-        else:
-            logging.debug("no transactions found")
+        try:
+            transactions = response.json()["data"]["transactions"]
+            if len(transactions) > 0:
+                logging.debug("Listing transactions:")
+                for t in transactions:
+                    logging.debug(t)
+            else:
+                logging.debug("no transactions found")
+        except KeyError:
+            return self.api_error_print(response.json()["error"])
 
     def list_accounts(self):
         url = ("https://api.youneedabudget.com/v1/budgets/" +

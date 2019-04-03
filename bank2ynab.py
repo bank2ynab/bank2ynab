@@ -637,23 +637,24 @@ class YNAB_API(object):  # in progress (2)
         if(self.api_token is not None):
             logging.info("Connecting to YNAB API...")
 
-            error_code = self.list_budgets()  # test API token auth
-            if error_code[0] == "401":  # TODO: need to handle other errors
+            # check for API token auth (and other errors)
+            error_code = self.list_budgets()
+            if len(error_code) > 0:
                 return error_code
-
             else:
+                # if no default budget, build budget list and select default
                 if(self.budget_id is None):
                     msg = "No default budget set! \nPick a budget"
                     self.list_budgets()  # create list of budget_ids
                     budget_selection = int_input(1, len(self.budget_ids), msg)
                     self.budget_id = self.budget_ids[budget_selection - 1]
 
+                # if no default account, build account list and select default
                 if(self.account_id is None):
                     msg = "No default account set! \nPick an account"
                     self.list_accounts()  # create list of account_ids
-                    account_selection = int_input(
-                        1, len(self.account_ids), msg)
-                    self.account_id = self.account_ids[account_selection - 1]
+                    ac_selection = int_input(1, len(self.account_ids), msg)
+                    self.account_id = self.account_ids[ac_selection - 1]
 
                 if(self.budget_id is not None and self.account_id is not None):
                     self.post_transactions()

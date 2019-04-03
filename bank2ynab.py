@@ -844,7 +844,7 @@ if __name__ == "__main__":
     api = YNAB_API(get_configs())
     api.run()
     """
-    I wonder should we call this inside the processing
+    I wonder should we call the API inside the processing
     of each individual bank so we can access the data
     from each bank as it's created?
     """

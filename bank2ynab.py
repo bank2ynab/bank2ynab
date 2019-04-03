@@ -719,6 +719,25 @@ class YNAB_API(object):  # in progress (2)
             "import_id": None
         }
 
+        # go through each bank's data
+        transactions = []
+        for key in transaction_data:
+            account_transactions = transaction_data[key]
+            for t in account_transactions:
+                transaction = default_transaction
+                date = t[0]
+                payee = t[1]
+                # category = t[2]  # unused
+                memo = t[3]
+                # amount = float(t[5]) - float(t[6])  # need to fix strings
+                transaction["date"] = date
+                transaction["amount"] = 0
+                transaction["payee_name"] = payee
+                transaction["memo"] = memo
+
+                transactions.append(transaction)
+
+        """
         # TODO: use date, amount, payee and memo from transactions
         # start of debugging sample transaction bit
         date = "2019-01-01"
@@ -740,7 +759,8 @@ class YNAB_API(object):  # in progress (2)
 
         transactions = [transaction1, transaction2]
         # end of debugging sample transaction bit
-
+        """
+        print(transactions)  # debug
         # compile our data to post
         data = {
             "transactions": []

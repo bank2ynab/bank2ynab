@@ -584,6 +584,8 @@ class Bank2Ynab(object):
     def __init__(self, config_object, is_py2=False):
         self._is_py2 = is_py2
         self.banks = []
+        self.transaction_data = {}
+
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)
             bank_object = build_bank(bank_config)
@@ -606,6 +608,8 @@ class Bank2Ynab(object):
                 # create cleaned csv for each file
                 output = bank.read_data(src_file)
                 bank.write_data(src_file, output)
+                # save transaction data for each bank to object
+                self.transaction_data[bank_name] = output
                 # delete original csv file
                 if bank.config["delete_original"] is True:
                     logging.info("Removing input file: {}".format(src_file))
@@ -633,7 +637,7 @@ class YNAB_API(object):  # in progress (2)
         # TODO: Fix debug structure, so it will be used in logging instead
         self.debug = False
 
-    def run(self):
+    def run(self, transaction_data):
         if(self.api_token is not None):
             logging.info("Connecting to YNAB API...")
 
@@ -657,7 +661,7 @@ class YNAB_API(object):  # in progress (2)
                     self.account_id = self.account_ids[ac_selection - 1]
 
                 if(self.budget_id is not None and self.account_id is not None):
-                    self.post_transactions()
+                    self.post_transactions(transaction_data)
         else:
             logging.info("No API-token provided.")
 
@@ -694,8 +698,11 @@ class YNAB_API(object):  # in progress (2)
         # we should probably move the transaction template compilation here
         self.transactions.append(transaction)
 
-    def post_transactions(self):
-        logging.info("Posting transactions..")
+    def post_transactions(self, transaction_data):
+        """
+        :param transaction_data: dictionary of bank names to transaction lists
+        """
+        logging.info("Posting transactions...")
         url = ("https://api.youneedabudget.com/v1/budgets/" +
                "{}/transactions?access_token={}".format(
                    self.budget_id,
@@ -834,4 +841,4 @@ if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
     api = YNAB_API(get_configs())  # rearrange this flow to call api caching
-    api.run()
+    api.run(b2y.transaction_data)

@@ -661,6 +661,28 @@ class YNAB_API(object):  # in progress (2)
         else:
             logging.info("No API-token provided.")
 
+    def api_read(self, budget, kwd):  # in progress
+        """
+        General function for reading data from YNAB API
+        :param  budget:         boolean indicating if there's a budget or not
+        :param  kwd:            keyword for data type, e.g. transactions
+        :return error_codes:    if it fails we return our error
+        """
+        id = self.budget_id
+        api_t = self.api_token
+        base_url = "https://api.youneedabudget.com/v1/budgets/"
+
+        if budget is False:
+            url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
+        else:
+            url = base_url + "access_token={}".format(api_t)
+        response = requests.get(url)
+        try:
+            read_data = response.json()["data"][kwd]
+        except KeyError:
+            return self.api_error_print(response.json()["error"])
+        return read_data
+
     def post_transactions(self):
         logging.info("Posting transactions..")
         url = ("https://api.youneedabudget.com/v1/budgets/" +

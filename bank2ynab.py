@@ -521,7 +521,7 @@ class B2YBank(object):
 
     def _fix_date(self, row, date_format):
         """ fix date format when required
-        convert date to DD/MM/YYYY
+        convert date to YYYY-MM-DD
         :param row: list of values
         :param date_format: date format string
         """
@@ -535,7 +535,8 @@ class B2YBank(object):
             # parse our date according to provided formatting string
             input_date = datetime.strptime(row[date_col].lstrip(), date_format)
             # do our actual date processing
-            output_date = datetime.strftime(input_date, "%d/%m/%Y")
+            output_date = datetime.strftime(input_date, "%Y-%m-%d")
+            # output_date = datetime.strftime(input_date, "%d/%m/%Y")  # old
             row[date_col] = output_date
         except (ValueError, IndexError):
             pass

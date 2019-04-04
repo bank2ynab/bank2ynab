@@ -668,7 +668,11 @@ class YNAB_API(object):  # in progress (2)
                 if(self.budget_id is None):
                     msg = "No default budget set! \nPick a budget"
                     self.list_budgets(True)  # create list of budget_ids
-                    budget_selection = int_input(1, len(self.budget_ids), msg)
+                    budget_count = len(self.budget_ids)
+                    if budget_count > 1:
+                        budget_selection = int_input(1, budget_count, msg)
+                    elif budget_count > 0:
+                        budget_selection = 1
                     self.budget_id = self.budget_ids[budget_selection - 1]
 
                 # if no default account, build account list and select default

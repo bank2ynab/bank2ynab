@@ -690,14 +690,6 @@ class YNAB_API(object):  # in progress (2)
             return self.api_error_print(response.json()["error"])
         return read_data
 
-    def cache_transaction(self, transaction):  # TODO
-        """
-        Add each transaction to this object's transaction list
-        while the main bank2ynab process is running
-        """
-        # we should probably move the transaction template compilation here
-        self.transactions.append(transaction)
-
     def post_transactions(self, transaction_data):
         """
         :param transaction_data: dictionary of bank names to transaction lists

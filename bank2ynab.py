@@ -793,8 +793,8 @@ class YNAB_API(object):  # in progress (2)
 
         # error handling
         if "error" in json.loads(post_response.text):
-            logging.error("error while sending %s" % str(data["transactions"]))
             logging.error(json.loads(post_response.text)["error"])
+            self.api_error_print(json.loads(post_response.text)["error"])
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")
@@ -852,7 +852,7 @@ class YNAB_API(object):  # in progress (2)
     def api_error_print(self, details):
         """
         Prints details about errors returned by the YNAB api
-        :param: details: dictionary of returned error info from the YNAB api
+        :param details: dictionary of returned error info from the YNAB api
         :return id: HTTP error ID
         :return detail: human-understandable explanation of error
         """
@@ -871,7 +871,7 @@ class YNAB_API(object):  # in progress (2)
         id = details["id"]
         name = details["name"]
         detail = errors[id]
-        logging.error("{}: {} ({})".format(detail, id, name))
+        logging.error("{} - {} ({})".format(id, detail, name))
 
         return ["ERROR", id, detail]
 

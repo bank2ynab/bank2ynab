@@ -758,30 +758,6 @@ class YNAB_API(object):  # in progress (2)
                 transaction["memo"] = memo
 
                 transactions.append(transaction)
-
-        """
-        # TODO: use date, amount, payee and memo from transactions
-        # start of debugging sample transaction bit
-        date = "2019-01-01"
-        amount = 12000000000
-        payee_name = None
-        memo = None
-
-        transaction1 = default_transaction
-        transaction1["date"] = date
-        transaction1["amount"] = amount
-        transaction1["payee_name"] = payee_name
-        transaction1["memo"] = memo
-
-        transaction2 = default_transaction
-        transaction2["date"] = date
-        transaction2["amount"] = 999299
-        transaction2["payee_name"] = "woman of power"
-        transaction2["memo"] = memo
-
-        transactions = [transaction1, transaction2]
-        # end of debugging sample transaction bit
-        """
         # compile our data to post
         data = {
             "transactions": []

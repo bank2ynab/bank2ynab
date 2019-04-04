@@ -675,14 +675,7 @@ class YNAB_API(object):  # in progress (2)
                         budget_selection = 1
                     self.budget_id = self.budget_ids[budget_selection - 1]
 
-                # if no default account, build account list and select default
-                if(self.account_id is None):
-                    msg = "No default account set! \nPick an account"
-                    self.list_accounts()  # create list of account_ids
-                    ac_selection = int_input(1, len(self.account_ids), msg)
-                    self.account_id = self.account_ids[ac_selection - 1]
-
-                if(self.budget_id is not None and self.account_id is not None):
+                if self.budget_id:
                     self.post_transactions(transaction_data)
         else:
             logging.info("No API-token provided.")
@@ -724,7 +717,7 @@ class YNAB_API(object):  # in progress (2)
 
         # this is the transaction template to insert obtained values into
         default_transaction = {
-            "account_id": self.account_id,
+            "account_id": None,
             "payee_id": None,
             "category_id": None,
             "cleared": "cleared",
@@ -736,6 +729,19 @@ class YNAB_API(object):  # in progress (2)
         # go through each bank's data
         transactions = []
         for key in transaction_data:
+            # choose what account to write this bank's transactions to
+            # TODO: save selection for each bank for future use
+            msg = "Pick a YNAB account for transactions from {}".format(key)
+            self.list_accounts()  # create list of account_ids
+            account_count = len(self.account_ids)
+            if account_count > 1:
+                ac_selection = int_input(1, account_count, msg)
+            elif account_count > 0:
+                # if there's only one account, select that
+                ac_selection = 1
+            account_id = self.account_ids[ac_selection - 1]
+
+            # save transaction data for each bank in main dict
             account_transactions = transaction_data[key]
             for t in account_transactions[1:]:
                 transaction = default_transaction
@@ -744,6 +750,7 @@ class YNAB_API(object):  # in progress (2)
                 payee = t[1]
                 memo = t[3]
                 amount = string_num_diff(t[4], t[5])
+                transaction["account_id"] = account_id
                 transaction["date"] = date
                 transaction["amount"] = amount
                 transaction["payee_name"] = payee

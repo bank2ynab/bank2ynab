@@ -318,6 +318,24 @@ def int_input(min, max, msg):
                 "This integer is not in the acceptable range, try again!")
     return user_input
 
+
+def string_num_diff(str1, str2):
+    """
+    converts strings to floats and subtracts 1 from 2
+    """
+    try:
+        num1 = float(str1)
+    except ValueError:
+        num1 = 0.0
+    try:
+        num2 = float(str2)
+    except ValueError:
+        num2 = 0.0
+
+    difference = num2 - num1
+    return difference
+
+
 # -- end of utilities
 
 
@@ -715,15 +733,15 @@ class YNAB_API(object):  # in progress (2)
         transactions = []
         for key in transaction_data:
             account_transactions = transaction_data[key]
-            for t in account_transactions:
+            for t in account_transactions[1:]:
                 transaction = default_transaction
+                print(t)  # debug
                 date = t[0]
                 payee = t[1]
-                # category = t[2]  # unused
                 memo = t[3]
-                # amount = float(t[5]) - float(t[6])  # need to fix strings
+                amount = string_num_diff(t[4], t[5])
                 transaction["date"] = date
-                transaction["amount"] = 0
+                transaction["amount"] = amount
                 transaction["payee_name"] = payee
                 transaction["memo"] = memo
 
@@ -752,7 +770,6 @@ class YNAB_API(object):  # in progress (2)
         transactions = [transaction1, transaction2]
         # end of debugging sample transaction bit
         """
-        print(transactions)  # debug
         # compile our data to post
         data = {
             "transactions": []

@@ -746,11 +746,18 @@ class YNAB_API(object):  # in progress (2)
             # save transaction data for each bank in main dict
             account_transactions = transaction_data[key]
             for t in account_transactions[1:]:
-                transaction = default_transaction
+                transaction = dict()
                 date = t[0]
                 payee = t[1]
                 memo = t[3]
                 amount = string_num_diff(t[4], t[5])
+
+                transaction["payee_id"] = default_transaction["payee_id"]
+                transaction["category_id"] = default_transaction["category_id"]
+                transaction["cleared"] = default_transaction["cleared"]
+                transaction["approved"] = default_transaction["approved"]
+                transaction["flag_color"] = default_transaction["flag_color"]
+                transaction["import_id"] = default_transaction["import_id"]
                 transaction["account_id"] = account_id
                 transaction["date"] = date
                 transaction["amount"] = amount
@@ -760,10 +767,8 @@ class YNAB_API(object):  # in progress (2)
                 transactions.append(transaction)
         # compile our data to post
         data = {
-            "transactions": []
+            "transactions": transactions
         }
-        for transaction in transactions:
-            data["transactions"].append(transaction)
 
         # send our data to API
         post_response = requests.post(url, json=data)

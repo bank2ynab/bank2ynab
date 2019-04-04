@@ -322,6 +322,7 @@ def int_input(min, max, msg):
 def string_num_diff(str1, str2):
     """
     converts strings to floats and subtracts 1 from 2
+    also convert output to "milliunits"
     """
     try:
         num1 = float(str1)
@@ -332,7 +333,7 @@ def string_num_diff(str1, str2):
     except ValueError:
         num2 = 0.0
 
-    difference = num2 - num1
+    difference = int(1000 * (num2 - num1))
     return difference
 
 
@@ -745,7 +746,6 @@ class YNAB_API(object):  # in progress (2)
             account_transactions = transaction_data[key]
             for t in account_transactions[1:]:
                 transaction = default_transaction
-                print(t)  # debug
                 date = t[0]
                 payee = t[1]
                 memo = t[3]

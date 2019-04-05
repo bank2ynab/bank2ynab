@@ -440,6 +440,8 @@ class B2YBank(object):
                     fixed_row = self._fix_outflow(fixed_row)
                     # fill in blank memo fields
                     fixed_row = self._auto_memo(fixed_row, fill_memo)
+                    # convert decimal point
+                    fixed_row = self._fix_decimal_point(fixed_row)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
@@ -495,6 +497,18 @@ class B2YBank(object):
         if(inflow.startswith("-")):
             row[inflow_index] = ""
             row[outflow_index] = inflow[1:]
+        return row
+
+    def _fix_decimal_point(self, row):
+        """
+        convert , to . in inflow and outflow strings
+        :param row: list of values
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        row[inflow_index] = row[inflow_index].replace(",", ".")
+        row[outflow_index] = row[outflow_index].replace(",", ".")
+
         return row
 
     def _valid_row(self, row):

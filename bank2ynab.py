@@ -711,7 +711,7 @@ class YNAB_API(object):  # in progress (2)
         """
         :param transaction_data: dictionary of bank names to transaction lists
         """
-        logging.info("Posting transactions...")
+        logging.info("Processing transactions...")
         url = ("https://api.youneedabudget.com/v1/budgets/" +
                "{}/transactions?access_token={}".format(
                    self.budget_id,
@@ -770,13 +770,17 @@ class YNAB_API(object):  # in progress (2)
             "transactions": transactions
         }
 
-        # send our data to API
-        post_response = requests.post(url, json=data)
+        # send our data to API (if there's data to send)
+        if data["transactions"] != []:
+            logging.info("Uploading transactions to YNAB...")
+            post_response = requests.post(url, json=data)
 
-        # error handling
-        if "error" in json.loads(post_response.text):
-            logging.error(json.loads(post_response.text)["error"])
-            self.api_error_print(json.loads(post_response.text)["error"])
+            # error handling
+            if "error" in json.loads(post_response.text):
+                logging.error(json.loads(post_response.text)["error"])
+                self.api_error_print(json.loads(post_response.text)["error"])
+        else:
+            logging.info("No transactions to upload to YNAB.")
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")

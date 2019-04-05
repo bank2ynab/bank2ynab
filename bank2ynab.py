@@ -761,8 +761,8 @@ class YNAB_API(object):  # in progress (2)
                 transaction["account_id"] = account_id
                 transaction["date"] = date
                 transaction["amount"] = amount
-                transaction["payee_name"] = payee
-                transaction["memo"] = memo
+                transaction["payee_name"] = payee[:50]
+                transaction["memo"] = memo[:100]
 
                 transactions.append(transaction)
         # compile our data to post

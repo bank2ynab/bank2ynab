@@ -771,6 +771,16 @@ class YNAB_API(object):  # in progress (2)
                 memo = t[3]
                 amount = string_num_diff(t[4], t[5])
 
+                # check is there a duplicate transaction already
+                count = 1
+                for pre_transaction in transactions:
+                    if pre_transaction["import_id"].startswith(
+                            "YNAB:{}:{}:".format(amount, date)):
+                        count += 1
+
+                # assign values to transaction dictionary
+                transaction["import_id"] = "YNAB:{}:{}:{}".format(
+                    amount, date, count)
                 transaction["account_id"] = account_id
                 transaction["date"] = date
                 transaction["amount"] = amount

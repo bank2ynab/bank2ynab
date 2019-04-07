@@ -763,6 +763,7 @@ class YNAB_API(object):  # in progress (2)
                 transaction = dict()
                 date = t[0]
                 payee = t[1]
+                category = t[2]
                 memo = t[3]
                 amount = string_num_diff(t[4], t[5])
 
@@ -777,6 +778,7 @@ class YNAB_API(object):  # in progress (2)
                 transaction["amount"] = amount
                 transaction["payee_name"] = payee[:50]
                 transaction["memo"] = memo[:100]
+                transaction["category"] = category
 
                 transactions.append(transaction)
         # compile our data to post

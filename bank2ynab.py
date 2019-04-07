@@ -331,7 +331,7 @@ def int_input(min, max, msg):
         try:
             user_input = int(
                 input("{} (range {} - {}): ".format(msg, min, max)))
-            if user_input < min or user_input > max:
+            if user_input not in range(min, max + 1):
                 raise ValueError
             break
         except ValueError:

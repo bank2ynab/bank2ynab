@@ -827,7 +827,7 @@ class YNAB_API(object):  # in progress (2)
         try:
             self.process_api_response(json.loads(post_response.text)["error"])
         except KeyError:
-            logging.error("API error")
+            logging.info("Success!")
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")

@@ -681,7 +681,7 @@ class YNAB_API(object):  # in progress (2)
                 return error_code
             else:
                 # if no default budget, build budget list and select default
-                if(self.budget_id is None):
+                if self.budget_id is None:
                     msg = "No default budget set! \nPick a budget"
                     self.list_budgets(True)  # create list of budget_ids
                     budget_count = len(self.budget_ids)
@@ -692,7 +692,9 @@ class YNAB_API(object):  # in progress (2)
                     self.budget_id = self.budget_ids[budget_selection - 1]
 
                 if self.budget_id:
-                    self.post_transactions(transaction_data)
+                    transactions = self.process_transactions(transaction_data)
+                    if transactions["transactions"] != []:
+                        self.post_transactions(transactions)
         else:
             logging.info("No API-token provided.")
 
@@ -718,19 +720,14 @@ class YNAB_API(object):  # in progress (2)
             read_data = response.json()["data"][kwd]
         except KeyError:
             # the API has returned an error so let's handle it
-            return self.api_error_print(response.json()["error"])
             return self.process_api_response(response.json()["error"])
         return read_data
 
-    def post_transactions(self, transaction_data):
+    def process_transactions(self, transaction_data):
         """
         :param transaction_data: dictionary of bank names to transaction lists
         """
         logging.info("Processing transactions...")
-        url = ("https://api.youneedabudget.com/v1/budgets/" +
-               "{}/transactions?access_token={}".format(
-                   self.budget_id,
-                   self.api_token))
 
         # this is the transaction template to insert obtained values into
         default_transaction = {
@@ -795,18 +792,23 @@ class YNAB_API(object):  # in progress (2)
             "transactions": transactions
         }
 
-        # send our data to API (if there's data to send)
-        if data["transactions"] != []:
-            logging.info("Uploading transactions to YNAB...")
-            post_response = requests.post(url, json=data)
+        return data
 
-            # error handling
-            if "error" in json.loads(post_response.text):
-                logging.error(json.loads(post_response.text)["error"])
-                self.api_error_print(json.loads(post_response.text)["error"])
-        else:
-            logging.info("No transactions to upload to YNAB.")
+    def post_transactions(self, data):
+        # send our data to API
+        logging.info("Uploading transactions to YNAB...")
+        url = ("https://api.youneedabudget.com/v1/budgets/" +
+               "{}/transactions?access_token={}".format(
+                   self.budget_id,
+                   self.api_token))
+
+        post_response = requests.post(url, json=data)
+
+        # response handling
+        try:
             self.process_api_response(json.loads(post_response.text)["error"])
+        except KeyError:
+            logging.error("API error")
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")

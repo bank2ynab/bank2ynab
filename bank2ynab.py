@@ -759,14 +759,8 @@ class YNAB_API(object):  # in progress (2)
             # choose what account to write this bank's transactions to
             # TODO: save selection for each bank for future use
             msg = "Pick a YNAB account for transactions from {}".format(key)
-            self.list_accounts()  # create list of account_ids
-            account_count = len(self.account_ids)
-            if account_count > 1:
-                ac_selection = int_input(1, account_count, msg)
-            elif account_count > 0:
-                # if there's only one account, select that
-                ac_selection = 1
-            account_id = self.account_ids[ac_selection - 1]
+            account_ids = self.list_accounts()  # create list of account_ids
+            account_id = option_selection(account_ids, msg)
 
             # save transaction data for each bank in main dict
             account_transactions = transaction_data[key]
@@ -840,19 +834,18 @@ class YNAB_API(object):  # in progress (2)
         if accounts[0] == "ERROR":
             return accounts
 
+        account_ids = list()
         if len(accounts) > 0:
-            logging.info("Listing accounts:")
-            index = 0
-            for t in accounts:
-                index = index + 1
-                print("| {} | {}".format(index, t['name']))
-                self.account_ids.append(t['id'])
-
-                logging.debug("id: {}".format(t["id"]))
-                logging.debug("on_budget: {}".format(t["on_budget"]))
-                logging.debug("closed: {}".format(t["closed"]))
+            for account in accounts:
+                account_ids.append([account["name"], account["id"]])
+                # debug messages
+                logging.debug("id: {}".format(account["id"]))
+                logging.debug("on_budget: {}".format(account["on_budget"]))
+                logging.debug("closed: {}".format(account["closed"]))
         else:
             logging.info("no accounts found")
+
+        return account_ids
 
     def list_budgets(self):
         budgets = self.api_read(False, "budgets")

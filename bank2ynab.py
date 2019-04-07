@@ -571,7 +571,6 @@ class B2YBank(object):
             input_date = datetime.strptime(row[date_col].lstrip(), date_format)
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%Y-%m-%d")
-            # output_date = datetime.strftime(input_date, "%d/%m/%Y")  # old
             row[date_col] = output_date
         except (ValueError, IndexError):
             pass

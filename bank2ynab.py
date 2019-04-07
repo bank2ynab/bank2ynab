@@ -761,18 +761,16 @@ class YNAB_API(object):  # in progress (2)
             account_transactions = transaction_data[key]
             for t in account_transactions[1:]:
                 transaction = dict()
+                # by default transaction matches the default transaction
+                for key in default_transaction:
+                    transaction[key] = default_transaction[key]
+
                 date = t[0]
                 payee = t[1]
                 category = t[2]
                 memo = t[3]
                 amount = string_num_diff(t[4], t[5])
 
-                transaction["payee_id"] = default_transaction["payee_id"]
-                transaction["category_id"] = default_transaction["category_id"]
-                transaction["cleared"] = default_transaction["cleared"]
-                transaction["approved"] = default_transaction["approved"]
-                transaction["flag_color"] = default_transaction["flag_color"]
-                transaction["import_id"] = default_transaction["import_id"]
                 transaction["account_id"] = account_id
                 transaction["date"] = date
                 transaction["amount"] = amount

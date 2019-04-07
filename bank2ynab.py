@@ -298,6 +298,27 @@ def find_directory(filepath):
     return input_dir
 
 
+def option_selection(options, msg):
+    """
+    Used to select from a list of options
+    If only one item in list, selects that by default
+    Otherwise displays "msg" asking for input selection (integer only)
+    :param options: list of [name, option] pairs to select from
+    :param msg: the message to display on the input line
+    :return option_selected: the selected item from the list
+    """
+    selection = 1
+    count = len(options)
+    if count > 1:
+        index = 0
+        for option in options:
+            index += 1
+            print("| {} | {}".format(index, option[0]))
+        selection = int_input(1, count, msg)
+    option_selected = options[selection - 1][1]
+    return option_selected
+
+
 def int_input(min, max, msg):
     """
     Makes a user select an integer between min & max stated values

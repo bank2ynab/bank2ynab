@@ -793,6 +793,15 @@ class YNAB_API(object):  # in progress (2)
 
         return data
 
+    def create_import_id(self, amount, date, existing_transactions):
+        # check is there a duplicate transaction already
+        count = 1
+        for transaction in existing_transactions:
+            if transaction["import_id"].startswith(
+                    "YNAB:{}:{}:".format(amount, date)):
+                count += 1
+        return "YNAB:{}:{}:{}".format(amount, date, count)
+
     def post_transactions(self, data):
         # send our data to API
         logging.info("Uploading transactions to YNAB...")

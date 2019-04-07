@@ -681,13 +681,11 @@ class YNAB_API(object):  # in progress (2)
     def __init__(self, config_object, transactions=None):
         # TODO: get a hold of the transactions
         self.transactions = []
-        self.budget_ids = []
         self.account_ids = []
 
         self.api_token = get_config_line(config_object, "DEFAULT",
                                          ["YNAB API Access Token", False, ""])
         self.budget_id = None
-        self.account_id = None
 
         # TODO: Fix debug structure, so it will be used in logging instead
         self.debug = False

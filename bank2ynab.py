@@ -719,6 +719,7 @@ class YNAB_API(object):  # in progress (2)
         except KeyError:
             # the API has returned an error so let's handle it
             return self.api_error_print(response.json()["error"])
+            return self.process_api_response(response.json()["error"])
         return read_data
 
     def post_transactions(self, transaction_data):
@@ -805,6 +806,7 @@ class YNAB_API(object):  # in progress (2)
                 self.api_error_print(json.loads(post_response.text)["error"])
         else:
             logging.info("No transactions to upload to YNAB.")
+            self.process_api_response(json.loads(post_response.text)["error"])
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")
@@ -859,14 +861,14 @@ class YNAB_API(object):  # in progress (2)
                     else:
                         logging.debug("%s: %s" % (str(key), str(value)))
 
-    def api_error_print(self, details):
+    def process_api_response(self, details):
         """
         Prints details about errors returned by the YNAB api
         :param details: dictionary of returned error info from the YNAB api
         :return id: HTTP error ID
         :return detail: human-understandable explanation of error
         """
-
+        # TODO: make this function into a general response handler instead
         errors = {
             "400": "Bad syntax or validation error",
             "401": "API access token missing, invalid, revoked, or expired",

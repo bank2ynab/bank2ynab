@@ -810,7 +810,7 @@ class YNAB_API(object):  # in progress (2)
 
         post_response = requests.post(url, json=data)
 
-        # response handling
+        # response handling - TODO: make this more thorough!
         try:
             self.process_api_response(json.loads(post_response.text)["error"])
         except KeyError:
@@ -854,6 +854,9 @@ class YNAB_API(object):  # in progress (2)
         budget_ids = list()
         for budget in budgets:
             budget_ids.append([budget["name"], budget["id"]])
+
+            """ commented out because this is a bit messy and confusing
+            # TODO: make this legible!
             # debug messages:
             for key, value in budget.items():
                 if(type(value) is dict):
@@ -863,6 +866,7 @@ class YNAB_API(object):  # in progress (2)
                                       (str(subkey), str(subvalue)))
                 else:
                     logging.debug("%s: %s" % (str(key), str(value)))
+            """
         return budget_ids
 
     def process_api_response(self, details):

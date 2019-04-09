@@ -206,8 +206,8 @@ class UnicodeWriter:
 def get_configs():
     """ Retrieve all configuration parameters."""
     conf_files = ["bank2ynab.conf", "user_configuration.conf"]
-    if not os.path.exists("bank2ynab.conf"):
-        logging.error("\nError: Can't find configuration file: bank2ynab.conf")
+    if not os.path.exists(conf_files[0]):
+        logging.error("Configuration file not found: {}".format(conf_files[0]))
     config = configparser.RawConfigParser()
     if __PY2:
         config.read(conf_files)
@@ -243,7 +243,8 @@ def fix_conf_params(conf_obj, section_name):
         "cd_flags": ["Inflow or Outflow Indicator", False, ","],
         "payee_to_memo": ["Use Payee for Memo", True, ""],
         "plugin": ["Plugin", False, ""],
-        "api_token": ["YNAB API Access Token", False, ""]
+        "api_token": ["YNAB API Access Token", False, ""],
+        "api_account": ["YNAB Account ID", False, ""]
     }
 
     for key in config:
@@ -681,9 +682,10 @@ class YNAB_API(object):  # in progress (2)
         # TODO: get a hold of the transactions
         self.transactions = []
         self.account_ids = []
-
-        self.api_token = get_config_line(config_object, "DEFAULT",
-                                         ["YNAB API Access Token", False, ""])
+        # TODO - make this play nice with our get_configs method (PY2)
+        self.config = configparser.RawConfigParser()
+        self.config.read("user_configuration.conf")
+        self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
         self.budget_id = None
 
         # TODO: Fix debug structure, so it will be used in logging instead
@@ -756,10 +758,7 @@ class YNAB_API(object):  # in progress (2)
         transactions = []
         for key in transaction_data:
             # choose what account to write this bank's transactions to
-            # TODO: save selection for each bank for future use
-            msg = "Pick a YNAB account for transactions from {}".format(key)
-            account_ids = self.list_accounts()  # create list of account_ids
-            account_id = option_selection(account_ids, msg)
+            account_id = self.select_account(key)
 
             # save transaction data for each bank in main dict
             account_transactions = transaction_data[key]
@@ -897,10 +896,39 @@ class YNAB_API(object):  # in progress (2)
 
         return ["ERROR", id, detail]
 
+    def select_account(self, bank):
+        account_id = ""
+        try:
+            account_id = self.config.get(bank, "YNAB Account ID")
+            logging.info("Previously-saved account for {} found.".format(bank))
+        except configparser.NoSectionError:
+            logging.info("No user configuration for {} found.".format(bank))
+        if account_id == "":
+            account_ids = self.list_accounts()  # create list of account_ids
+            msg = "Pick a YNAB account for transactions from {}".format(bank)
+            account_id = option_selection(account_ids, msg)
+            # save account selection for bank
+            self.save_account_selection(bank, account_id)
+        return account_id
+
+    def save_account_selection(self, bank, account_id):
+        """
+        saves YNAB account to use for each bank
+        """
+        try:
+            self.config.add_section(bank)
+        except configparser.DuplicateSectionError:
+            pass
+        self.config.set(bank, "YNAB Account ID", account_id)
+
+        logging.info("Saving default account for {}...".format(bank))
+        with open("user_configuration.conf", "w") as config_file:
+            self.config.write(config_file)
+
 
 # Let's run this thing!
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
-    api = YNAB_API(get_configs())  # rearrange this flow to call api caching
+    api = YNAB_API(get_configs())
     api.run(b2y.transaction_data)

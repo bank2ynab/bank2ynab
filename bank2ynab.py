@@ -741,55 +741,46 @@ class YNAB_API(object):  # in progress (2)
         :param transaction_data: dictionary of bank names to transaction lists
         """
         logging.info("Processing transactions...")
-
-        # this is the transaction template to insert obtained values into
-        default_transaction = {
-            "account_id": None,
-            "payee_id": None,
-            "category_id": None,
-            "cleared": "cleared",
-            "approved": False,
-            "flag_color": None,
-            "import_id": None
-        }
-
         # go through each bank's data
         transactions = []
-        for key in transaction_data:
+        for bank in transaction_data:
             # choose what account to write this bank's transactions to
-            account_id = self.select_account(key)
-
+            account_id = self.select_account(bank)
             # save transaction data for each bank in main dict
-            account_transactions = transaction_data[key]
+            account_transactions = transaction_data[bank]
             for t in account_transactions[1:]:
-                transaction = dict()
-                # by default transaction matches the default transaction
-                for key in default_transaction:
-                    transaction[key] = default_transaction[key]
-
-                date = t[0]
-                payee = t[1]
-                category = t[2]
-                memo = t[3]
-                amount = string_num_diff(t[4], t[5])
-
-                # assign values to transaction dictionary
-                transaction["import_id"] = self.create_import_id(
-                    amount, date, transactions)
-                transaction["account_id"] = account_id
-                transaction["date"] = date
-                transaction["amount"] = amount
-                transaction["payee_name"] = payee[:50]
-                transaction["memo"] = memo[:100]
-                transaction["category"] = category
-
-                transactions.append(transaction)
+                trans_dict = self.create_transaction(
+                    account_id, t, transactions)
+                transactions.append(trans_dict)
         # compile our data to post
         data = {
             "transactions": transactions
         }
-
         return data
+
+    def create_transaction(self, account_id, this_trans, transactions):
+        date = this_trans[0]
+        payee = this_trans[1]
+        category = this_trans[2]
+        memo = this_trans[3]
+        amount = string_num_diff(this_trans[4], this_trans[5])
+
+        # assign values to transaction dictionary
+        transaction = {
+            "account_id": account_id,
+            "date": date,
+            "payee_name": payee[:50],
+            "amount": amount,
+            "memo": memo[:100],
+            "category": category,
+            "cleared": "cleared",
+            "import_id": self.create_import_id(amount, date, transactions),
+            "payee_id": None,
+            "category_id": None,
+            "approved": False,
+            "flag_color": None
+        }
+        return transaction
 
     def create_import_id(self, amount, date, existing_transactions):
         """

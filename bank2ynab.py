@@ -244,7 +244,7 @@ def fix_conf_params(conf_obj, section_name):
         "payee_to_memo": ["Use Payee for Memo", True, ""],
         "plugin": ["Plugin", False, ""],
         "api_token": ["YNAB API Access Token", False, ""],
-        "api_account": ["YNAB Account ID", False, ""]
+        "api_account": ["YNAB Account ID", False, "|"]
     }
 
     for key in config:
@@ -679,7 +679,6 @@ class YNAB_API(object):  # in progress (2)
     """
 
     def __init__(self, config_object, transactions=None):
-        # TODO: get a hold of the transactions
         self.transactions = []
         self.account_ids = []
         # TODO - make this play nice with our get_configs method (PY2)
@@ -898,9 +897,17 @@ class YNAB_API(object):  # in progress (2)
 
     def select_account(self, bank):
         account_id = ""
+        # check if bank has account associated with it already
         try:
-            account_id = self.config.get(bank, "YNAB Account ID")
-            logging.info("Previously-saved account for {} found.".format(bank))
+            config_line = get_config_line(
+                self.config, bank, ["YNAB Account ID", False, "|"])
+            # make sure the budget ID matches
+            if config_line[0] == self.budget_id:
+                account_id = config_line[1]
+                logging.info(
+                    "Previously-saved account for {} found.".format(bank))
+            else:
+                raise configparser.NoSectionError
         except configparser.NoSectionError:
             logging.info("No user configuration for {} found.".format(bank))
         if account_id == "":
@@ -919,7 +926,8 @@ class YNAB_API(object):  # in progress (2)
             self.config.add_section(bank)
         except configparser.DuplicateSectionError:
             pass
-        self.config.set(bank, "YNAB Account ID", account_id)
+        self.config.set(bank, "YNAB Account ID",
+                        "{}||{}".format(self.budget_id, account_id))
 
         logging.info("Saving default account for {}...".format(bank))
         with open("user_configuration.conf", "w") as config_file:

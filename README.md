@@ -147,6 +147,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. US Schwab
 1. US TB Bank
 1. (software) Mint
+1. (software) Neteller
 1. (software) Personal Capital
 
 ----

@@ -792,6 +792,15 @@ class YNAB_API(object):  # in progress (2)
         return data
 
     def create_import_id(self, amount, date, existing_transactions):
+        """
+        Create import ID for our transaction
+        import_id format = YNAB:amount:ISO-date:occurrences
+        Maximum 36 characters ("YNAB" + ISO-date = 10 characters)
+        :param amount: transaction amount in "milliunits"
+        :param date: date in ISO format
+        :param existing_transactions: list of currently-compiled transactions
+        :return: properly formatted import ID
+        """
         # check is there a duplicate transaction already
         count = 1
         for transaction in existing_transactions:

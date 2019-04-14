@@ -120,6 +120,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DK Bankernes EDB Central
 1. DK Nordea
 1. DK Sparkassen Thy
+1. HU Erste Bank checking
 1. IE AIB Ireland
 1. IE Bank of Ireland
 1. MV Bank of Maldives, checking
@@ -146,6 +147,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. US Schwab
 1. US TB Bank
 1. (software) Mint
+1. (software) Neteller
 1. (software) Personal Capital
 
 ----

@@ -1,52 +1,49 @@
-"""from copy import copy"""
-
 from test.utils import get_test_confparser
 from unittest import TestCase
 
-from os.path import join  # , abspath, exists
-
-"""
+from os.path import join
 import os
-
-from bank2ynab import (B2YBank, fix_conf_params, build_bank, option_selection,
-    int_input, string_num_diff
-"""
-
-
+from shutil import copyfile
+from bank2ynab import YNAB_API
+import configparser
 _PY2 = False
 
 
 class Test_YNAB_API(TestCase):
 
-    TESTCONFPATH = join("test-data", "test.conf")
-
     def setUp(self):
         global _PY2
+        self.TESTCONFPATH = join("test-data", "test.conf")
+        self.TEMPCONFPATH = join("test-data", "temp-test.conf")
         self.cp, self.py2, = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
-        self.b = None
+        self.test_class = None
+        # copy config file to temp location
+        copyfile(self.TESTCONFPATH, self.TEMPCONFPATH)
 
     def tearDown(self):
-        pass
+        # restore config file from temp location
+        if os.path.exists(self.TEMPCONFPATH):
+            copyfile(self.TEMPCONFPATH, self.TESTCONFPATH)
+            os.remove(self.TEMPCONFPATH)
+            pass
 
     def test_init_and_name(self):
-        """ Check parameters are correctly stored in the object.
-        self.b = B2YBank(self.defaults, self.py2)
+        """ Check parameters are correctly stored in the API object."""
+        """
+        self.test_class = YNAB_API(self.defaults)
         cfe = copy(self.defaults)
-        self.assertEqual(self.b.config, cfe)
-        self.assertEqual("DEFAULT", self.b.name)
-
+        self.assertEqual(self.test_class.config, cfe)
+        self.assertEqual("DEFAULT", self.test_class.name)
+        """
+        """
         def __init__(self, config_object, transactions=None):
         self.transactions = []
         self.account_ids = []
-        # TODO - make this play nice with our get_configs method (PY2)
         self.config = configparser.RawConfigParser()
         self.config.read("user_configuration.conf")
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
         self.budget_id = None
-
-        # TODO: Fix debug structure, so it will be used in logging instead
-        self.debug = False
         """
 
     def test_run(self):
@@ -313,18 +310,24 @@ class Test_YNAB_API(TestCase):
 
     def test_save_account_selection(self):
         """
-        def save_account_selection(self, bank, account_id):
-
-            saves YNAB account to use for each bank
-
-            try:
-                self.config.add_section(bank)
-            except configparser.DuplicateSectionError:
-                pass
-            self.config.set(bank, "YNAB Account ID",
-                            "{}||{}".format(self.budget_id, account_id))
-
-            logging.info("Saving default account for {}...".format(bank))
-            with open("user_configuration.conf", "w") as config_file:
-                self.config.write(config_file)
+        Test that account info is saved under the correct bank and
+        in the correct file.
         """
+        test_class = YNAB_API(self.cp)
+        test_class.budget_id = "Test Budget ID"
+        test_account_id = "Test Account ID"
+        test_banks = ["New Bank", "Existing Bank"]
+        test_class.config_path = self.TESTCONFPATH
+        test_class.config = configparser.RawConfigParser()
+        test_class.config.read(test_class.config_path)
+
+        # save test bank details to test config
+        for test_bank in test_banks:
+            test_class.save_account_selection(test_bank, test_account_id)
+        # check test config for test bank details & make sure ID matches
+        config = configparser.RawConfigParser()
+        config.read(test_class.config_path)
+        for test_bank in test_banks:
+            test_id = config.get(test_bank, "YNAB Account ID")
+            self.assertEqual(test_id, "{}||{}".format(
+                test_class.budget_id, test_account_id))

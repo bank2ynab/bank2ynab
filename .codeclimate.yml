@@ -1,7 +1,7 @@
 plugins:
   pep8:
     enabled: true
-  radon: 
+  radon:
     enabled: true
   sonar-python:
     enabled: true
@@ -15,4 +15,3 @@ exclude_patterns:
   - "plugins/__init__.py"
   - "plugins/null.py"
   - "plugins/plugin-template.py"
-  

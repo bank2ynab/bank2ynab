@@ -13,6 +13,7 @@ from bank2ynab import B2YBank
 
 class NullBank(B2YBank):
     """ Example subclass used for testing the plugin system."""
+
     def __init__(self, config_object, is_py2):
         """
         :param config_object: a dictionary of conf parameters

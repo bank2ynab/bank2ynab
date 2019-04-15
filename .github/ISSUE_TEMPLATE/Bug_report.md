@@ -18,14 +18,14 @@ A clear and concise description of what actually happened.
 **What did you DO? (steps to reproduce)**
 Steps to reproduce the behavior:
 1. First ...
-2. Then ... 
+2. Then ...
 3. And then ...
 4. ...
 
 **What's your software environment?**
  - Script language: Python 3.5, Python 2.7, other?
  - Operating system: Windows, Linux, MacOS?
- - OS version: 
+ - OS version:
 
 **Can you provide other helpful information?**
 Add any other context about the problem here.

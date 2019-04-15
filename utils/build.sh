@@ -11,10 +11,10 @@ get_input ()
     while true; do
       read -p "$1 Press 'Y' to continue, or any other key to skip: " -n 1 response
       case $response in
-        [Yy]* ) 
+        [Yy]* )
           $2
           result=$?
-          if [ $result -eq ""0"" ]; then 
+          if [ $result -eq ""0"" ]; then
             echo "--OK--"
             break
           else
@@ -28,8 +28,8 @@ get_input ()
   fi
 }
 # remove old build files:
-if [ -f ""dist/*"" ] 
-    then 
+if [ -f ""dist/*"" ]
+    then
       echo "rm..."
       rm dist/*
 fi

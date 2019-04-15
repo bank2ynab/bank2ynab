@@ -47,6 +47,7 @@ except NameError:
 # (well, really just for py2...)
 class CrossversionFileContext(object):
     """ ContextManager class for common operations on files"""
+
     def __init__(self, file_path, is_py2, **kwds):
         self.file_path = os.path.abspath(file_path)
         self.stream = None
@@ -70,6 +71,7 @@ class CrossversionFileContext(object):
 class CrossversionCsvReader(CrossversionFileContext):
     """ context manager returning a csv.Reader-compatible object
     regardless of Python version"""
+
     def __enter__(self):
         encoding = detect_encoding(self.file_path)
         if self.is_py2:
@@ -86,6 +88,7 @@ class CrossversionCsvReader(CrossversionFileContext):
 class CrossversionCsvWriter(CrossversionFileContext):
     """ context manager returning a csv.Writer-compatible object
     regardless of Python version"""
+
     def __enter__(self):
         if self.is_py2:
             self.stream = open(self.file_path, "wb")
@@ -165,7 +168,7 @@ class UnicodeReader:
 
     def next(self):
         row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]
+        return [unicode(s, "utf-8") for s in row]  # noqa
 
     def __iter__(self):
         return self

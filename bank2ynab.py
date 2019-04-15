@@ -683,7 +683,8 @@ class YNAB_API(object):  # in progress (2)
         self.account_ids = []
         # TODO - make this play nice with our get_configs method (PY2)
         self.config = configparser.RawConfigParser()
-        self.config.read("user_configuration.conf")
+        self.config_path = "user_configuration.conf"
+        self.config.read(self.config_path)
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
         self.budget_id = None
 
@@ -930,7 +931,7 @@ class YNAB_API(object):  # in progress (2)
                         "{}||{}".format(self.budget_id, account_id))
 
         logging.info("Saving default account for {}...".format(bank))
-        with open("user_configuration.conf", "w") as config_file:
+        with open(self.config_path, "w") as config_file:
             self.config.write(config_file)
 
 

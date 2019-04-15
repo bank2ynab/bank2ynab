@@ -107,6 +107,5 @@ venv.bak/
 # visual studio code workspace
 *.code-workspace
 
-# bank2ynab user configuration file
-user_configuration.conf
+# pre-commit hooks config file
 .pre-commit-config.yaml

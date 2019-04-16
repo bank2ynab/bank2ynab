@@ -1,6 +1,4 @@
-# Step 1: See https://github.com/bank2ynab/bank2ynab/wiki/WorkingWithPlugins
-# Step 2: Copy this template into a new file.
-# Step 3: Replace "RaiffeisenRCM" below with a descriptive bank name
+# Plugin for handling [AT Raiffeisen RCM] format
 
 from bank2ynab import B2YBank, CrossversionCsvReader
 
@@ -33,7 +31,7 @@ class RaiffeisenRCMPlugin(B2YBank):
                 https://stackoverflow.com/a/663175/20571
                 """
                 date = row[2]
-                tmp["Date"] = date[6:8] + '/' + date[4:6] + '/' + date[0:4]
+                tmp["Date"] = date[6:8] + '-' + date[4:6] + '-' + date[0:4]
                 # PAYEE STUFF:
                 tmp["Payee"] = row[3].strip()
                 # CATEGORY STUFF:

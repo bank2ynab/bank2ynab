@@ -19,10 +19,22 @@ class RaiffeisenRCMPlugin(B2YBank):
                                    self._is_py2,
                                    delimiter=delim) as reader:
             for index, row in enumerate(reader):
-                # skip first row if headers
-                if index == 0 and header_rows != 0:
-                    continue
                 tmp = {}
+
+                # special first row
+                if index == 0 and header_rows != 0:
+                    tmp["Date"] = "Date"
+                    tmp["Payee"] = "Payee"
+                    tmp["Category"] = "Category"
+                    tmp["Memo"] = "Memo"
+                    tmp["Outflow"] = "Outflow"
+                    tmp["Inflow"] = "Inflow"
+                    out_row = [''] * len(output_columns)
+                    for index, key in enumerate(output_columns):
+                        out_row[index] = tmp.get(key, "")
+                    output_data.append(out_row)
+                    continue
+                
                 """
                 DATE STUFF:
                 YNAB's date format is "DD/MM/YYYY".
@@ -33,7 +45,11 @@ class RaiffeisenRCMPlugin(B2YBank):
                 date = row[2]
                 tmp["Date"] = date[6:8] + '-' + date[4:6] + '-' + date[0:4]
                 # PAYEE STUFF:
-                tmp["Payee"] = row[3].strip()
+                # fill payee if present, otherwise fill from memo:
+                if row[3].strip() != '':
+                    tmp["Payee"] = row[3].strip()
+                else:
+                    tmp["Payee"] = row[1].strip() + ' ' + row[5].strip()
                 # CATEGORY STUFF:
                 # tmp["Category"] = '' # No category is provided.
                 # MEMO STUFF:
@@ -42,7 +58,7 @@ class RaiffeisenRCMPlugin(B2YBank):
                 # AMOUNT STUFF:
                 # tmp["Outflow"] # Outflow is provided as a negative inflow.
                 # Convert from ATS to EUR:
-                tmp["Inflow"] = row[4] # round(float(row[4]) / 13.760300331,2)
+                tmp["Inflow"] = round(float(row[4]) / 13.760300331,2)
                 
                 # respect Output Columns option
                 out_row = [''] * len(output_columns)

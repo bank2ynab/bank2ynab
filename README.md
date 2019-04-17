@@ -137,6 +137,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SK Tatra Banka
 1. SK VUB
 1. UK Barclaycard credit card
+1. UK Barclaycard Business Credit Card
 1. UK Co-operative Bank
 1. UK first direct checking
 1. UK Monzo checking

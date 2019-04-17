@@ -49,7 +49,7 @@ class RaiffeisenRCMPlugin(B2YBank):
                 if row[3].strip() != '':
                     tmp["Payee"] = row[3].strip()
                 else:
-                    tmp["Payee"] = row[1].strip() + ' ' + row[5].strip()
+                    tmp["Payee"] = row[5].strip()
                 # CATEGORY STUFF:
                 # tmp["Category"] = '' # No category is provided.
                 # MEMO STUFF:
@@ -66,6 +66,7 @@ class RaiffeisenRCMPlugin(B2YBank):
                     out_row[index] = tmp.get(key, "")
                 output_data.append(out_row)
         return output_data
+
 
 def build_bank(config, is_py2):
     return RaiffeisenRCMPlugin(config, is_py2)

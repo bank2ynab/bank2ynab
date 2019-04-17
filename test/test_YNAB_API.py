@@ -28,7 +28,7 @@ class Test_YNAB_API(TestCase):
             os.remove(self.TEMPCONFPATH)
             pass
 
-    def test_init_and_name(self):
+    def test_init_and_name(self):  # todo
         """ Check parameters are correctly stored in the API object."""
         """
         self.test_class = YNAB_API(self.defaults)
@@ -46,7 +46,7 @@ class Test_YNAB_API(TestCase):
         self.budget_id = None
         """
 
-    def test_run(self):
+    def test_run(self):  # todo
         """
         def run(self, transaction_data):
         if(self.api_token is not None):
@@ -70,7 +70,7 @@ class Test_YNAB_API(TestCase):
             logging.info("No API-token provided.")
         """
 
-    def test_api_read(self):
+    def test_api_read(self):  # todo
         """
         def api_read(self, budget, kwd):
 
@@ -98,7 +98,7 @@ class Test_YNAB_API(TestCase):
         return read_data
         """
 
-    def test_process_transactions(self):
+    def test_process_transactions(self):  # todo
         """
         :param transaction_data: dictionary of bank names to transaction lists
 
@@ -121,7 +121,7 @@ class Test_YNAB_API(TestCase):
         return data
         """
 
-    def test_create_transaction(self):
+    def test_create_transaction(self):  # todo
         """
         (self, account_id, this_trans, transactions):
         date = this_trans[0]
@@ -148,7 +148,7 @@ class Test_YNAB_API(TestCase):
         return transaction
         """
 
-    def test_create_import_id(self):
+    def test_create_import_id(self):  # todo
         """
         def create_import_id(self, amount, date, existing_transactions):
         Create import ID for our transaction
@@ -168,7 +168,7 @@ class Test_YNAB_API(TestCase):
         return "YNAB:{}:{}:{}".format(amount, date, count)
         """
 
-    def test_post_transactions(self):
+    def test_post_transactions(self):  # todo
         """
         def post_transactions(self, data):
             # send our data to API
@@ -187,7 +187,7 @@ class Test_YNAB_API(TestCase):
                 logging.info("Success!")
         """
 
-    def test_list_transactions(self):
+    def test_list_transactions(self):  # todo
         """
         def list_transactions(self):
             transactions = self.api_read(True, "transactions")
@@ -202,7 +202,7 @@ class Test_YNAB_API(TestCase):
                 logging.debug("no transactions found")
         """
 
-    def test_list_accounts(self):
+    def test_list_accounts(self):  # todo
         """
         def list_accounts(self):
             accounts = self.api_read(True, "accounts")
@@ -223,7 +223,7 @@ class Test_YNAB_API(TestCase):
             return account_ids
         """
 
-    def test_list_budgets(self):
+    def test_list_budgets(self):  # todo
         """
         def list_budgets(self):
             budgets = self.api_read(False, "budgets")
@@ -249,7 +249,7 @@ class Test_YNAB_API(TestCase):
             return budget_ids
         """
 
-    def test_process_api_response(self):
+    def test_process_api_response(self):  # todo
         """
         def process_api_response(self, details):
 

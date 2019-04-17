@@ -1,5 +1,6 @@
 from test.utils import get_test_confparser
 from unittest import TestCase
+from unittest.mock import patch
 
 from os.path import join
 import os
@@ -24,7 +25,6 @@ class Test_YNAB_API(TestCase):
     def tearDown(self):
         # restore config file from temp location
         if os.path.exists(self.TEMPCONFPATH):
-            copyfile(self.TEMPCONFPATH, self.TESTCONFPATH)
             os.remove(self.TEMPCONFPATH)
             pass
 
@@ -237,7 +237,7 @@ class Test_YNAB_API(TestCase):
                 commented out because this is a bit messy and confusing
                 # TODO: make this legible!
                 # debug messages:
-                #for key, value in budget.items():
+                # for key, value in budget.items():
                     if(type(value) is dict):
                         logging.debug("%s: " % str(key))
                         for subkey, subvalue in value.items():
@@ -279,34 +279,40 @@ class Test_YNAB_API(TestCase):
             return ["ERROR", id, detail]
         """
 
-    def test_select_account(self):
+    # IN PROGRESS
+    # TODO - make the mocking work properly,
+    # doesn't return the right values now I think
+    """
+    bank: New Bank || id: Account 1 || target_id: Account 2
+    bank: test_api_existing_bank || id: Account 2 || target_id: Test Account ID
+    """
+    @patch("bank2ynab.YNAB_API.list_accounts")
+    @patch("bank2ynab.option_selection")
+    def test_select_account(self, mock_list_accounts, mock_option_selection):
         """
-        def select_account(self, bank):
-            account_id = ""
-            # check if bank has account associated with it already
-            try:
-                config_line = get_config_line(
-                    self.config, bank, ["YNAB Account ID", False, "|"])
-                # make sure the budget ID matches
-                if config_line[0] == self.budget_id:
-                    account_id = config_line[1]
-                    logging.info(
-                        "Previously-saved account for {} found.".format(bank))
-                else:
-                    raise configparser.NoSectionError
-            except configparser.NoSectionError:
-                logging.info("No user configuration for {} found.".format(
-                    bank))
-            if account_id == "":
-                account_ids = self.list_accounts()
-                # create list of account_ids
-                msg = "Pick a YNAB account for transactions
-                    from {}".format(bank)
-                account_id = option_selection(account_ids, msg)
-                # save account selection for bank
-                self.save_account_selection(bank, account_id)
-            return account_id
+        Test account selection logic
         """
+        test_class = YNAB_API(self.cp)
+        test_class.budget_id = "Test Budget ID"
+        test_banks = [
+            ("New Bank", "Account 2"),
+            ("test_api_existing_bank", "Test Account ID")
+        ]
+        test_class.config_path = self.TEMPCONFPATH
+        test_class.config = configparser.RawConfigParser()
+        test_class.config.read(test_class.config_path)
+
+        # override list_accounts function
+        fake_ids = ["Account 1", "Account 2", "Account 3"]
+        mock_list_accounts.side_effect = fake_ids
+        # override option_selection function
+        mock_option_selection.return_value = fake_ids[2]  # think problem here
+
+        for bank, target_id in test_banks:
+            id = test_class.select_account(bank)
+            print("\nbank: {} || id: {} || target_id: {}\n".format(
+                bank, id, target_id))  # debugging account selection!
+            # self.assertEqual(id, target_id)
 
     def test_save_account_selection(self):
         """
@@ -317,7 +323,7 @@ class Test_YNAB_API(TestCase):
         test_class.budget_id = "Test Budget ID"
         test_account_id = "Test Account ID"
         test_banks = ["New Bank", "Existing Bank"]
-        test_class.config_path = self.TESTCONFPATH
+        test_class.config_path = self.TEMPCONFPATH
         test_class.config = configparser.RawConfigParser()
         test_class.config.read(test_class.config_path)
 

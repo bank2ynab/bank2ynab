@@ -34,7 +34,7 @@ class RaiffeisenRCMPlugin(B2YBank):
                         out_row[index] = tmp.get(key, "")
                     output_data.append(out_row)
                     continue
-                
+
                 """
                 DATE STUFF:
                 YNAB's date format is "DD/MM/YYYY".
@@ -58,15 +58,14 @@ class RaiffeisenRCMPlugin(B2YBank):
                 # AMOUNT STUFF:
                 # tmp["Outflow"] # Outflow is provided as a negative inflow.
                 # Convert from ATS to EUR:
-                tmp["Inflow"] = round(float(row[4]) / 13.760300331,2)
-                
+                tmp["Inflow"] = round(float(row[4]) / 13.760300331, 2)
+
                 # respect Output Columns option
                 out_row = [''] * len(output_columns)
                 for index, key in enumerate(output_columns):
                     out_row[index] = tmp.get(key, "")
                 output_data.append(out_row)
         return output_data
-
 
 def build_bank(config, is_py2):
     return RaiffeisenRCMPlugin(config, is_py2)

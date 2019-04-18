@@ -1,6 +1,5 @@
 from test.utils import get_test_confparser
 from unittest import TestCase
-from unittest.mock import patch
 
 from os.path import join
 import os
@@ -280,39 +279,26 @@ class Test_YNAB_API(TestCase):
         """
 
     # IN PROGRESS
-    # TODO - make the mocking work properly,
-    # doesn't return the right values now I think
-    """
-    bank: New Bank || id: Account 1 || target_id: Account 2
-    bank: test_api_existing_bank || id: Account 2 || target_id: Test Account ID
-    """
-    @patch("bank2ynab.YNAB_API.list_accounts")
-    @patch("bank2ynab.option_selection")
-    def test_select_account(self, mock_list_accounts, mock_option_selection):
+    # TODO - mock list_accounts & option_selection
+    def test_select_account(self):
         """
         Test account selection logic
         """
         test_class = YNAB_API(self.cp)
         test_class.budget_id = "Test Budget ID"
         test_banks = [
-            ("New Bank", "Account 2"),
-            ("test_api_existing_bank", "Test Account ID")
+            ("test_api_existing_bank", "Test Account ID"),
+            ("New Bank", "Account 2")
         ]
         test_class.config_path = self.TEMPCONFPATH
         test_class.config = configparser.RawConfigParser()
         test_class.config.read(test_class.config_path)
 
-        # override list_accounts function
-        fake_ids = ["Account 1", "Account 2", "Account 3"]
-        mock_list_accounts.side_effect = fake_ids
-        # override option_selection function
-        mock_option_selection.return_value = fake_ids[2]  # think problem here
-
         for bank, target_id in test_banks:
             id = test_class.select_account(bank)
             print("\nbank: {} || id: {} || target_id: {}\n".format(
                 bank, id, target_id))  # debugging account selection!
-            # self.assertEqual(id, target_id)
+            self.assertEqual(id, target_id)
 
     def test_save_account_selection(self):
         """

@@ -901,7 +901,7 @@ class YNAB_API(object):  # in progress (2)
         # check if bank has account associated with it already
         try:
             config_line = get_config_line(
-                self.config, bank, ["YNAB Account ID", False, "|"])
+                self.config, bank, ["YNAB Account ID", False, "||"])
             # make sure the budget ID matches
             if config_line[0] == self.budget_id:
                 account_id = config_line[1]

@@ -1,0 +1,3 @@
+Tranzakció dátuma,Partner neve,Partner számlaszáma,Számla neve,Számlaszám,Tranzakció típusa,Tranzakció összege,Tranzakció devizaneme,Bevétel/Kiadás,Kártyaszám,Értéknap,Közlemény,Megbízás azonosító,Részletek,Egyenleg,Devizanem
+2019.04.19.,memo goes here,payee account,name of account,bank account,transaction t...,-350,HUF,outflow,card number,2019.04.19.,,,payee,2345.56,HUF
+2019.04.17.,memo goes here,payee account,name of account,bank account,transaction t...,1290,HUF,inflow,card number,2019.04.18.,,,payee,1055.56,HUF

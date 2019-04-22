@@ -304,9 +304,6 @@ class Test_YNAB_API(TestCase):
         for bank, target_id in test_banks:
             id = test_class.select_account(bank)
             self.assertEqual(id, target_id)
-        # make sure mock is being used correctly
-        mock_list_acs.assert_called_once()
-        mock_option_sel.assert_called_once()
 
     def test_save_account_selection(self):
         """

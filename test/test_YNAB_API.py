@@ -1,6 +1,6 @@
 from test.utils import get_test_confparser
 from unittest import TestCase
-
+from unittest.mock import patch
 from os.path import join
 import os
 from shutil import copyfile
@@ -22,10 +22,9 @@ class Test_YNAB_API(TestCase):
         copyfile(self.TESTCONFPATH, self.TEMPCONFPATH)
 
     def tearDown(self):
-        # restore config file from temp location
+        # delete temp config file
         if os.path.exists(self.TEMPCONFPATH):
             os.remove(self.TEMPCONFPATH)
-            pass
 
     def test_init_and_name(self):  # todo
         """ Check parameters are correctly stored in the API object."""
@@ -278,9 +277,9 @@ class Test_YNAB_API(TestCase):
             return ["ERROR", id, detail]
         """
 
-    # IN PROGRESS
-    # TODO - mock list_accounts & option_selection
-    def test_select_account(self):
+    @patch("bank2ynab.option_selection")
+    @patch.object(YNAB_API, "list_accounts")
+    def test_select_account(self, mock_list_acs, mock_option_sel):
         """
         Test account selection logic
         """
@@ -288,17 +287,26 @@ class Test_YNAB_API(TestCase):
         test_class.budget_id = "Test Budget ID"
         test_banks = [
             ("test_api_existing_bank", "Test Account ID"),
-            ("New Bank", "Account 2")
+            ("New Bank", "ID #2")
         ]
         test_class.config_path = self.TEMPCONFPATH
         test_class.config = configparser.RawConfigParser()
         test_class.config.read(test_class.config_path)
 
+        mock_ids = [
+            ("Account 1", "ID #1"),
+            ("Account 2", "ID #2"),
+            ("Account 3", "ID #3")
+        ]
+        mock_list_acs.return_value = mock_ids
+        mock_option_sel.return_value = "ID #2"
+
         for bank, target_id in test_banks:
             id = test_class.select_account(bank)
-            print("\nbank: {} || id: {} || target_id: {}\n".format(
-                bank, id, target_id))  # debugging account selection!
             self.assertEqual(id, target_id)
+        # make sure mock is being used correctly
+        mock_list_acs.assert_called_once()
+        mock_option_sel.assert_called_once()
 
     def test_save_account_selection(self):
         """

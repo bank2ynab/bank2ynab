@@ -110,3 +110,4 @@ venv.bak/
 # pre-commit hooks config file
 .pre-commit-config.yaml
 user_configuration.conf
+test-data/temp-test.conf

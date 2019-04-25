@@ -323,7 +323,7 @@ class Test_YNAB_API(TestCase):
             test_class.save_account_selection(test_bank, test_account_id)
         # check test config for test bank details & make sure ID matches
         config = configparser.RawConfigParser()
-        config.read(test_class.config_path)
+        config.read(test_class.user_config_path)
         for test_bank in test_banks:
             test_id = config.get(test_bank, "YNAB Account ID")
             self.assertEqual(test_id, "{}||{}".format(

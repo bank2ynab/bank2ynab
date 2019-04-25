@@ -681,12 +681,12 @@ class YNAB_API(object):  # in progress (2)
     def __init__(self, config_object, transactions=None):
         self.transactions = []
         self.account_ids = []
-        # TODO - make this play nice with our get_configs method (PY2)
-        self.config = configparser.RawConfigParser()
-        self.config_path = "user_configuration.conf"
-        self.config.read(self.config_path)
-        self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
         self.budget_id = None
+        self.config = get_configs()
+        self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
+        # TODO make user_config section play nice with get_configs()
+        self.user_config_path = "user_configuration.conf"
+        self.user_config = configparser.RawConfigParser()
 
         # TODO: Fix debug structure, so it will be used in logging instead
         self.debug = False
@@ -909,7 +909,7 @@ class YNAB_API(object):  # in progress (2)
                 logging.info(
                     "Previously-saved account for {} found.".format(bank))
             else:
-                raise configparser.NoSectionError
+                raise configparser.NoSectionError(bank)
         except configparser.NoSectionError:
             logging.info("No user configuration for {} found.".format(bank))
         if account_id == "":
@@ -924,16 +924,17 @@ class YNAB_API(object):  # in progress (2)
         """
         saves YNAB account to use for each bank
         """
+        self.user_config.read(self.user_config_path)
         try:
-            self.config.add_section(bank)
+            self.user_config.add_section(bank)
         except configparser.DuplicateSectionError:
             pass
-        self.config.set(bank, "YNAB Account ID",
-                        "{}||{}".format(self.budget_id, account_id))
+        self.user_config.set(bank, "YNAB Account ID",
+                             "{}||{}".format(self.budget_id, account_id))
 
         logging.info("Saving default account for {}...".format(bank))
-        with open(self.config_path, "w") as config_file:
-            self.config.write(config_file)
+        with open(self.user_config_path, "w", encoding="utf-8") as config_file:
+            self.user_config.write(config_file)
 
 
 # Let's run this thing!

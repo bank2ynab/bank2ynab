@@ -856,8 +856,9 @@ class YNAB_API(object):  # in progress (2)
         for budget in budgets:
             budget_ids.append([budget["name"], budget["id"]])
 
-            """ commented out because this is a bit messy and confusing
+            # commented out because this is a bit messy and confusing
             # TODO: make this legible!
+            """
             # debug messages:
             for key, value in budget.items():
                 if(type(value) is dict):

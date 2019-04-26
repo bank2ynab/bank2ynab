@@ -146,25 +146,80 @@ class Test_YNAB_API(TestCase):
         return transaction
         """
 
-    def test_create_import_id(self):  # todo
-        """
-        def create_import_id(self, amount, date, existing_transactions):
-        Create import ID for our transaction
-        import_id format = YNAB:amount:ISO-date:occurrences
-        Maximum 36 characters ("YNAB" + ISO-date = 10 characters)
-        :param amount: transaction amount in "milliunits"
-        :param date: date in ISO format
-        :param existing_transactions: list of currently-compiled transactions
-        :return: properly formatted import ID
+    def test_create_import_id(self):
+        test_class = YNAB_API(self.cp)
 
-        # check is there a duplicate transaction already
-        count = 1
-        for transaction in existing_transactions:
-            if transaction["import_id"].startswith(
-                    "YNAB:{}:{}:".format(amount, date)):
-                count += 1
-        return "YNAB:{}:{}:{}".format(amount, date, count)
-        """
+        test_values = [
+            (100, "2019-01-01", "YNAB:100:2019-01-01:1"),  # no duplicate
+            (200, "2019-01-01", "YNAB:200:2019-01-01:2"),  # 1 duplicate
+            (300, "2019-01-01", "YNAB:300:2019-01-01:3"),  # 2 duplicates
+            (400, "2019-01-01", "YNAB:400:2019-01-01:1"),  # no duplicate
+            (500, "2019-01-01", "YNAB:500:2019-01-01:1"),  # no duplicate
+            (600, "2019-01-01", "YNAB:600:2019-01-01:2")  # 1 duplicate
+        ]
+
+        test_transactions = [
+            {
+                "account_id": "Account",
+                "date": "2019-01-01",
+                "payee_name": "Person",
+                "amount": 200,
+                "memo": "Memo",
+                "category": "Category",
+                "cleared": "cleared",
+                "import_id": "YNAB:200:2019-01-01:1",
+                "payee_id": None,
+                "category_id": None,
+                "approved": False,
+                "flag_color": None
+            },
+            {
+                "account_id": "Account",
+                "date": "2019-01-01",
+                "payee_name": "Person",
+                "amount": 300,
+                "memo": "Memo",
+                "category": "Category",
+                "cleared": "cleared",
+                "import_id": "YNAB:300:2019-01-01:1",
+                "payee_id": None,
+                "category_id": None,
+                "approved": False,
+                "flag_color": None
+            },
+            {
+                "account_id": "Account",
+                "date": "2019-01-01",
+                "payee_name": "Person",
+                "amount": 300,
+                "memo": "Memo",
+                "category": "Category",
+                "cleared": "cleared",
+                "import_id": "YNAB:300:2019-01-01:2",
+                "payee_id": None,
+                "category_id": None,
+                "approved": False,
+                "flag_color": None
+            },
+            {
+                "account_id": "Account",
+                "date": "2019-01-01",
+                "payee_name": "Person",
+                "amount": 600,
+                "memo": "Memo",
+                "category": "Category",
+                "cleared": "cleared",
+                "import_id": "YNAB:600:2019-01-01:1",
+                "payee_id": None,
+                "category_id": None,
+                "approved": False,
+                "flag_color": None
+            }
+        ]
+
+        for amount, date, target_id in test_values:
+            id = test_class.create_import_id(amount, date, test_transactions)
+            self.assertEqual(id, target_id)
 
     def test_post_transactions(self):  # todo
         """

@@ -796,9 +796,13 @@ class YNAB_API(object):  # in progress (2)
         # check is there a duplicate transaction already
         count = 1
         for transaction in existing_transactions:
-            if transaction["import_id"].startswith(
-                    "YNAB:{}:{}:".format(amount, date)):
-                count += 1
+            try:
+                if transaction["import_id"].startswith(
+                        "YNAB:{}:{}:".format(amount, date)):
+                    count += 1
+            except KeyError:
+                # transaction doesn't have import id for some reason
+                pass
         return "YNAB:{}:{}:{}".format(amount, date, count)
 
     def post_transactions(self, data):

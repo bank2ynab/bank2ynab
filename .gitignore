@@ -106,4 +106,3 @@ venv.bak/
 
 # visual studio code workspace
 *.code-workspace
-.pre-commit-config.yaml

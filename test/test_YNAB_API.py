@@ -119,32 +119,88 @@ class Test_YNAB_API(TestCase):
         return data
         """
 
-    def test_create_transaction(self):  # todo
-        """
-        (self, account_id, this_trans, transactions):
-        date = this_trans[0]
-        payee = this_trans[1]
-        category = this_trans[2]
-        memo = this_trans[3]
-        amount = string_num_diff(this_trans[4], this_trans[5])
+    def test_create_transaction(self):
+        test_class = YNAB_API(self.cp)
+        test_transactions = [
+            (
+                ["2019-01-01", "Mimsy", "Category", "Memo", 400, 0],
+                {
+                    "account_id": "account_id",
+                    "date": "2019-01-01",
+                    "payee_name": "Mimsy",
+                    "amount": -400000,
+                    "memo": "Memo",
+                    "category": "Category",
+                    "cleared": "cleared",
+                    "import_id": "YNAB:-400000:2019-01-01:1",
+                    "payee_id": None,
+                    "category_id": None,
+                    "approved": False,
+                    "flag_color": None
+                }
+            ),
+            (
+                ["2019-01-01", "Mimsy", "Category", "Memo", 400, ""],
+                {
+                    "account_id": "account_id",
+                    "date": "2019-01-01",
+                    "payee_name": "Mimsy",
+                    "amount": -400000,
+                    "memo": "Memo",
+                    "category": "Category",
+                    "cleared": "cleared",
+                    "import_id": "YNAB:-400000:2019-01-01:2",
+                    "payee_id": None,
+                    "category_id": None,
+                    "approved": False,
+                    "flag_color": None
+                }
+            ),
+            (
+                ["2019-01-01", "Mimsy", "Category", "Memo", "", 500],
+                {
+                    "account_id": "account_id",
+                    "date": "2019-01-01",
+                    "payee_name": "Mimsy",
+                    "amount": 500000,
+                    "memo": "Memo",
+                    "category": "Category",
+                    "cleared": "cleared",
+                    "import_id": "YNAB:500000:2019-01-01:1",
+                    "payee_id": None,
+                    "category_id": None,
+                    "approved": False,
+                    "flag_color": None
+                }
+            ),
+            (
+                ["2019-01-01", "Borogrove", "Category", "Memo", 600, ""],
+                {
+                    "account_id": "account_id",
+                    "date": "2019-01-01",
+                    "payee_name": "Borogrove",
+                    "amount": -600000,
+                    "memo": "Memo",
+                    "category": "Category",
+                    "cleared": "cleared",
+                    "import_id": "YNAB:-600000:2019-01-01:1",
+                    "payee_id": None,
+                    "category_id": None,
+                    "approved": False,
+                    "flag_color": None
+                }
+            )
+        ]
 
-        # assign values to transaction dictionary
-        transaction = {
-            "account_id": account_id,
-            "date": date,
-            "payee_name": payee[:50],
-            "amount": amount,
-            "memo": memo[:100],
-            "category": category,
-            "cleared": "cleared",
-            "import_id": self.create_import_id(amount, date, transactions),
-            "payee_id": None,
-            "category_id": None,
-            "approved": False,
-            "flag_color": None
-        }
-        return transaction
-        """
+        transactions = []
+        for test_row, target_transaction in test_transactions:
+            test_transaction = test_class.create_transaction(
+                "account_id", test_row, transactions)
+            transactions.append(test_transaction)
+
+            for key in test_transaction:
+                self.assertEqual(
+                    target_transaction[key], test_transaction[key])
 
     def test_create_import_id(self):
         test_class = YNAB_API(self.cp)

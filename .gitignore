@@ -106,3 +106,4 @@ venv.bak/
 
 # visual studio code workspace
 *.code-workspace
+user_configuration.conf

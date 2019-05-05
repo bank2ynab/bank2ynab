@@ -103,6 +103,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. BE KBC checking
 1. BR Inter checking
 1. CA TD Canada Trust, checking+Visa
+1. CH Zürcher Kantonalbank, Kontoauszug
+1. , Finanzassistent
 1. CZ AirBank checking and savings
 1. CZ Ceska Sporitelna
 1. CZ Raiffeisen bank
@@ -125,6 +127,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. IE Bank of Ireland
 1. MV Bank of Maldives, checking
 1. NL Bunq checking
+1. NL bunqDesktop software
 1. NL ING Bank
 1. NL Rabobank (2017 format)
 1. NL Rabobank (2018 format)

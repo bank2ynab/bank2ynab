@@ -569,7 +569,7 @@ class B2YBank(object):
             if row[date_col] == "":
                 return row
             # parse our date according to provided formatting string
-            input_date = datetime.strptime(row[date_col].lstrip(), date_format)
+            input_date = datetime.strptime(row[date_col].strip(), date_format)
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%Y-%m-%d")
             row[date_col] = output_date

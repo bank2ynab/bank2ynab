@@ -98,7 +98,8 @@ For details, please see our [issue list labeled "Bug"](https://github.com/bank2y
 Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
 
 1. AT easybank credit card
-1. AT Raiffeisen Bank checking
+1. AT Raiffeisen Bank 2018 checking
+1. AT Raiffeisen Bank 2019 checking
 1. AT Raiffeisen Bank VISA card
 1. BE KBC checking
 1. BR Inter checking

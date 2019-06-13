@@ -122,6 +122,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Ostseesparkasse Rostock credit card
 1. DE Sparkasse Rhein-Neckar-Nord
 1. DK Bankernes EDB Central
+1. DK Jyske Bank VISA
 1. DK Nordea
 1. DK Sparkassen Thy
 1. HU Erste Bank checking

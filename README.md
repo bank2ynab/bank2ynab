@@ -103,6 +103,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. AT Raiffeisen Bank VISA card
 1. BE KBC checking
 1. BE BE Keytrade Bank
+1. BR Banco do Brasil checking
 1. BR Inter checking
 1. CA TD Canada Trust, checking+Visa
 1. CH Zürcher Kantonalbank, Kontoauszug

@@ -140,6 +140,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Länsförsäkringar checking
 1. SE Nordea
 1. SE Swedbank
+1. SE Swedbank (2019 format)
 1. SG OCBC Bank
 1. SG POSB savings
 1. SK Tatra Banka

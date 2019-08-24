@@ -98,9 +98,12 @@ For details, please see our [issue list labeled "Bug"](https://github.com/bank2y
 Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
 
 1. AT easybank credit card
-1. AT Raiffeisen Bank checking
+1. AT Raiffeisen Bank 2018 checking
+1. AT Raiffeisen Bank 2019 checking
 1. AT Raiffeisen Bank VISA card
 1. BE KBC checking
+1. BE BE Keytrade Bank
+1. BR Banco do Brasil checking
 1. BR Inter checking
 1. CA TD Canada Trust, checking+Visa
 1. CH Zürcher Kantonalbank, Kontoauszug
@@ -120,6 +123,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Ostseesparkasse Rostock credit card
 1. DE Sparkasse Rhein-Neckar-Nord
 1. DK Bankernes EDB Central
+1. DK Jyske Bank VISA
 1. DK Nordea
 1. DK Sparkassen Thy
 1. HU Erste Bank checking
@@ -132,9 +136,12 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL Rabobank (2017 format)
 1. NL Rabobank (2018 format)
 1. NO DNB
+1. NO Sparebank 1 VISA
 1. SE Handelsbanken
+1. SE Länsförsäkringar checking
 1. SE Nordea
 1. SE Swedbank
+1. SE Swedbank (2019 format)
 1. SG OCBC Bank
 1. SG POSB savings
 1. SK Tatra Banka

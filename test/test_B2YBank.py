@@ -121,13 +121,13 @@ class TestB2YBank(TestCase):
                         "HOFER DANKT  0527  K2   28.09. 17:17",
                         "",
                         "HOFER DANKT  0527  K2   28.09. 17:17",
-                        "44,96", ""
+                        "44.96", ""
                     ]),
                     (24, [
                         "28.09.2017", "SOFTWARE Wien",
                         "",
                         "SOFTWARE Wien",
-                        "", "307,67"
+                        "", "307.67"
                     ])
                 ]:
                     result_row = output_data[row]

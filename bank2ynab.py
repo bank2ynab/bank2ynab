@@ -24,9 +24,12 @@ import importlib
 import re
 from datetime import datetime
 import logging
+# API testing stuff
+import requests
+import json
 
 # configure our logger
-logging.basicConfig(format="%(levelname)s %(message)s", level=logging.INFO)
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 # main Python2 switch
 # any module with different naming should be handled here
@@ -203,8 +206,8 @@ class UnicodeWriter:
 def get_configs():
     """ Retrieve all configuration parameters."""
     conf_files = ["bank2ynab.conf", "user_configuration.conf"]
-    if not os.path.exists("bank2ynab.conf"):
-        logging.error("\nError: Can't find configuration file: bank2ynab.conf")
+    if not os.path.exists(conf_files[0]):
+        logging.error("Configuration file not found: {}".format(conf_files[0]))
     config = configparser.RawConfigParser()
     if __PY2:
         config.read(conf_files)
@@ -239,7 +242,10 @@ def fix_conf_params(conf_obj, section_name):
         "delete_original": ["Delete Source File", True, ""],
         "cd_flags": ["Inflow or Outflow Indicator", False, ","],
         "payee_to_memo": ["Use Payee for Memo", True, ""],
-        "plugin": ["Plugin", False, ""]}
+        "plugin": ["Plugin", False, ""],
+        "api_token": ["YNAB API Access Token", False, ""],
+        "api_account": ["YNAB Account ID", False, "|"]
+    }
 
     for key in config:
         config[key] = get_config_line(conf_obj, section_name, config[key])
@@ -291,6 +297,67 @@ def find_directory(filepath):
             raise FileNotFoundError(s.format(filepath))
         input_dir = filepath
     return input_dir
+
+
+def option_selection(options, msg):
+    """
+    Used to select from a list of options
+    If only one item in list, selects that by default
+    Otherwise displays "msg" asking for input selection (integer only)
+    :param options: list of [name, option] pairs to select from
+    :param msg: the message to display on the input line
+    :return option_selected: the selected item from the list
+    """
+    selection = 1
+    count = len(options)
+    if count > 1:
+        index = 0
+        for option in options:
+            index += 1
+            print("| {} | {}".format(index, option[0]))
+        selection = int_input(1, count, msg)
+    option_selected = options[selection - 1][1]
+    return option_selected
+
+
+def int_input(min, max, msg):
+    """
+    Makes a user select an integer between min & max stated values
+    :param  min: the minimum acceptable integer value
+    :param  max: the maximum acceptable integer value
+    :param  msg: the message to display on the input line
+    :return user_input: sanitised integer input in acceptable range
+    """
+    while True:
+        try:
+            user_input = int(
+                input("{} (range {} - {}): ".format(msg, min, max)))
+            if user_input not in range(min, max + 1):
+                raise ValueError
+            break
+        except ValueError:
+            logging.info(
+                "This integer is not in the acceptable range, try again!")
+    return user_input
+
+
+def string_num_diff(str1, str2):
+    """
+    converts strings to floats and subtracts 1 from 2
+    also convert output to "milliunits"
+    """
+    try:
+        num1 = float(str1)
+    except ValueError:
+        num1 = 0.0
+    try:
+        num2 = float(str2)
+    except ValueError:
+        num2 = 0.0
+
+    difference = int(1000 * (num2 - num1))
+    return difference
+
 
 # -- end of utilities
 
@@ -395,6 +462,8 @@ class B2YBank(object):
                     fixed_row = self._fix_outflow(fixed_row)
                     # fill in blank memo fields
                     fixed_row = self._auto_memo(fixed_row, fill_memo)
+                    # convert decimal point
+                    fixed_row = self._fix_decimal_point(fixed_row)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
@@ -452,6 +521,18 @@ class B2YBank(object):
             row[outflow_index] = inflow[1:]
         return row
 
+    def _fix_decimal_point(self, row):
+        """
+        convert , to . in inflow and outflow strings
+        :param row: list of values
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        row[inflow_index] = row[inflow_index].replace(",", ".")
+        row[outflow_index] = row[outflow_index].replace(",", ".")
+
+        return row
+
     def _valid_row(self, row):
         """ if our row doesn't have an inflow or outflow, mark as invalid
         :param row: list of values
@@ -476,7 +557,7 @@ class B2YBank(object):
 
     def _fix_date(self, row, date_format):
         """ fix date format when required
-        convert date to DD/MM/YYYY
+        convert date to YYYY-MM-DD
         :param row: list of values
         :param date_format: date format string
         """
@@ -490,7 +571,7 @@ class B2YBank(object):
             # parse our date according to provided formatting string
             input_date = datetime.strptime(row[date_col].strip(), date_format)
             # do our actual date processing
-            output_date = datetime.strftime(input_date, "%d/%m/%Y")
+            output_date = datetime.strftime(input_date, "%Y-%m-%d")
             row[date_col] = output_date
         except (ValueError, IndexError):
             pass
@@ -558,6 +639,8 @@ class Bank2Ynab(object):
     def __init__(self, config_object, is_py2=False):
         self._is_py2 = is_py2
         self.banks = []
+        self.transaction_data = {}
+
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)
             bank_object = build_bank(bank_config)
@@ -580,6 +663,8 @@ class Bank2Ynab(object):
                 # create cleaned csv for each file
                 output = bank.read_data(src_file)
                 bank.write_data(src_file, output)
+                # save transaction data for each bank to object
+                self.transaction_data[bank_name] = output
                 # delete original csv file
                 if bank.config["delete_original"] is True:
                     logging.info("Removing input file: {}".format(src_file))
@@ -587,7 +672,278 @@ class Bank2Ynab(object):
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 
+class YNAB_API(object):  # in progress (2)
+    """
+    uses Personal Access Token stored in user_configuration.conf
+    (note for devs: be careful not to accidentally share API access token!)
+    """
+
+    def __init__(self, config_object, transactions=None):
+        self.transactions = []
+        self.account_ids = []
+        self.budget_id = None
+        self.config = get_configs()
+        self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
+        # TODO make user_config section play nice with get_configs()
+        self.user_config_path = "user_configuration.conf"
+        self.user_config = configparser.RawConfigParser()
+
+        # TODO: Fix debug structure, so it will be used in logging instead
+        self.debug = False
+
+    def run(self, transaction_data):
+        if(self.api_token is not None):
+            logging.info("Connecting to YNAB API...")
+
+            # check for API token auth (and other errors)
+            error_code = self.list_budgets()
+            if error_code[0] == "ERROR":
+                return error_code
+            else:
+                # if no default budget, build budget list and select default
+                if self.budget_id is None:
+                    msg = "No default budget set! \nPick a budget"
+                    budget_ids = self.list_budgets()
+                    self.budget_id = option_selection(budget_ids, msg)
+
+                transactions = self.process_transactions(transaction_data)
+                if transactions["transactions"] != []:
+                    self.post_transactions(transactions)
+        else:
+            logging.info("No API-token provided.")
+
+    def api_read(self, budget, kwd):
+        """
+        General function for reading data from YNAB API
+        :param  budget: boolean indicating if there's a default budget
+        :param  kwd: keyword for data type, e.g. transactions
+        :return error_codes: if it fails we return our error
+        """
+        id = self.budget_id
+        api_t = self.api_token
+        base_url = "https://api.youneedabudget.com/v1/budgets/"
+
+        if budget is False:
+            # only happens when we're looking for the list of budgets
+            url = base_url + "?access_token={}".format(api_t)
+        else:
+            url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
+
+        response = requests.get(url)
+        try:
+            read_data = response.json()["data"][kwd]
+        except KeyError:
+            # the API has returned an error so let's handle it
+            return self.process_api_response(response.json()["error"])
+        return read_data
+
+    def process_transactions(self, transaction_data):
+        """
+        :param transaction_data: dictionary of bank names to transaction lists
+        """
+        logging.info("Processing transactions...")
+        # go through each bank's data
+        transactions = []
+        for bank in transaction_data:
+            # choose what account to write this bank's transactions to
+            account_id = self.select_account(bank)
+            # save transaction data for each bank in main dict
+            account_transactions = transaction_data[bank]
+            for t in account_transactions[1:]:
+                trans_dict = self.create_transaction(
+                    account_id, t, transactions)
+                transactions.append(trans_dict)
+        # compile our data to post
+        data = {
+            "transactions": transactions
+        }
+        return data
+
+    def create_transaction(self, account_id, this_trans, transactions):
+        date = this_trans[0]
+        payee = this_trans[1]
+        category = this_trans[2]
+        memo = this_trans[3]
+        amount = string_num_diff(this_trans[4], this_trans[5])
+
+        # assign values to transaction dictionary
+        transaction = {
+            "account_id": account_id,
+            "date": date,
+            "payee_name": payee[:50],
+            "amount": amount,
+            "memo": memo[:100],
+            "category": category,
+            "cleared": "cleared",
+            "import_id": self.create_import_id(amount, date, transactions),
+            "payee_id": None,
+            "category_id": None,
+            "approved": False,
+            "flag_color": None
+        }
+        return transaction
+
+    def create_import_id(self, amount, date, existing_transactions):
+        """
+        Create import ID for our transaction
+        import_id format = YNAB:amount:ISO-date:occurrences
+        Maximum 36 characters ("YNAB" + ISO-date = 10 characters)
+        :param amount: transaction amount in "milliunits"
+        :param date: date in ISO format
+        :param existing_transactions: list of currently-compiled transactions
+        :return: properly formatted import ID
+        """
+        # check is there a duplicate transaction already
+        count = 1
+        for transaction in existing_transactions:
+            try:
+                if transaction["import_id"].startswith(
+                        "YNAB:{}:{}:".format(amount, date)):
+                    count += 1
+            except KeyError:
+                # transaction doesn't have import id for some reason
+                pass
+        return "YNAB:{}:{}:{}".format(amount, date, count)
+
+    def post_transactions(self, data):
+        # send our data to API
+        logging.info("Uploading transactions to YNAB...")
+        url = ("https://api.youneedabudget.com/v1/budgets/" +
+               "{}/transactions?access_token={}".format(
+                   self.budget_id,
+                   self.api_token))
+
+        post_response = requests.post(url, json=data)
+
+        # response handling - TODO: make this more thorough!
+        try:
+            self.process_api_response(json.loads(post_response.text)["error"])
+        except KeyError:
+            logging.info("Success!")
+
+    def list_transactions(self):
+        transactions = self.api_read(True, "transactions")
+        if transactions[0] == "ERROR":
+            return transactions
+
+        if len(transactions) > 0:
+            logging.debug("Listing transactions:")
+            for t in transactions:
+                logging.debug(t)
+        else:
+            logging.debug("no transactions found")
+
+    def list_accounts(self):
+        accounts = self.api_read(True, "accounts")
+        if accounts[0] == "ERROR":
+            return accounts
+
+        account_ids = list()
+        if len(accounts) > 0:
+            for account in accounts:
+                account_ids.append([account["name"], account["id"]])
+                # debug messages
+                logging.debug("id: {}".format(account["id"]))
+                logging.debug("on_budget: {}".format(account["on_budget"]))
+                logging.debug("closed: {}".format(account["closed"]))
+        else:
+            logging.info("no accounts found")
+
+        return account_ids
+
+    def list_budgets(self):
+        budgets = self.api_read(False, "budgets")
+        if budgets[0] == "ERROR":
+            return budgets
+
+        budget_ids = list()
+        for budget in budgets:
+            budget_ids.append([budget["name"], budget["id"]])
+
+            # commented out because this is a bit messy and confusing
+            # TODO: make this legible!
+            """
+            # debug messages:
+            for key, value in budget.items():
+                if(type(value) is dict):
+                    logging.debug("%s: " % str(key))
+                    for subkey, subvalue in value.items():
+                        logging.debug("  %s: %s" %
+                                      (str(subkey), str(subvalue)))
+                else:
+                    logging.debug("%s: %s" % (str(key), str(value)))
+            """
+        return budget_ids
+
+    def process_api_response(self, details):
+        """
+        Prints details about errors returned by the YNAB api
+        :param details: dictionary of returned error info from the YNAB api
+        :return id: HTTP error ID
+        :return detail: human-understandable explanation of error
+        """
+        # TODO: make this function into a general response handler instead
+        errors = {
+            "400": "Bad syntax or validation error",
+            "401": "API access token missing, invalid, revoked, or expired",
+            "403.1": "The subscription for this account has lapsed.",
+            "403.2": "The trial for this account has expired.",
+            "404.1": "The specified URI does not exist.",
+            "404.2": "Resource not found",
+            "409": "Conflict error",
+            "429": "Too many requests. Wait a while and try again.",
+            "500": "Unexpected error"
+        }
+        id = details["id"]
+        name = details["name"]
+        detail = errors[id]
+        logging.error("{} - {} ({})".format(id, detail, name))
+
+        return ["ERROR", id, detail]
+
+    def select_account(self, bank):
+        account_id = ""
+        # check if bank has account associated with it already
+        try:
+            config_line = get_config_line(
+                self.config, bank, ["YNAB Account ID", False, "||"])
+            # make sure the budget ID matches
+            if config_line[0] == self.budget_id:
+                account_id = config_line[1]
+                logging.info(
+                    "Previously-saved account for {} found.".format(bank))
+            else:
+                raise configparser.NoSectionError(bank)
+        except configparser.NoSectionError:
+            logging.info("No user configuration for {} found.".format(bank))
+        if account_id == "":
+            account_ids = self.list_accounts()  # create list of account_ids
+            msg = "Pick a YNAB account for transactions from {}".format(bank)
+            account_id = option_selection(account_ids, msg)
+            # save account selection for bank
+            self.save_account_selection(bank, account_id)
+        return account_id
+
+    def save_account_selection(self, bank, account_id):
+        """
+        saves YNAB account to use for each bank
+        """
+        self.user_config.read(self.user_config_path)
+        try:
+            self.user_config.add_section(bank)
+        except configparser.DuplicateSectionError:
+            pass
+        self.user_config.set(bank, "YNAB Account ID",
+                             "{}||{}".format(self.budget_id, account_id))
+
+        logging.info("Saving default account for {}...".format(bank))
+        with open(self.user_config_path, "w", encoding="utf-8") as config_file:
+            self.user_config.write(config_file)
+
+
 # Let's run this thing!
 if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
+    api = YNAB_API(get_configs())
+    api.run(b2y.transaction_data)

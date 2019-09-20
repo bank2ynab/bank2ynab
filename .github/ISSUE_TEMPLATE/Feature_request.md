@@ -14,7 +14,8 @@ about: Suggest an idea for this project
 
 *Bank format: only fill out these lines if you're comfortable with it, otherwise skip:*
 *To be filled in as required. Delete fields that match default values.*
-```Source Filename Pattern = my_export_filename
+```
+Source Filename Pattern = my_export_filename
 Source Filename Extension = .csv
 Use Regex for Filename = False
 Source CSV Delimiter = ,

@@ -130,6 +130,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. IE AIB Ireland
 1. IE Bank of Ireland
 1. IE N26
+1. IE Ulster Bank, savings
 1. MV Bank of Maldives, checking
 1. NL Bunq checking
 1. NL bunqDesktop software

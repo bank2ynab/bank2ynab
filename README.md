@@ -139,6 +139,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL Rabobank (2018 format)
 1. NO DNB
 1. NO Sparebank 1 VISA
+1. PL mBank, checking
 1. SE Handelsbanken
 1. SE Länsförsäkringar checking
 1. SE Nordea

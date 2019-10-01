@@ -67,7 +67,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 ### <a name="requirements"></a>Requirements
 
 - Windows or Mac or Linux
-- Python v2.7+ installed, v3.5+ preferred ([download it from python.org](https://www.python.org/downloads/))
+- Python v3.5+ installed ([download it from python.org](https://www.python.org/downloads/)) (Python v2.7 *might* work but we make no promises; Py2 has end-of-life on 01Jan2020.)
 - Support for other scripting languages may follow. Contributions are welcome!
 
 ## <a name="userguide"></a>User Guide
@@ -130,6 +130,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. IE AIB Ireland
 1. IE Bank of Ireland
 1. IE N26
+1. IE Ulster Bank, savings
 1. MV Bank of Maldives, checking
 1. NL Bunq checking
 1. NL bunqDesktop software
@@ -138,13 +139,16 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL Rabobank (2018 format)
 1. NO DNB
 1. NO Sparebank 1 VISA
+1. PL mBank, checking
 1. SE Handelsbanken
 1. SE Länsförsäkringar checking
 1. SE Nordea
 1. SE SEB, Skandinaviska Enskilda Banken
 1. SE Swedbank
+1. SE Sparbanken Tanum
+1. SG Swedbank
 1. SE Swedbank (2019 format)
-1. SG OCBC Bank
+1. SE OCBC Bank
 1. SG POSB savings
 1. SK Tatra Banka
 1. SK VUB

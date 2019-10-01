@@ -144,9 +144,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Länsförsäkringar checking
 1. SE Nordea
 1. SE SEB, Skandinaviska Enskilda Banken
-1. SE Swedbank
 1. SE Sparbanken Tanum
-1. SG Swedbank
+1. SE Swedbank
 1. SE Swedbank (2019 format)
 1. SE OCBC Bank
 1. SG POSB savings

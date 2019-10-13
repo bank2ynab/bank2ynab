@@ -236,6 +236,7 @@ def fix_conf_params(conf_obj, section_name):
         "regex": ["Use Regex For Filename", True, ""],
         "fixed_prefix": ["Output Filename Prefix", False, ""],
         "input_delimiter": ["Source CSV Delimiter", False, ""],
+        "input_number_format": ["Number Format", False, ""],
         "header_rows": ["Header Rows", False, ""],
         "footer_rows": ["Footer Rows", False, ""],
         "date_format": ["Date Format", False, ""],
@@ -358,6 +359,10 @@ def string_num_diff(str1, str2):
     difference = int(1000 * (num2 - num1))
     return difference
 
+
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
 
 # -- end of utilities
 
@@ -526,10 +531,20 @@ class B2YBank(object):
         convert , to . in inflow and outflow strings
         :param row: list of values
         """
+
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
-        row[inflow_index] = row[inflow_index].replace(",", ".")
-        row[outflow_index] = row[outflow_index].replace(",", ".")
+
+        if (self.config["input_number_format"] == "de"):
+            row[inflow_index] = rreplace(
+                row[inflow_index], ",", "c", 1).replace(
+                ".", "").replace("c", ".")
+            row[outflow_index] = rreplace(
+                row[outflow_index], ",", "c", 1).replace(
+                ".", "").replace("c", ".")
+        else:
+            row[inflow_index] = row[inflow_index].replace(",", ".")
+            row[outflow_index] = row[outflow_index].replace(",", ".")
 
         return row
 

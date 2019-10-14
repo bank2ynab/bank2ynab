@@ -86,8 +86,11 @@ Using `bank2ynab` is easy:
      - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.bat` file, choose *Send to* and then choose *Desktop (create shortcut)*. Now you can just double-click that shortcut!
    - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab.py`.
      - *Important:* Be sure to use `python3` specifically, and not `python` or `python2` which is probably the system default.
-1. Drag-and-drop the converted CSV file onto the YNAB web app.
-   - YNAB will detect this and offer you import options. If you had already switched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
+ 1. Depending on your configuration, the conversion script will now import your files into YNAB automatically, or you can add the files manually:
+    - **Automatic import** (when you have provided [your YNAB API access token](https://github.com/bank2ynab/bank2ynab/wiki/Create-your-YNAB-API-access-token): 
+      - The conversion script will now ask you which budget it should use to import your converted CSV file to (if you have multiple). It will also ask you which account inside the budget to use (if you have multiple); you'll only have to answer this question once.
+    - **Manually drag-and-drop** the converted CSV file onto the YNAB web app:
+      - YNAB will detect this and offer you import options. If you had already switched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
 
 ## <a name="knownbugs"></a>Known Bugs
 

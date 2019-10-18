@@ -9,6 +9,7 @@ Development:
 [![GitHub issues by-label](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab/bug.svg)](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
 [![GitHub open issues](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/commits/develop)
+[![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/bank2ynab/bank2ynab/blob/develop/docs/CONTRIBUTING.md)
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
 
 Testing:

@@ -524,12 +524,17 @@ class B2YBank(object):
     def _fix_decimal_point(self, row):
         """
         convert , to . in inflow and outflow strings
+        then remove every instance of . except last one
         :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
-        row[inflow_index] = row[inflow_index].replace(",", ".")
-        row[outflow_index] = row[outflow_index].replace(",", ".")
+        inflow = row[inflow_index].replace(",", ".")
+        outflow = row[outflow_index].replace(",", ".")
+        dot_count = inflow.count(".") - 1
+        row[inflow_index] = inflow.replace(".", "", dot_count)
+        dot_count = outflow.count(".") - 1
+        row[outflow_index] = outflow.replace(".", "", dot_count)
 
         return row
 

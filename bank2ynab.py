@@ -26,6 +26,7 @@ from datetime import datetime
 import logging
 # API testing stuff
 import requests
+import locale
 import json
 
 # configure our logger
@@ -239,6 +240,7 @@ def fix_conf_params(conf_obj, section_name):
         "header_rows": ["Header Rows", False, ""],
         "footer_rows": ["Footer Rows", False, ""],
         "date_format": ["Date Format", False, ""],
+        "date_language": ["Date Language", False, ""],
         "delete_original": ["Delete Source File", True, ""],
         "cd_flags": ["Inflow or Outflow Indicator", False, ","],
         "payee_to_memo": ["Use Payee for Memo", True, ""],
@@ -429,6 +431,7 @@ class B2YBank(object):
         footer_rows = int(self.config["footer_rows"])
         cd_flags = self.config["cd_flags"]
         date_format = self.config["date_format"]
+        date_language = self.config["date_language"]
         fill_memo = self.config["payee_to_memo"]
         output_data = []
 
@@ -455,7 +458,7 @@ class B2YBank(object):
                     # process Inflow or Outflow flags
                     row = self._cd_flag_process(row, cd_flags)
                     # fix the date format
-                    row = self._fix_date(row, date_format)
+                    row = self._fix_date(row, date_format, date_language)
                     # create our output_row
                     fixed_row = self._fix_row(row)
                     # convert negative inflows to standard outflows
@@ -560,11 +563,12 @@ class B2YBank(object):
                 row[memo_index] = row[payee_index]
         return row
 
-    def _fix_date(self, row, date_format):
+    def _fix_date(self, row, date_format, date_language):
         """ fix date format when required
         convert date to YYYY-MM-DD
         :param row: list of values
         :param date_format: date format string
+        :param date_language: LC_TIME locale string
         """
         if not(date_format):
             return(row)
@@ -573,8 +577,12 @@ class B2YBank(object):
         try:
             if row[date_col] == "":
                 return row
+            if date_language:
+                locale.setlocale(locale.LC_TIME, date_language)
             # parse our date according to provided formatting string
             input_date = datetime.strptime(row[date_col].strip(), date_format)
+            if date_language:
+                locale.setlocale(locale.LC_TIME, locale.getdefaultlocale())
             # do our actual date processing
             output_date = datetime.strftime(input_date, "%Y-%m-%d")
             row[date_col] = output_date

@@ -9,10 +9,11 @@ Development:
 [![GitHub issues by-label](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab/bug.svg)](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
 [![GitHub open issues](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/commits/develop)
+[![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/bank2ynab/bank2ynab/blob/develop/docs/CONTRIBUTING.md)
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
 
 Testing:
-[![Travis status](https://travis-ci.org/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.org/bank2ynab/bank2ynab)
+[![Travis status](https://travis-ci.com/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.com/bank2ynab/bank2ynab)
 [![Coverage Status](https://codecov.io/gh/bank2ynab/bank2ynab/branch/develop/graph/badge.svg)](https://codecov.io/gh/bank2ynab/bank2ynab)
 [![Maintainability](https://api.codeclimate.com/v1/badges/a9bbb651ef51fc1d9f4f/maintainability)](https://codeclimate.com/github/bank2ynab/bank2ynab/maintainability)
 
@@ -50,7 +51,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 
 - If you're "just a user":
   - [tell us your import format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can create a converter - for you and for everyone else!
-  - use the converter provided here and [give us feedback](https://github.com/bank2ynab/bank2ynab/issues/new) - or participate!
+  - use the converter provided here and [give us feedback](https://github.com/bank2ynab/bank2ynab/issues/new/choose) - or participate!
 - If you've already built a YNAB converter:
   - take advantage of this project to get more import formats.
   - give back to this project by [sharing your existing import formats](https://goo.gl/forms/b7SNwTxmQFfnXlMf2).
@@ -67,7 +68,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 ### <a name="requirements"></a>Requirements
 
 - Windows or Mac or Linux
-- Python v2.7+ installed, v3.5+ preferred ([download it from python.org](https://www.python.org/downloads/))
+- Python v3.5+ installed ([download it from python.org](https://www.python.org/downloads/)) (Python v2.7 *might* work but we make no promises; Py2 has end-of-life on 01Jan2020.)
 - Support for other scripting languages may follow. Contributions are welcome!
 
 ## <a name="userguide"></a>User Guide
@@ -77,7 +78,7 @@ Using `bank2ynab` is easy:
 1. Download some bank statements from your banking website.
    - Make sure to choose CSV format. Save with the default suggested filename so that the converter can find it.
    - It's okay if the statements contain data that you already have in YNAB. YNAB will detect and skip these.
-1. Check the `[DEFAULT]` configuration in `bank2ynab.conf`. *You only need to do this once.* Specifically:
+1. Check the `[DEFAULT]` configuration in `user_configuration.conf`. *You only need to do this once.* Specifically:
    - `Source Path = c:\users\example-username\Downloads` Specify where you save your downloaded CSV files.
    - `Delete Source File = True` set to `False` if you want to keep the original CSV you downloaded.
 1. Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
@@ -86,8 +87,11 @@ Using `bank2ynab` is easy:
      - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.bat` file, choose *Send to* and then choose *Desktop (create shortcut)*. Now you can just double-click that shortcut!
    - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab.py`.
      - *Important:* Be sure to use `python3` specifically, and not `python` or `python2` which is probably the system default.
-1. Drag-and-drop the converted CSV file onto the YNAB web app.
-   - YNAB will detect this and offer you import options. If you had already switched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
+ 1. Depending on your configuration, the conversion script will now import your files into YNAB automatically, or you can add the files manually:
+    - **Automatic import** (when you have provided [your YNAB API access token](https://github.com/bank2ynab/bank2ynab/wiki/Create-your-YNAB-API-access-token): 
+      - The conversion script will now ask you which budget it should use to import your converted CSV file to (if you have multiple). It will also ask you which account inside the budget to use (if you have multiple); you'll only have to answer this question once.
+    - **Manually drag-and-drop** the converted CSV file onto the YNAB web app:
+      - YNAB will detect this and offer you import options. If you had already switched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
 
 ## <a name="knownbugs"></a>Known Bugs
 
@@ -98,11 +102,17 @@ For details, please see our [issue list labeled "Bug"](https://github.com/bank2y
 Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
 
 1. AT easybank credit card
-1. AT Raiffeisen Bank checking
+1. AT Raiffeisen Bank 2018 checking
+1. AT Raiffeisen Bank 2019 checking
 1. AT Raiffeisen Bank VISA card
 1. BE KBC checking
+1. BE BE Keytrade Bank
+1. BR Banco do Brasil checking
 1. BR Inter checking
 1. CA TD Canada Trust, checking+Visa
+1. CH Zürcher Kantonalbank, Kontoauszug
+1. , Finanzassistent
+1. CZ AirBank checking and savings
 1. CZ Ceska Sporitelna
 1. CZ Raiffeisen bank
 1. DE Commerzbank checking
@@ -117,28 +127,47 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Ostseesparkasse Rostock credit card
 1. DE Sparkasse Rhein-Neckar-Nord
 1. DK Bankernes EDB Central
+1. DK Jyske Bank VISA
 1. DK Nordea
 1. DK Sparkassen Thy
+1. HU Erste Bank checking
 1. IE AIB Ireland
 1. IE Bank of Ireland
+1. IE N26
+1. IE Ulster Bank, savings
 1. MV Bank of Maldives, checking
 1. NL Bunq checking
+1. NL bunqDesktop software
 1. NL ING Bank
 1. NL Rabobank (2017 format)
 1. NL Rabobank (2018 format)
 1. NO DNB
+1. NO Sparebank 1 VISA
+1. PL mBank, checking
 1. SE Handelsbanken
+1. SE Länsförsäkringar checking
 1. SE Nordea
+1. SE SEB, Skandinaviska Enskilda Banken
+1. SE Sparbanken Tanum
 1. SE Swedbank
-1. SG OCBC Bank
+1. SE Swedbank (2019 format)
+1. SE OCBC Bank
 1. SG POSB savings
+1. SK Tatra Banka
+1. SK VUB
 1. UK Barclaycard credit card
+1. UK Barclaycard Business Credit Card
 1. UK Co-operative Bank
 1. UK first direct checking
 1. UK Monzo checking
+1. US Bank of America
+1. US Bank of America Credit Card
 1. US BB&T
+1. US Chase Credit Card
 1. US Schwab
 1. US TB Bank
+1. (software) Mint
+1. (software) Neteller
 1. (software) Personal Capital
 
 ----

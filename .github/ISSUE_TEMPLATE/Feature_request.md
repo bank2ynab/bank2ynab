@@ -14,14 +14,15 @@ about: Suggest an idea for this project
 
 *Bank format: only fill out these lines if you're comfortable with it, otherwise skip:*
 *To be filled in as required. Delete fields that match default values.*
-```Source Filename Pattern = my_export_filename
+```
+Source Filename Pattern = my_export_filename
 Source Filename Extension = .csv
 Use Regex for Filename = False
 Source CSV Delimiter = ,
 Header Rows = 1
 Footer Rows = 0
 Input Columns = Date,Payee,Outflow,Inflow,Running Balance
-Date Format = 
+Date Format =
 # (see http://strftime.org/ for date format strings)
 Inflow or Outflow Indicator =
 Output Columns = Date,Payee,Category,Memo,Outflow,Inflow

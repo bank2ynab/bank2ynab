@@ -1,14 +1,15 @@
-# Step 1: See https://github.com/bank2ynab/bank2ynab/wiki/WorkingWithPlugins
-# Step 2: Copy this template into a new file.
-# Step 3: Replace "YourActualBank" below with a descriptive bank name
+# Plugin to work with John Lewis Partnership Card [UK]
 
 from bank2ynab import B2YBank, CrossversionCsvReader
+import re
+import datetime
 
 
-class YourActualBankPlugin(B2YBank):
+class JLP_Card_UKPlugin(B2YBank):
+
     def __init__(self, config_object, is_py2):
-        super(YourActualBankPlugin, self).__init__(config_object, is_py2)
-        self.name = "YourActualBank"
+        super(JLP_Card_UKPlugin, self).__init__(config_object, is_py2)
+        self.name = "JLP_Card_UK"
 
     def read_data(self, file_path):
         delim = self.config["input_delimiter"]
@@ -24,31 +25,32 @@ class YourActualBankPlugin(B2YBank):
                 # skip first row if headers
                 if index == 0 and header_rows != 0:
                     continue
+                # skip rows with "Pending" date
+                if row[0] == "Pending":
+                    continue
                 tmp = {}
                 """
                 DATE STUFF:
                 YNAB's date format is "DD/MM/YYYY".
-                This bank's date format is "YYYMMDD" without delimiters.
-                Moving the substrings into the proper order:
-                https://stackoverflow.com/a/663175/20571
+                This bank's date format is "DD-MON-YYYY".
                 """
-                date = row[2]
-                tmp["Date"] = date[6:7] + '/' + date[4:5] + '/' + date[0:3]
+                tmp["Date"] = (datetime.datetime
+                               .strptime(row[0], '%d-%b-%Y')
+                               .strftime('%d/%m/%Y'))
                 # PAYEE STUFF:
-                tmp["Payee"] = row[7]
+                tmp["Payee"] = row[1]
                 # CATEGORY STUFF:
                 tmp["Category"] = ''
                 # MEMO STUFF:
-                tmp["Memo"] = row[11]
+                tmp["Memo"] = ''
                 # AMOUNT STUFF:
-                # C means inflow (credit), D means outflow (debit)
-                if row[4] == 'C':
+                # CR means inflow (credit)
+                if row[3] == 'CR':
                     tmp["Outflow"] = ''
-                    tmp["Inflow"] = row[5]
+                    tmp["Inflow"] = re.sub(r'\ |\£|\+|\,', '', row[2])
                 else:
-                    tmp["Outflow"] = row[5]
+                    tmp["Outflow"] = re.sub(r'\ |\£|\+|\,', '', row[2])
                     tmp["Inflow"] = ''
-
                 # respect Output Columns option
                 out_row = [''] * len(output_columns)
                 for index, key in enumerate(output_columns):
@@ -60,4 +62,4 @@ class YourActualBankPlugin(B2YBank):
 
 
 def build_bank(config, is_py2):
-    return YourActualBankPlugin(config, is_py2)
+    return JLP_Card_UKPlugin(config, is_py2)

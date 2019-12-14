@@ -50,7 +50,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 * **Check the [FAQs](https://github.com/bank2ynab/bank2ynab/wiki/FAQ)** for a list of common questions and problems.
 * **Perform a [cursory search](https://github.com/bank2ynab/bank2ynab/issues)** to see if the problem has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one.
 
-If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/bank2ynab/bank2ynab/issues/new). 
+If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/bank2ynab/bank2ynab/issues/new).
 * If possible, use the template to create the issue.
 * **Use a clear and descriptive title** for the issue to identify the problem, and include a **clear description** with as much relevant information as possible. If you can, please include **test data** (anonymized) that causes the problem.
 * [Assign labels](#using-labels) to the issue. Make a best guess if you're in doubt.
@@ -103,7 +103,7 @@ Note our wiki pages, especially the [Branching Strategy](https://github.com/bank
 
 ### Coding Conventions
 
-Start reading our code and you'll get the hang of it. 
+Start reading our code and you'll get the hang of it.
 
 * We optimize for readability.
 * We indent using four spaces (soft tabs).
@@ -124,7 +124,7 @@ Start reading our code and you'll get the hang of it.
 
 ### Using Labels
 
-This section lists the labels we use to help us track and manage issues. Labels make it easy to find groups of issues. An issue can have one or several labels. 
+This section lists the labels we use to help us track and manage issues. Labels make it easy to find groups of issues. An issue can have one or several labels.
 
 | Label name   | Description   |
 | ------------ | ------------- |

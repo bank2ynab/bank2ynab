@@ -4,8 +4,9 @@ from bank2ynab import B2YBank, CrossversionCsvReader
 import re
 import datetime
 
+
 class JLP_Card_UKPlugin(B2YBank):
-    
+
     def __init__(self, config_object, is_py2):
         super(JLP_Card_UKPlugin, self).__init__(config_object, is_py2)
         self.name = "JLP_Card_UK"

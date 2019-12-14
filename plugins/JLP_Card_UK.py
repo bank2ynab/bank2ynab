@@ -5,6 +5,7 @@ import re
 import datetime
 
 class JLP_Card_UKPlugin(B2YBank):
+    
     def __init__(self, config_object, is_py2):
         super(JLP_Card_UKPlugin, self).__init__(config_object, is_py2)
         self.name = "JLP_Card_UK"
@@ -32,7 +33,9 @@ class JLP_Card_UKPlugin(B2YBank):
                 YNAB's date format is "DD/MM/YYYY".
                 This bank's date format is "DD-MON-YYYY".
                 """
-                tmp["Date"] = datetime.datetime.strptime(row[0], '%d-%b-%Y').strftime('%d/%m/%Y')
+                tmp["Date"] = (datetime.datetime
+                               .strptime(row[0], '%d-%b-%Y')
+                               .strftime('%d/%m/%Y'))
                 # PAYEE STUFF:
                 tmp["Payee"] = row[1]
                 # CATEGORY STUFF:

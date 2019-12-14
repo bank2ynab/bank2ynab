@@ -54,6 +54,8 @@ class YourActualBankPlugin(B2YBank):
                 for index, key in enumerate(output_columns):
                     out_row[index] = tmp.get(key, "")
                 output_data.append(out_row)
+            # insert the header row at the top.
+            output_data.insert(0, output_columns)
         return output_data
 
 

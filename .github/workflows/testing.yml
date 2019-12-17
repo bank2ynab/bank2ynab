@@ -38,7 +38,8 @@ jobs:
         python -m unittest discover -v
     - name: Code coverage check
       run: |
-        pip install coverage
-        pip install codecov
-        codecov
-        coverage report
+        echo "Temporarily disabled."
+        #pip install coverage
+        #pip install codecov
+        #codecov
+        #coverage report

@@ -14,7 +14,7 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest] # need to re-add mac and windows here
-        python-version: [3.5, 3.6, 3.7, 3.8, nightly]
+        python-version: [3.5, 3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v1

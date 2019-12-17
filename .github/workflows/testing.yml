@@ -13,7 +13,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [ubuntu-latest] # need to re-add mac and windows here
         python-version: [3.4, 3.5, 3.6, 3.7, 3.8, nightly]
 
     steps:

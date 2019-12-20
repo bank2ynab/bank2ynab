@@ -2,18 +2,6 @@
 
 A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
 
-Development:
-[![GitHub issues by-label](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab/bug.svg)](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
-[![GitHub open issues](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/issues)
-[![GitHub last commit](https://img.shields.io/github/last-commit/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/commits/develop)
-[![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/bank2ynab/bank2ynab/blob/develop/docs/CONTRIBUTING.md)
-[![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
-
-Testing:
-[![Travis status](https://travis-ci.com/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.com/bank2ynab/bank2ynab)
-[![Coverage Status](https://codecov.io/gh/bank2ynab/bank2ynab/branch/develop/graph/badge.svg)](https://codecov.io/gh/bank2ynab/bank2ynab)
-[![Maintainability](https://api.codeclimate.com/v1/badges/a9bbb651ef51fc1d9f4f/maintainability)](https://codeclimate.com/github/bank2ynab/bank2ynab/maintainability)
-
 - [What? (Features)](#what)
   - [Wish List](#wishlist)
 - [Why?](#why)
@@ -56,7 +44,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 - Join the chat over at https://gitter.im/bank2ynab/Lobby
 - See also: [the wiki](https://github.com/bank2ynab/bank2ynab/wiki), perhaps most importantly [this page about import formats](https://github.com/bank2ynab/bank2ynab/wiki/ImportFormats).
 
-## <a name=install></a>Installation Instructions
+## <a name="install"></a>Installation Instructions
 
 - Download [this ZIP file](https://github.com/bank2ynab/bank2ynab/archive/master.zip)
 - Note the [Requirements](#requirements) for additional details!

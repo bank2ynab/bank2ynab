@@ -773,6 +773,19 @@ class YNAB_API(object):  # in progress (2)
 
     def create_transaction(self, account_id, this_trans, transactions):
         date = this_trans[0]
+        # API requires yyyy-mm-dd format rather than the dd/mm/yyyy format. (ugh)
+        date_pattern = r"(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})"
+        date_matcher = re.compile(date_pattern)
+        date_match = date_matcher.fullmatch(date)
+        if (date_match):
+            logging.debug(f"Reformatting date: {date}")
+            yyyy = date_match.group('yyyy')
+            mm = date_match.group('mm')
+            dd = date_match.group('dd')
+            date = f"{yyyy}-{mm}-{dd}"
+            logging.debug(f"Reformatted date: {date}")
+        else:
+            raise(ValueError)
         payee = this_trans[1]
         category = this_trans[2]
         memo = this_trans[3]
@@ -824,8 +837,7 @@ class YNAB_API(object):  # in progress (2)
                "{}/transactions?access_token={}".format(
                    self.budget_id,
                    self.api_token))
-        logging.debug(f"URL: {url}")
-        logging.debug(f"Payload: {json.dumps(data)}")
+        logging.debug(f"Transaction Payload: {json.dumps(data)}")
         post_response = requests.post(url, json=data)
 
         # response handling - TODO: make this more thorough!

@@ -647,8 +647,8 @@ class Bank2Ynab(object):
         self.transaction_data = {}
 
         # switch logging level if defined (the earlier the better)
-        log_level = config_object.get('DEFAULT','Log Level').upper()
-        numeric_log_level = getattr(logging, 
+        log_level = config_object.get('DEFAULT', 'Log Level').upper()
+        numeric_log_level = getattr(logging,
                                     log_level.upper(), None)
         if not isinstance(numeric_log_level, int):
             raise ValueError('Invalid log level: %s' % log_level)
@@ -773,7 +773,8 @@ class YNAB_API(object):  # in progress (2)
 
     def create_transaction(self, account_id, this_trans, transactions):
         date = this_trans[0]
-        # API requires yyyy-mm-dd format rather than the dd/mm/yyyy format. (ugh)
+        # API requires yyyy-mm-dd format rather than
+        # the dd/mm/yyyy format used elsewhere. (ugh)
         if not (re.fullmatch(r"\d{4}-\d{2}-\d{2}", date)):
             date_pattern = r"(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})"
             date_matcher = re.compile(date_pattern)
@@ -924,7 +925,10 @@ class YNAB_API(object):  # in progress (2)
         name = details["name"]
         error_reason = errors[id]
         detail = details.get("detail", "No further detail provided")
-        logging.error("{} - {} ({}) - {}".format(id, error_reason, name, detail))
+        logging.error("{} - {} ({}) - {}".format(id,
+                                                 error_reason,
+                                                 name,
+                                                 detail))
 
         return ["ERROR", id, detail]
 

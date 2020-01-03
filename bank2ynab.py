@@ -646,6 +646,13 @@ class Bank2Ynab(object):
         self.banks = []
         self.transaction_data = {}
 
+        # switch logging level if defined (the earlier the better)
+        log_level = config_object.get('DEFAULT','Log Level').upper()
+        numeric_log_level = getattr(logging, 
+                                    log_level.upper(), None)
+        if not isinstance(numeric_log_level, int):
+            raise ValueError('Invalid log level: %s' % log_level)
+        logging.getLogger().setLevel(numeric_log_level)
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)
             bank_object = build_bank(bank_config)
@@ -817,7 +824,8 @@ class YNAB_API(object):  # in progress (2)
                "{}/transactions?access_token={}".format(
                    self.budget_id,
                    self.api_token))
-
+        logging.debug(f"URL: {url}")
+        logging.debug(f"Payload: {data}")
         post_response = requests.post(url, json=data)
 
         # response handling - TODO: make this more thorough!

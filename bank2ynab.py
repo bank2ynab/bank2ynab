@@ -825,7 +825,7 @@ class YNAB_API(object):  # in progress (2)
                    self.budget_id,
                    self.api_token))
         logging.debug(f"URL: {url}")
-        logging.debug(f"Payload: {data}")
+        logging.debug(f"Payload: {json.dumps(data)}")
         post_response = requests.post(url, json=data)
 
         # response handling - TODO: make this more thorough!
@@ -909,8 +909,9 @@ class YNAB_API(object):  # in progress (2)
         }
         id = details["id"]
         name = details["name"]
-        detail = errors[id]
-        logging.error("{} - {} ({})".format(id, detail, name))
+        error_reason = errors[id]
+        detail = details.get("detail", "No further detail provided")
+        logging.error("{} - {} ({}) - {}".format(id, error_reason, name, detail))
 
         return ["ERROR", id, detail]
 

@@ -778,12 +778,12 @@ class YNAB_API(object):  # in progress (2)
         date_matcher = re.compile(date_pattern)
         date_match = date_matcher.fullmatch(date)
         if (date_match):
-            logging.debug(f"Reformatting date: {date}")
+            logging.debug("Reformatting date: {}" % date)
             yyyy = date_match.group('yyyy')
             mm = date_match.group('mm')
             dd = date_match.group('dd')
-            date = f"{yyyy}-{mm}-{dd}"
-            logging.debug(f"Reformatted date: {date}")
+            date = "{}-{}-{}" % (yyyy, mm, dd)
+            logging.debug("Reformatted date: {}" % date)
         else:
             raise(ValueError)
         payee = this_trans[1]
@@ -837,7 +837,7 @@ class YNAB_API(object):  # in progress (2)
                "{}/transactions?access_token={}".format(
                    self.budget_id,
                    self.api_token))
-        logging.debug(f"Transaction Payload: {json.dumps(data)}")
+        logging.debug("Transaction Payload: {}" % (json.dumps(data)))
         post_response = requests.post(url, json=data)
 
         # response handling - TODO: make this more thorough!

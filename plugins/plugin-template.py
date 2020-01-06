@@ -12,6 +12,12 @@ class YourActualBankPlugin(B2YBank):
 
     def _preprocess_file(self, file_path):
         """
+        This is an example of how to preprocess the transaction file
+        prior to feeding the data into the main read_data function.
+        Any specialised string or format operations can easily
+        be done here.
+        """
+        """
         For every row that doesn't have a valid date field
         strip out separators and append to preceding row.
         Overwrite input file with modified output.

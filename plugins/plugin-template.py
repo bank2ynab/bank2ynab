@@ -41,13 +41,12 @@ class YourActualBankPlugin(B2YBank):
                 if row[0] == ",":
                     # join with the previous row but excluding the newline char
                     # of the previous row
-                    output_rows[-1] = output_rows[-1][:-1] \
-                        + ',' + row.strip(' ,')
+                    output_rows[-1] = output_rows[-1][:-1] + "," + row.strip(" ,")
                 else:
                     output_rows.append(row)
 
         # overwrite source file
-        with open(file_path, 'w') as output_file:
+        with open(file_path, "w") as output_file:
             for row in output_rows:
                 output_file.write(row)
         return

@@ -15,9 +15,7 @@ class RaiffeisenRCMPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with CrossversionCsvReader(file_path,
-                                   self._is_py2,
-                                   delimiter=delim) as reader:
+        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 tmp = {}
 
@@ -29,7 +27,7 @@ class RaiffeisenRCMPlugin(B2YBank):
                     tmp["Memo"] = "Memo"
                     tmp["Outflow"] = "Outflow"
                     tmp["Inflow"] = "Inflow"
-                    out_row = [''] * len(output_columns)
+                    out_row = [""] * len(output_columns)
                     for index, key in enumerate(output_columns):
                         out_row[index] = tmp.get(key, "")
                     output_data.append(out_row)
@@ -43,10 +41,10 @@ class RaiffeisenRCMPlugin(B2YBank):
                 https://stackoverflow.com/a/663175/20571
                 """
                 date = row[2]
-                tmp["Date"] = date[6:8] + '-' + date[4:6] + '-' + date[0:4]
+                tmp["Date"] = date[6:8] + "-" + date[4:6] + "-" + date[0:4]
                 # PAYEE STUFF:
                 # fill payee if present, otherwise fill from memo:
-                if row[3].strip() != '':
+                if row[3].strip() != "":
                     tmp["Payee"] = row[3].strip()
                 else:
                     tmp["Payee"] = row[5].strip()
@@ -54,14 +52,14 @@ class RaiffeisenRCMPlugin(B2YBank):
                 # tmp["Category"] = '' # No category is provided.
                 # MEMO STUFF:
                 # concatenate two input columns into one output column:
-                tmp["Memo"] = row[1].strip() + ' ' + row[5].strip()
+                tmp["Memo"] = row[1].strip() + " " + row[5].strip()
                 # AMOUNT STUFF:
                 # tmp["Outflow"] # Outflow is provided as a negative inflow.
                 # Convert from ATS to EUR:
                 tmp["Inflow"] = round(float(row[4]) / 13.760300331, 2)
 
                 # respect Output Columns option
-                out_row = [''] * len(output_columns)
+                out_row = [""] * len(output_columns)
                 for index, key in enumerate(output_columns):
                     out_row[index] = tmp.get(key, "")
                 output_data.append(out_row)

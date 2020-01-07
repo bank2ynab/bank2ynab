@@ -24,6 +24,7 @@ import importlib
 import re
 from datetime import datetime
 import logging
+
 # API testing stuff
 import requests
 import json
@@ -79,9 +80,9 @@ class CrossversionCsvReader(CrossversionFileContext):
         encoding = detect_encoding(self.file_path)
         if self.is_py2:
             self.stream = open(self.file_path, "rb")
-            self.csv_object = UnicodeReader(self.stream,
-                                            encoding=encoding,
-                                            **self.params)
+            self.csv_object = UnicodeReader(
+                self.stream, encoding=encoding, **self.params
+            )
         else:
             self.stream = open(self.file_path, encoding=encoding)
             self.csv_object = csv.reader(self.stream, **self.params)
@@ -96,13 +97,10 @@ class CrossversionCsvWriter(CrossversionFileContext):
         if self.is_py2:
             self.stream = open(self.file_path, "wb")
             self.csv_object = UnicodeWriter(
-                self.stream,
-                encoding="utf-8",
-                **self.params)
+                self.stream, encoding="utf-8", **self.params
+            )
         else:
-            self.stream = open(
-                self.file_path, "w",
-                encoding="utf-8", newline="")
+            self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
             self.csv_object = csv.writer(self.stream, **self.params)
         return self.csv_object
 
@@ -118,26 +116,103 @@ def detect_encoding(filepath):
     # because some encodings will happily encode anything even if wrong,
     # keeping the most common near the top should make it more likely that
     # we're doing the right thing.
-    encodings = ['ascii', 'utf-8', 'utf-16', 'cp1251', 'utf_32', 'utf_32_be',
-                 'utf_32_le', 'utf_16', 'utf_16_be',
-                 'utf_16_le', 'utf_7', 'utf_8_sig', 'cp850', 'cp852',
-                 'latin_1', 'big5', 'big5hkscs', 'cp037', 'cp424',
-                 'cp437', 'cp500', 'cp720', 'cp737', 'cp775', 'cp855',
-                 'cp856', 'cp857', 'cp858', 'cp860', 'cp861', 'cp862',
-                 'cp863', 'cp864', 'cp865', 'cp866', 'cp869', 'cp874',
-                 'cp875', 'cp932', 'cp949', 'cp950', 'cp1006', 'cp1026',
-                 'cp1140', 'cp1250', 'cp1252', 'cp1253', 'cp1254', 'cp1255',
-                 'cp1256', 'cp1257', 'cp1258', 'euc_jp', 'euc_jis_2004',
-                 'euc_jisx0213', 'euc_kr', 'gb2312', 'gbk', 'gb18030', 'hz',
-                 'iso2022_jp', 'iso2022_jp_1', 'iso2022_jp_2',
-                 'iso2022_jp_2004', 'iso2022_jp_3', 'iso2022_jp_ext',
-                 'iso2022_kr', 'latin_1', 'iso8859_2', 'iso8859_3',
-                 'iso8859_4', 'iso8859_5', 'iso8859_6', 'iso8859_7',
-                 'iso8859_8', 'iso8859_9', 'iso8859_10', 'iso8859_11',
-                 'iso8859_13', 'iso8859_14', 'iso8859_15', 'iso8859_16',
-                 'johab', 'koi8_r', 'koi8_u', 'mac_cyrillic', 'mac_greek',
-                 'mac_iceland', 'mac_latin2', 'mac_roman', 'mac_turkish',
-                 'ptcp154', 'shift_jis', 'shift_jis_2004', 'shift_jisx0213']
+    encodings = [
+        "ascii",
+        "utf-8",
+        "utf-16",
+        "cp1251",
+        "utf_32",
+        "utf_32_be",
+        "utf_32_le",
+        "utf_16",
+        "utf_16_be",
+        "utf_16_le",
+        "utf_7",
+        "utf_8_sig",
+        "cp850",
+        "cp852",
+        "latin_1",
+        "big5",
+        "big5hkscs",
+        "cp037",
+        "cp424",
+        "cp437",
+        "cp500",
+        "cp720",
+        "cp737",
+        "cp775",
+        "cp855",
+        "cp856",
+        "cp857",
+        "cp858",
+        "cp860",
+        "cp861",
+        "cp862",
+        "cp863",
+        "cp864",
+        "cp865",
+        "cp866",
+        "cp869",
+        "cp874",
+        "cp875",
+        "cp932",
+        "cp949",
+        "cp950",
+        "cp1006",
+        "cp1026",
+        "cp1140",
+        "cp1250",
+        "cp1252",
+        "cp1253",
+        "cp1254",
+        "cp1255",
+        "cp1256",
+        "cp1257",
+        "cp1258",
+        "euc_jp",
+        "euc_jis_2004",
+        "euc_jisx0213",
+        "euc_kr",
+        "gb2312",
+        "gbk",
+        "gb18030",
+        "hz",
+        "iso2022_jp",
+        "iso2022_jp_1",
+        "iso2022_jp_2",
+        "iso2022_jp_2004",
+        "iso2022_jp_3",
+        "iso2022_jp_ext",
+        "iso2022_kr",
+        "latin_1",
+        "iso8859_2",
+        "iso8859_3",
+        "iso8859_4",
+        "iso8859_5",
+        "iso8859_6",
+        "iso8859_7",
+        "iso8859_8",
+        "iso8859_9",
+        "iso8859_10",
+        "iso8859_11",
+        "iso8859_13",
+        "iso8859_14",
+        "iso8859_15",
+        "iso8859_16",
+        "johab",
+        "koi8_r",
+        "koi8_u",
+        "mac_cyrillic",
+        "mac_greek",
+        "mac_iceland",
+        "mac_latin2",
+        "mac_roman",
+        "mac_turkish",
+        "ptcp154",
+        "shift_jis",
+        "shift_jis_2004",
+        "shift_jisx0213",
+    ]
     result = None
     error = (ValueError, UnicodeError, UnicodeDecodeError, UnicodeEncodeError)
     for enc in encodings:
@@ -198,6 +273,8 @@ class UnicodeWriter:
     def writerows(self, rows):
         for row in rows:
             self.writerow(row)
+
+
 # -- end of py2 utilities
 # -- end of charset-handling classes
 
@@ -244,7 +321,7 @@ def fix_conf_params(conf_obj, section_name):
         "payee_to_memo": ["Use Payee for Memo", True, ""],
         "plugin": ["Plugin", False, ""],
         "api_token": ["YNAB API Access Token", False, ""],
-        "api_account": ["YNAB Account ID", False, "|"]
+        "api_account": ["YNAB Account ID", False, "|"],
     }
 
     for key in config:
@@ -282,14 +359,16 @@ def find_directory(filepath):
                 import winreg
             except ImportError:
                 import _winreg as winreg
-            shell_path = ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
-                          "\\Explorer\\Shell Folders")
+            shell_path = (
+                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
+                "\\Explorer\\Shell Folders"
+            )
             dl_key = "{374DE290-123F-4565-9164-39C4925E467B}"
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, shell_path) as key:
                 input_dir = winreg.QueryValueEx(key, dl_key)[0]
         else:
             # Linux, OSX
-            userhome = os.path.expanduser('~')
+            userhome = os.path.expanduser("~")
             input_dir = os.path.join(userhome, "Downloads")
     else:
         if not os.path.exists(filepath):
@@ -330,14 +409,12 @@ def int_input(min, max, msg):
     """
     while True:
         try:
-            user_input = int(
-                input("{} (range {} - {}): ".format(msg, min, max)))
+            user_input = int(input("{} (range {} - {}): ".format(msg, min, max)))
             if user_input not in range(min, max + 1):
                 raise ValueError
             break
         except ValueError:
-            logging.info(
-                "This integer is not in the acceptable range, try again!")
+            logging.info("This integer is not in the acceptable range, try again!")
     return user_input
 
 
@@ -401,20 +478,26 @@ class B2YBank(object):
             except FileNotFoundError:
                 directory_list = os.listdir(".")
             if regex_active is True:
-                files = [join(path, f)
-                         for f in directory_list
-                         if f.endswith(ext)
-                         if re.match(file_pattern + r".*\.", f)
-                         if prefix not in f]
+                files = [
+                    join(path, f)
+                    for f in directory_list
+                    if f.endswith(ext)
+                    if re.match(file_pattern + r".*\.", f)
+                    if prefix not in f
+                ]
             else:
-                files = [join(path, f)
-                         for f in directory_list
-                         if f.endswith(ext)
-                         if f.startswith(file_pattern)
-                         if prefix not in f]
+                files = [
+                    join(path, f)
+                    for f in directory_list
+                    if f.endswith(ext)
+                    if f.startswith(file_pattern)
+                    if prefix not in f
+                ]
             if files != [] and missing_dir is True:
-                s = ("\nFormat: {}\n\nError: Can't find download path: {}"
-                     "\nTrying default path instead:\t {}")
+                s = (
+                    "\nFormat: {}\n\nError: Can't find download path: {}"
+                    "\nTrying default path instead:\t {}"
+                )
                 logging.error(s.format(self.name, try_path, path))
         return files
 
@@ -436,14 +519,14 @@ class B2YBank(object):
         self._preprocess_file(file_path)
 
         # get total number of rows in transaction file using a generator
-        with CrossversionCsvReader(file_path,
-                                   self._is_py2,
-                                   delimiter=delim) as row_count_reader:
+        with CrossversionCsvReader(
+            file_path, self._is_py2, delimiter=delim
+        ) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        with CrossversionCsvReader(file_path,
-                                   self._is_py2,
-                                   delimiter=delim) as transaction_reader:
+        with CrossversionCsvReader(
+            file_path, self._is_py2, delimiter=delim
+        ) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 line = transaction_reader.line_num
@@ -491,9 +574,10 @@ class B2YBank(object):
         output = []
         for header in self.config["output_columns"]:
             # find all input columns with data for this output column
-            indices = filter(lambda i:
-                             self.config["input_columns"][i] == header,
-                             range(len(self.config["input_columns"])))
+            indices = filter(
+                lambda i: self.config["input_columns"][i] == header,
+                range(len(self.config["input_columns"])),
+            )
             # fetch data from those input columns if they are not empty,
             # and merge them
             cell_parts = []
@@ -516,7 +600,7 @@ class B2YBank(object):
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
         inflow = row[inflow_index]
-        if(inflow.startswith("-")):
+        if inflow.startswith("-"):
             row[inflow_index] = ""
             row[outflow_index] = inflow[1:]
         return row
@@ -566,8 +650,8 @@ class B2YBank(object):
         :param row: list of values
         :param date_format: date format string
         """
-        if not(date_format):
-            return(row)
+        if not (date_format):
+            return row
 
         date_col = self.config["input_columns"].index("Date")
         try:
@@ -604,14 +688,12 @@ class B2YBank(object):
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
-        new_filename = "{}{}.csv".format(
-            self.config["fixed_prefix"],
-            target_fname)
+        new_filename = "{}{}.csv".format(self.config["fixed_prefix"], target_fname)
         while os.path.isfile(new_filename):
             counter = 1
             new_filename = "{}{}_{}.csv".format(
-                self.config["fixed_prefix"],
-                target_fname, counter)
+                self.config["fixed_prefix"], target_fname, counter
+            )
             counter += 1
         target_filename = join(target_dir, new_filename)
         logging.info("Writing output file: {}".format(target_filename))
@@ -627,9 +709,11 @@ def build_bank(bank_config):
     if plugin_module:
         p_mod = importlib.import_module("plugins.{}".format(plugin_module))
         if not hasattr(p_mod, "build_bank"):
-            s = ("The specified plugin {}.py".format(plugin_module) +
-                 "does not contain the required "
-                 "build_bank(config, is_py2) method.")
+            s = (
+                "The specified plugin {}.py".format(plugin_module)
+                + "does not contain the required "
+                "build_bank(config, is_py2) method."
+            )
             raise ImportError(s)
         bank = p_mod.build_bank(bank_config, __PY2)
         return bank
@@ -646,13 +730,6 @@ class Bank2Ynab(object):
         self.banks = []
         self.transaction_data = {}
 
-        # switch logging level if defined (the earlier the better)
-        log_level = config_object.get("DEFAULT", "Log Level").upper()
-        numeric_log_level = getattr(logging,
-                                    log_level.upper(), None)
-        if not isinstance(numeric_log_level, int):
-            raise ValueError("Invalid log level: {}".format(log_level))
-        logging.getLogger().setLevel(numeric_log_level)
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)
             bank_object = build_bank(bank_config)
@@ -668,8 +745,9 @@ class Bank2Ynab(object):
             files = bank.get_files()
             bank_name = bank.name
             for src_file in files:
-                logging.info("\nParsing input file:  {} (format: {})".format(
-                    src_file, bank_name))
+                logging.info(
+                    "\nParsing input file:  {} (format: {})".format(src_file, bank_name)
+                )
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file
@@ -704,7 +782,7 @@ class YNAB_API(object):  # in progress (2)
         self.debug = False
 
     def run(self, transaction_data):
-        if(self.api_token is not None):
+        if self.api_token is not None:
             logging.info("Connecting to YNAB API...")
 
             # check for API token auth (and other errors)
@@ -762,22 +840,14 @@ class YNAB_API(object):  # in progress (2)
             # save transaction data for each bank in main dict
             account_transactions = transaction_data[bank]
             for t in account_transactions[1:]:
-                trans_dict = self.create_transaction(
-                    account_id, t, transactions)
+                trans_dict = self.create_transaction(account_id, t, transactions)
                 transactions.append(trans_dict)
         # compile our data to post
-        data = {
-            "transactions": transactions
-        }
+        data = {"transactions": transactions}
         return data
 
     def create_transaction(self, account_id, this_trans, transactions):
-
         date = this_trans[0]
-        # Check date vs API requirement for yyyy-mm-dd format
-        if not (re.fullmatch(r"\d{4}-\d{2}-\d{2}", date)):
-            logging.debug("Invalid date format: {}".format(date))
-            raise(ValueError)
         payee = this_trans[1]
         category = this_trans[2]
         memo = this_trans[3]
@@ -796,7 +866,7 @@ class YNAB_API(object):  # in progress (2)
             "payee_id": None,
             "category_id": None,
             "approved": False,
-            "flag_color": None
+            "flag_color": None,
         }
         return transaction
 
@@ -815,7 +885,8 @@ class YNAB_API(object):  # in progress (2)
         for transaction in existing_transactions:
             try:
                 if transaction["import_id"].startswith(
-                        "YNAB:{}:{}:".format(amount, date)):
+                    "YNAB:{}:{}:".format(amount, date)
+                ):
                     count += 1
             except KeyError:
                 # transaction doesn't have import id for some reason
@@ -825,11 +896,11 @@ class YNAB_API(object):  # in progress (2)
     def post_transactions(self, data):
         # send our data to API
         logging.info("Uploading transactions to YNAB...")
-        url = ("https://api.youneedabudget.com/v1/budgets/" +
-               "{}/transactions?access_token={}".format(
-                   self.budget_id,
-                   self.api_token))
-        logging.debug("Transaction Payload: {}".format(json.dumps(data)))
+        url = (
+            "https://api.youneedabudget.com/v1/budgets/"
+            + "{}/transactions?access_token={}".format(self.budget_id, self.api_token)
+        )
+
         post_response = requests.post(url, json=data)
 
         # response handling - TODO: make this more thorough!
@@ -909,16 +980,12 @@ class YNAB_API(object):  # in progress (2)
             "404.2": "Resource not found",
             "409": "Conflict error",
             "429": "Too many requests. Wait a while and try again.",
-            "500": "Unexpected error"
+            "500": "Unexpected error",
         }
         id = details["id"]
         name = details["name"]
-        error_reason = errors[id]
-        detail = details.get("detail", "No further detail provided")
-        logging.error("{} - {} ({}) - {}".format(id,
-                                                 error_reason,
-                                                 name,
-                                                 detail))
+        detail = errors[id]
+        logging.error("{} - {} ({})".format(id, detail, name))
 
         return ["ERROR", id, detail]
 
@@ -927,12 +994,12 @@ class YNAB_API(object):  # in progress (2)
         # check if bank has account associated with it already
         try:
             config_line = get_config_line(
-                self.config, bank, ["YNAB Account ID", False, "||"])
+                self.config, bank, ["YNAB Account ID", False, "||"]
+            )
             # make sure the budget ID matches
             if config_line[0] == self.budget_id:
                 account_id = config_line[1]
-                logging.info(
-                    "Previously-saved account for {} found.".format(bank))
+                logging.info("Previously-saved account for {} found.".format(bank))
             else:
                 raise configparser.NoSectionError(bank)
         except configparser.NoSectionError:
@@ -954,8 +1021,9 @@ class YNAB_API(object):  # in progress (2)
             self.user_config.add_section(bank)
         except configparser.DuplicateSectionError:
             pass
-        self.user_config.set(bank, "YNAB Account ID",
-                             "{}||{}".format(self.budget_id, account_id))
+        self.user_config.set(
+            bank, "YNAB Account ID", "{}||{}".format(self.budget_id, account_id)
+        )
 
         logging.info("Saving default account for {}...".format(bank))
         with open(self.user_config_path, "w", encoding="utf-8") as config_file:

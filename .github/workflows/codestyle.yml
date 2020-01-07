@@ -24,4 +24,4 @@ jobs:
           auto_fix: ${{ github.event_name == 'pull_request' }}
           # Enable linters
           black: true
-          flake8: true
+          #flake8: true

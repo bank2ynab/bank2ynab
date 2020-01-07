@@ -10,7 +10,6 @@ _PY2 = False
 
 
 class TestJLP_Card_UKPlugin(TestCase):
-
     def setUp(self):
         global _PY2
         self.cp, self.py2, = get_test_confparser()

@@ -1,14 +1,9 @@
 name: Python testing
 
-on:
-    pull_request:
-        branches:
-        - master
-        - develop
+on: [pull_request]
 
 jobs:
   build:
-
     runs-on: ${{matrix.os}}
     strategy:
       max-parallel: 4

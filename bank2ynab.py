@@ -772,22 +772,12 @@ class YNAB_API(object):  # in progress (2)
         return data
 
     def create_transaction(self, account_id, this_trans, transactions):
+
         date = this_trans[0]
-        # API requires yyyy-mm-dd format rather than
-        # the dd/mm/yyyy format used elsewhere. (ugh)
+        # Check date vs API requirement for yyyy-mm-dd format
         if not (re.fullmatch(r"\d{4}-\d{2}-\d{2}", date)):
-            date_pattern = r"(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})"
-            date_matcher = re.compile(date_pattern)
-            date_match = date_matcher.fullmatch(date)
-            if (date_match):
-                logging.debug("Reformatting date: {}".format(date))
-                yyyy = date_match.group('yyyy')
-                mm = date_match.group('mm')
-                dd = date_match.group('dd')
-                date = "{}-{}-{}".format(yyyy, mm, dd)
-                logging.debug("Reformatted date: {}".format(date))
-            else:
-                raise(ValueError)
+            logging.debug("Invalid date format: {}".format(date))
+            raise(ValueError)
         payee = this_trans[1]
         category = this_trans[2]
         memo = this_trans[3]

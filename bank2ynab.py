@@ -647,11 +647,11 @@ class Bank2Ynab(object):
         self.transaction_data = {}
 
         # switch logging level if defined (the earlier the better)
-        log_level = config_object.get('DEFAULT', 'Log Level').upper()
+        log_level = config_object.get("DEFAULT", "Log Level").upper()
         numeric_log_level = getattr(logging,
                                     log_level.upper(), None)
         if not isinstance(numeric_log_level, int):
-            raise ValueError('Invalid log level: %s' % log_level)
+            raise ValueError("Invalid log level: {}".format(log_level))
         logging.getLogger().setLevel(numeric_log_level)
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)

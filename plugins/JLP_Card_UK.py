@@ -6,7 +6,6 @@ import datetime
 
 
 class JLP_Card_UKPlugin(B2YBank):
-
     def __init__(self, config_object, is_py2):
         super(JLP_Card_UKPlugin, self).__init__(config_object, is_py2)
         self.name = "JLP_Card_UK"
@@ -18,9 +17,7 @@ class JLP_Card_UKPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with CrossversionCsvReader(file_path,
-                                   self._is_py2,
-                                   delimiter=delim) as reader:
+        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 # skip first row if headers
                 if index == 0 and header_rows != 0:
@@ -34,25 +31,25 @@ class JLP_Card_UKPlugin(B2YBank):
                 YNAB's date format is "DD/MM/YYYY".
                 This bank's date format is "DD-MON-YYYY".
                 """
-                tmp["Date"] = (datetime.datetime
-                               .strptime(row[0], '%d-%b-%Y')
-                               .strftime('%d/%m/%Y'))
+                tmp["Date"] = datetime.datetime.strptime(row[0], "%d-%b-%Y").strftime(
+                    "%d/%m/%Y"
+                )
                 # PAYEE STUFF:
                 tmp["Payee"] = row[1]
                 # CATEGORY STUFF:
-                tmp["Category"] = ''
+                tmp["Category"] = ""
                 # MEMO STUFF:
-                tmp["Memo"] = ''
+                tmp["Memo"] = ""
                 # AMOUNT STUFF:
                 # CR means inflow (credit)
-                if row[3] == 'CR':
-                    tmp["Outflow"] = ''
-                    tmp["Inflow"] = re.sub(r'\ |\£|\+|\,', '', row[2])
+                if row[3] == "CR":
+                    tmp["Outflow"] = ""
+                    tmp["Inflow"] = re.sub(r"\ |\£|\+|\,", "", row[2])
                 else:
-                    tmp["Outflow"] = re.sub(r'\ |\£|\+|\,', '', row[2])
-                    tmp["Inflow"] = ''
+                    tmp["Outflow"] = re.sub(r"\ |\£|\+|\,", "", row[2])
+                    tmp["Inflow"] = ""
                 # respect Output Columns option
-                out_row = [''] * len(output_columns)
+                out_row = [""] * len(output_columns)
                 for index, key in enumerate(output_columns):
                     out_row[index] = tmp.get(key, "")
                 output_data.append(out_row)

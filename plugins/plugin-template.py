@@ -2,7 +2,7 @@
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
 
-from bank2ynab import B2YBank, CrossversionCsvReader
+from bank2ynab import B2YBank
 
 
 class YourActualBankPlugin(B2YBank):
@@ -41,13 +41,12 @@ class YourActualBankPlugin(B2YBank):
                 if row[0] == ",":
                     # join with the previous row but excluding the newline char
                     # of the previous row
-                    output_rows[-1] = output_rows[-1][:-1] \
-                        + ',' + row.strip(' ,')
+                    output_rows[-1] = output_rows[-1][:-1] + "," + row.strip(" ,")
                 else:
                     output_rows.append(row)
 
         # overwrite source file
-        with open(file_path, 'w') as output_file:
+        with open(file_path, "w") as output_file:
             for row in output_rows:
                 output_file.write(row)
         return

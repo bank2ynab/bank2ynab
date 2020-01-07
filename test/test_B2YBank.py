@@ -36,11 +36,11 @@ class TestB2YBank(TestCase):
         """ Test it's finding the right amount of files"""
         # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_files in [
-                ("test_num_files", 2),
-                ("test_num_files_noexist", 0),
-                ("test_num_files_extension", 0),
-                ("test_regex", 1),
-                ("test_regex_noexist", 0)
+            ("test_num_files", 2),
+            ("test_num_files_noexist", 0),
+            ("test_num_files_extension", 0),
+            ("test_regex", 1),
+            ("test_regex_noexist", 0),
         ]:
 
             config = fix_conf_params(self.cp, section_name)
@@ -56,9 +56,9 @@ class TestB2YBank(TestCase):
         """ Test that the right number of rows are read from the test files """
         # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_records, fpath in [
-                ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
-                ("test_record_headers", 74, "test_headers.csv"),
-                ("test_delimiter_tab", 74, "test_delimiter_tab.csv")
+            ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
+            ("test_record_headers", 74, "test_headers.csv"),
+            ("test_delimiter_tab", 74, "test_delimiter_tab.csv"),
         ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)
@@ -76,7 +76,7 @@ class TestB2YBank(TestCase):
         # todo: allow incremental file suffixes when files named the same
         for section_name, num_records, fpath in [
             ("test_record_i18n", 74, "fixed_test_raiffeisen_01.csv"),
-            ("test_record_headers", 74, "fixed_test_headers.csv")
+            ("test_record_headers", 74, "fixed_test_headers.csv"),
         ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)
@@ -85,7 +85,7 @@ class TestB2YBank(TestCase):
                 self.assertEqual(len(output_data), num_records)
                 result_file = b.write_data(f, output_data)
                 # check the file is where we expect it to be
-                expected_file = abspath(join('test-data', fpath))
+                expected_file = abspath(join("test-data", fpath))
                 self.assertTrue(exists(expected_file))
                 self.assertEqual(expected_file, result_file)
                 # todo: check actual contents are what we expect
@@ -108,7 +108,7 @@ class TestB2YBank(TestCase):
             "test_row_format_default",
             "test_row_format_neg_inflow",
             "test_row_format_CD_flag",
-            "test_row_format_invalid"
+            "test_row_format_invalid",
         ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config, self.py2)
@@ -116,23 +116,32 @@ class TestB2YBank(TestCase):
                 output_data = b.read_data(f)
                 # test the same two rows in each scenario
                 for row, expected_row in [
-                    (23, [
-                        "28.09.2017",
-                        "HOFER DANKT  0527  K2   28.09. 17:17",
-                        "",
-                        "HOFER DANKT  0527  K2   28.09. 17:17",
-                        "44.96", ""
-                    ]),
-                    (24, [
-                        "28.09.2017", "SOFTWARE Wien",
-                        "",
-                        "SOFTWARE Wien",
-                        "", "307.67"
-                    ])
+                    (
+                        23,
+                        [
+                            "28.09.2017",
+                            "HOFER DANKT  0527  K2   28.09. 17:17",
+                            "",
+                            "HOFER DANKT  0527  K2   28.09. 17:17",
+                            "44.96",
+                            "",
+                        ],
+                    ),
+                    (
+                        24,
+                        [
+                            "28.09.2017",
+                            "SOFTWARE Wien",
+                            "",
+                            "SOFTWARE Wien",
+                            "",
+                            "307.67",
+                        ],
+                    ),
                 ]:
                     result_row = output_data[row]
 
-                    if(self.py2):
+                    if self.py2:
                         self.assertItemsEqual(expected_row, result_row)
                     else:
                         self.assertCountEqual(expected_row, result_row)
@@ -145,7 +154,7 @@ class TestB2YBank(TestCase):
         for row, row_validity in [
             (["28.09.2017", "Payee", "", "", "300", ""], True),
             (["28.09.2017", "Payee", "", "", "", "400"], True),
-            (["28.09.2017", "Payee", "", "", "", ""], False)
+            (["28.09.2017", "Payee", "", "", "", ""], False),
         ]:
             is_valid = b._valid_row(row)
             self.assertEqual(is_valid, row_validity)
@@ -160,7 +169,7 @@ class TestB2YBank(TestCase):
             (["28.09.2017", "Payee", "", "", "300", ""], "", False),
             (["28.09.2017", "Payee", "", "Memo", "300", ""], "Memo", False),
             (["28.09.2017", "Payee", "", "", "300", ""], "Payee", True),
-            (["28.09.2017", "Payee", "", "Memo", "", "400"], "Memo", True)
+            (["28.09.2017", "Payee", "", "Memo", "", "400"], "Memo", True),
         ]:
             new_memo = b._auto_memo(row, fill_memo)[memo_index]
             self.assertEqual(test_memo, new_memo)
@@ -173,19 +182,19 @@ class TestB2YBank(TestCase):
         for row, expected_row in [
             (
                 ["28.09.2017", "Payee", "", "", "300", ""],
-                ["28.09.2017", "Payee", "", "", "300", ""]
+                ["28.09.2017", "Payee", "", "", "300", ""],
             ),
             (
                 ["28.09.2017", "Payee", "", "", "", "-300"],
-                ["28.09.2017", "Payee", "", "", "300", ""]
+                ["28.09.2017", "Payee", "", "", "300", ""],
             ),
             (
                 ["28.09.2017", "Payee", "", "", "", "300"],
-                ["28.09.2017", "Payee", "", "", "", "300"]
-            )
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
         ]:
             result_row = b._fix_outflow(row)
-            if(self.py2):
+            if self.py2:
                 self.assertItemsEqual(expected_row, result_row)
             else:
                 self.assertCountEqual(expected_row, result_row)

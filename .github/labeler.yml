@@ -1,0 +1,5 @@
+# Add 'bank format' label to any change in bank2ynab.conf
+bank format:
+  - ./bank2ynab.conf
+project automation:
+  - .github/workflows/**/*

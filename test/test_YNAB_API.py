@@ -6,11 +6,11 @@ import os
 from shutil import copyfile
 from bank2ynab import YNAB_API
 import configparser
+
 _PY2 = False
 
 
 class Test_YNAB_API(TestCase):
-
     def setUp(self):
         global _PY2
         self.TESTCONFPATH = join("test-data", "test.conf")
@@ -136,8 +136,8 @@ class Test_YNAB_API(TestCase):
                     "payee_id": None,
                     "category_id": None,
                     "approved": False,
-                    "flag_color": None
-                }
+                    "flag_color": None,
+                },
             ),
             (
                 ["2019-01-01", "Mimsy", "Category", "Memo", 400, ""],
@@ -153,8 +153,8 @@ class Test_YNAB_API(TestCase):
                     "payee_id": None,
                     "category_id": None,
                     "approved": False,
-                    "flag_color": None
-                }
+                    "flag_color": None,
+                },
             ),
             (
                 ["2019-01-01", "Mimsy", "Category", "Memo", "", 500],
@@ -170,8 +170,8 @@ class Test_YNAB_API(TestCase):
                     "payee_id": None,
                     "category_id": None,
                     "approved": False,
-                    "flag_color": None
-                }
+                    "flag_color": None,
+                },
             ),
             (
                 ["2019-01-01", "Borogrove", "Category", "Memo", 600, ""],
@@ -187,20 +187,20 @@ class Test_YNAB_API(TestCase):
                     "payee_id": None,
                     "category_id": None,
                     "approved": False,
-                    "flag_color": None
-                }
-            )
+                    "flag_color": None,
+                },
+            ),
         ]
 
         transactions = []
         for test_row, target_transaction in test_transactions:
             test_transaction = test_class.create_transaction(
-                "account_id", test_row, transactions)
+                "account_id", test_row, transactions
+            )
             transactions.append(test_transaction)
 
             for key in test_transaction:
-                self.assertEqual(
-                    target_transaction[key], test_transaction[key])
+                self.assertEqual(target_transaction[key], test_transaction[key])
 
     def test_create_import_id(self):
         test_class = YNAB_API(self.cp)
@@ -211,7 +211,7 @@ class Test_YNAB_API(TestCase):
             (300, "2019-01-01", "YNAB:300:2019-01-01:3"),  # 2 duplicates
             (400, "2019-01-01", "YNAB:400:2019-01-01:1"),  # no duplicate
             (500, "2019-01-01", "YNAB:500:2019-01-01:1"),  # no duplicate
-            (600, "2019-01-01", "YNAB:600:2019-01-01:2")  # 1 duplicate
+            (600, "2019-01-01", "YNAB:600:2019-01-01:2"),  # 1 duplicate
         ]
 
         test_transactions = [
@@ -227,7 +227,7 @@ class Test_YNAB_API(TestCase):
                 "payee_id": None,
                 "category_id": None,
                 "approved": False,
-                "flag_color": None
+                "flag_color": None,
             },
             {
                 "account_id": "Account",
@@ -241,7 +241,7 @@ class Test_YNAB_API(TestCase):
                 "payee_id": None,
                 "category_id": None,
                 "approved": False,
-                "flag_color": None
+                "flag_color": None,
             },
             {
                 "account_id": "Account",
@@ -255,7 +255,7 @@ class Test_YNAB_API(TestCase):
                 "payee_id": None,
                 "category_id": None,
                 "approved": False,
-                "flag_color": None
+                "flag_color": None,
             },
             {
                 "account_id": "Account",
@@ -269,8 +269,8 @@ class Test_YNAB_API(TestCase):
                 "payee_id": None,
                 "category_id": None,
                 "approved": False,
-                "flag_color": None
-            }
+                "flag_color": None,
+            },
         ]
 
         for amount, date, target_id in test_values:
@@ -398,7 +398,7 @@ class Test_YNAB_API(TestCase):
         test_class.budget_id = "Test Budget ID"
         test_banks = [
             ("test_api_existing_bank", "Test Account ID"),
-            ("New Bank", "ID #2")
+            ("New Bank", "ID #2"),
         ]
         test_class.config_path = self.TEMPCONFPATH
         test_class.config = configparser.RawConfigParser()
@@ -407,7 +407,7 @@ class Test_YNAB_API(TestCase):
         mock_ids = [
             ("Account 1", "ID #1"),
             ("Account 2", "ID #2"),
-            ("Account 3", "ID #3")
+            ("Account 3", "ID #3"),
         ]
         mock_list_acs.return_value = mock_ids
         mock_option_sel.return_value = "ID #2"
@@ -437,5 +437,6 @@ class Test_YNAB_API(TestCase):
         config.read(test_class.user_config_path)
         for test_bank in test_banks:
             test_id = config.get(test_bank, "YNAB Account ID")
-            self.assertEqual(test_id, "{}||{}".format(
-                test_class.budget_id, test_account_id))
+            self.assertEqual(
+                test_id, "{}||{}".format(test_class.budget_id, test_account_id)
+            )

@@ -646,6 +646,13 @@ class Bank2Ynab(object):
         self.banks = []
         self.transaction_data = {}
 
+        # switch logging level if defined (the earlier the better)
+        log_level = config_object.get('DEFAULT', 'Log Level').upper()
+        numeric_log_level = getattr(logging,
+                                    log_level.upper(), None)
+        if not isinstance(numeric_log_level, int):
+            raise ValueError('Invalid log level: %s' % log_level)
+        logging.getLogger().setLevel(numeric_log_level)
         for section in config_object.sections():
             bank_config = fix_conf_params(config_object, section)
             bank_object = build_bank(bank_config)
@@ -766,6 +773,21 @@ class YNAB_API(object):  # in progress (2)
 
     def create_transaction(self, account_id, this_trans, transactions):
         date = this_trans[0]
+        # API requires yyyy-mm-dd format rather than
+        # the dd/mm/yyyy format used elsewhere. (ugh)
+        if not (re.fullmatch(r"\d{4}-\d{2}-\d{2}", date)):
+            date_pattern = r"(?P<dd>\d{2})/(?P<mm>\d{2})/(?P<yyyy>\d{4})"
+            date_matcher = re.compile(date_pattern)
+            date_match = date_matcher.fullmatch(date)
+            if (date_match):
+                logging.debug("Reformatting date: {}".format(date))
+                yyyy = date_match.group('yyyy')
+                mm = date_match.group('mm')
+                dd = date_match.group('dd')
+                date = "{}-{}-{}".format(yyyy, mm, dd)
+                logging.debug("Reformatted date: {}".format(date))
+            else:
+                raise(ValueError)
         payee = this_trans[1]
         category = this_trans[2]
         memo = this_trans[3]
@@ -817,7 +839,7 @@ class YNAB_API(object):  # in progress (2)
                "{}/transactions?access_token={}".format(
                    self.budget_id,
                    self.api_token))
-
+        logging.debug("Transaction Payload: {}".format(json.dumps(data)))
         post_response = requests.post(url, json=data)
 
         # response handling - TODO: make this more thorough!
@@ -901,8 +923,12 @@ class YNAB_API(object):  # in progress (2)
         }
         id = details["id"]
         name = details["name"]
-        detail = errors[id]
-        logging.error("{} - {} ({})".format(id, detail, name))
+        error_reason = errors[id]
+        detail = details.get("detail", "No further detail provided")
+        logging.error("{} - {} ({}) - {}".format(id,
+                                                 error_reason,
+                                                 name,
+                                                 detail))
 
         return ["ERROR", id, detail]
 

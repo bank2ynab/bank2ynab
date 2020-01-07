@@ -951,4 +951,4 @@ if __name__ == "__main__":
     b2y = Bank2Ynab(get_configs(), __PY2)
     b2y.run()
     api = YNAB_API(get_configs())
-    api.run(b2y.transaction_data)
+    api.run(b2y.transaction_data) 

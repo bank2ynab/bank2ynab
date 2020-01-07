@@ -17,9 +17,7 @@ class YourActualBankPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with CrossversionCsvReader(file_path,
-                                   self._is_py2,
-                                   delimiter=delim) as reader:
+        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 # skip first row if headers
                 if index == 0 and header_rows != 0:
@@ -33,24 +31,24 @@ class YourActualBankPlugin(B2YBank):
                 https://stackoverflow.com/a/663175/20571
                 """
                 date = row[2]
-                tmp["Date"] = date[6:7] + '/' + date[4:5] + '/' + date[0:3]
+                tmp["Date"] = date[6:7] + "/" + date[4:5] + "/" + date[0:3]
                 # PAYEE STUFF:
                 tmp["Payee"] = row[7]
                 # CATEGORY STUFF:
-                tmp["Category"] = ''
+                tmp["Category"] = ""
                 # MEMO STUFF:
                 tmp["Memo"] = row[11]
                 # AMOUNT STUFF:
                 # C means inflow (credit), D means outflow (debit)
-                if row[4] == 'C':
-                    tmp["Outflow"] = ''
+                if row[4] == "C":
+                    tmp["Outflow"] = ""
                     tmp["Inflow"] = row[5]
                 else:
                     tmp["Outflow"] = row[5]
-                    tmp["Inflow"] = ''
+                    tmp["Inflow"] = ""
 
                 # respect Output Columns option
-                out_row = [''] * len(output_columns)
+                out_row = [""] * len(output_columns)
                 for index, key in enumerate(output_columns):
                     out_row[index] = tmp.get(key, "")
                 output_data.append(out_row)

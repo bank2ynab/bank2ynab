@@ -33,8 +33,7 @@ class TestJLP_Card_UKPlugin(TestCase):
         self.assertEqual(records[4][4], "80.99")
     
     def test_read_data_no_plugin(self):
-        """ Test that the right number of rows are read, but without using
-            the specific plugin. """
+        """ Test that the right number of rows are read, but without plugin. """
         (section_name, num_records, fpath) = (
             "test_jlp_card",
             11,

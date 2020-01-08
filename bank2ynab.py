@@ -236,6 +236,7 @@ def fix_conf_params(conf_obj, section_name):
         "header_rows": ["Header Rows", False, ""],
         "footer_rows": ["Footer Rows", False, ""],
         "date_format": ["Date Format", False, ""],
+        "discard_invalid_dates": ["Discard Invalid Dates", True, ""],
         "delete_original": ["Delete Source File", True, ""],
         "cd_flags": ["Inflow or Outflow Indicator", False, ","],
         "payee_to_memo": ["Use Payee for Memo", True, ""],
@@ -537,13 +538,19 @@ class B2YBank(object):
         return row
 
     def _valid_row(self, row):
-        """ if our row doesn't have an inflow or outflow, mark as invalid
+        """ if our row doesn't have an inflow, outflow or a valid date,
+        mark as invalid
         :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
         if row[inflow_index] == "" and row[outflow_index] == "":
             return False
+        # check that date matches YYYY-MM-DD format
+        if self.config["discard_invalid_dates"]:
+            date_index = self.config["output_columns"].index("Date")
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row[date_index]):
+                return False
         return True
 
     def _auto_memo(self, row, fill_memo):

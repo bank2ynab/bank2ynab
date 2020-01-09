@@ -46,8 +46,7 @@ class Test_YNAB_API(TestCase):
 
     def test_run(self):  # todo
         """
-        def run(self, transaction_data):
-        if(self.api_token is not None):
+        if self.api_token is not None:
             logging.info("Connecting to YNAB API...")
 
             # check for API token auth (and other errors)
@@ -55,15 +54,16 @@ class Test_YNAB_API(TestCase):
             if error_code[0] == "ERROR":
                 return error_code
             else:
-                # if no default budget, build budget list and select default
-                if self.budget_id is None:
-                    msg = "No default budget set! \nPick a budget"
-                    budget_ids = self.list_budgets()
-                    self.budget_id = option_selection(budget_ids, msg)
+                # generate our list of budgets
+                budget_ids = self.list_budgets()
+                # if there's only one budget, silently set a default budget
+                if len(budget_ids) == 1:
+                    self.budget_id = budget_ids[0]
 
-                transactions = self.process_transactions(transaction_data)
-                if transactions["transactions"] != []:
-                    self.post_transactions(transactions)
+                budget_t_data = self.process_transactions(transaction_data)
+                for budget in budget_ids:
+                    if budget_t_data[budget]["transactions"] != []:
+                        self.post_transactions(budget_t_data[budget])
         else:
             logging.info("No API-token provided.")
         """

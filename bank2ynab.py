@@ -170,6 +170,48 @@ def get_configs():
     config.read(conf_files, encoding="utf-8")
     return config
 
+# classes dealing with input and output charsets
+class EncodingFileContext(object):
+    """ ContextManager class for common operations on files"""
+
+    def __init__(self, file_path, **kwds):
+        self.file_path = os.path.abspath(file_path)
+        self.stream = None
+        self.csv_object = None
+        self.params = kwds
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # cleanup
+        del self.csv_object
+        if self.stream is not None:
+            self.stream.close()
+        if exc_type is not None:
+            # this signals not to suppress any exception
+            return False
+
+
+class EncodingCsvReader(EncodingFileContext):
+    """ context manager returning a csv.Reader-compatible object"""
+
+    def __enter__(self):
+        encoding = detect_encoding(self.file_path)
+        self.stream = open(self.file_path, encoding=encoding)
+        self.csv_object = csv.reader(self.stream, **self.params)
+        return self.csv_object
+
+
+class EncodingCsvWriter(EncodingFileContext):
+    """ context manager returning a csv.Writer-compatible object
+    regardless of Python version"""
+
+    def __enter__(self):
+        self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
+        self.csv_object = csv.writer(self.stream, **self.params)
+        return self.csv_object
+        
 
 def fix_conf_params(conf_obj, section_name):
     """ from a ConfigParser object, return a dictionary of all parameters
@@ -399,10 +441,10 @@ class B2YBank(object):
         self._preprocess_file(file_path)
 
         # get total number of rows in transaction file using a generator
-        with csv.reader(file_path, delimiter=delim) as row_count_reader:
+        with EncodingCsvReader(file_path, delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        with csv.reader(file_path, delimiter=delim) as transaction_reader:
+        with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 line = transaction_reader.line_num
@@ -575,7 +617,7 @@ class B2YBank(object):
             counter += 1
         target_filename = join(target_dir, new_filename)
         logging.info("Writing output file: {}".format(target_filename))
-        with csv.writer(target_filename) as writer:
+        with EncodingCsvWriter(target_filename) as writer:
             for row in data:
                 writer.writerow(row)
         return target_filename

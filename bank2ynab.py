@@ -801,22 +801,21 @@ class YNAB_API(object):  # in progress (2)
         else:
             logging.info("No API-token provided.")
 
-    def api_read(self, budget, kwd):
+    def api_read(self, budget_id, kwd):
         """
         General function for reading data from YNAB API
         :param  budget: boolean indicating if there's a default budget
         :param  kwd: keyword for data type, e.g. transactions
         :return error_codes: if it fails we return our error
         """
-        id = self.budget_id
         api_t = self.api_token
         base_url = "https://api.youneedabudget.com/v1/budgets/"
 
-        if budget is False:
+        if budget is None:
             # only happens when we're looking for the list of budgets
             url = base_url + "?access_token={}".format(api_t)
         else:
-            url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
+            url = base_url + "{}/{}?access_token={}".format(budget_id, kwd, api_t)
 
         response = requests.get(url)
         try:
@@ -920,8 +919,8 @@ class YNAB_API(object):  # in progress (2)
         else:
             logging.debug("no transactions found")
 
-    def list_accounts(self):
-        accounts = self.api_read(True, "accounts")
+    def list_accounts(self, budget_id):
+        accounts = self.api_read(budget_id, "accounts")
         if accounts[0] == "ERROR":
             return accounts
 
@@ -939,7 +938,7 @@ class YNAB_API(object):  # in progress (2)
         return account_ids
 
     def list_budgets(self):
-        budgets = self.api_read(False, "budgets")
+        budgets = self.api_read(None, "budgets")
         if budgets[0] == "ERROR":
             return budgets
 
@@ -1021,13 +1020,13 @@ class YNAB_API(object):  # in progress (2)
         except configparser.DuplicateSectionError:
             pass
         self.user_config.set(
-            bank, "YNAB Account ID", "{}||{}".format(self.budget_id, account_id)
+            bank, "YNAB Account ID", "{}||{}".format(budget_id, account_id)
         )
 
         logging.info("Saving default account for {}...".format(bank))
         with open(self.user_config_path, "w", encoding="utf-8") as config_file:
             self.user_config.write(config_file)
-
+            
 
 # Let's run this thing!
 if __name__ == "__main__":

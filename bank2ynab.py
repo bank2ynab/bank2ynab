@@ -170,6 +170,7 @@ def get_configs():
     config.read(conf_files, encoding="utf-8")
     return config
 
+
 # classes dealing with input and output charsets
 class EncodingFileContext(object):
     """ ContextManager class for common operations on files"""
@@ -211,7 +212,7 @@ class EncodingCsvWriter(EncodingFileContext):
         self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
         self.csv_object = csv.writer(self.stream, **self.params)
         return self.csv_object
-        
+
 
 def fix_conf_params(conf_obj, section_name):
     """ from a ConfigParser object, return a dictionary of all parameters
@@ -444,7 +445,9 @@ class B2YBank(object):
         with EncodingCsvReader(file_path, delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
+        with EncodingCsvReader(
+            file_path, delimiter=delim
+        ) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 line = transaction_reader.line_num

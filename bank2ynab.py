@@ -789,15 +789,15 @@ class YNAB_API(object):  # in progress (2)
             if error_code[0] == "ERROR":
                 return error_code
             else:
-                # if no default budget, build budget list and select default
-                if self.budget_id is None:
-                    msg = "No default budget set! \nPick a budget"
-                    budget_ids = self.list_budgets()
-                    self.budget_id = option_selection(budget_ids, msg)
 
                 transactions = self.process_transactions(transaction_data)
                 if transactions["transactions"] != []:
                     self.post_transactions(transactions)
+                # generate our list of budgets
+                budget_ids = self.list_budgets()
+                # if there's only one budget, silently set a default budget
+                if len(budget_ids) == 1:
+                    self.budget_id = budget_ids[0]
         else:
             logging.info("No API-token provided.")
 

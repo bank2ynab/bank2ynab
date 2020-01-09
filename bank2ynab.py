@@ -994,21 +994,32 @@ class YNAB_API(object):  # in progress (2)
             config_line = get_config_line(
                 self.config, bank, ["YNAB Account ID", False, "||"]
             )
-            # make sure the budget ID matches
-            if config_line[0] == self.budget_id:
-                account_id = config_line[1]
-                logging.info("Previously-saved account for {} found.".format(bank))
-            else:
-                raise configparser.NoSectionError(bank)
+            budget_id = config_line[0]
+            account_id = config_line[1]
+            logging.info("Previously-saved account for {} found.".format(bank))
         except configparser.NoSectionError:
             logging.info("No user configuration for {} found.".format(bank))
+        
         if account_id == "":
-            account_ids = self.list_accounts()  # create list of account_ids
-            msg = "Pick a YNAB account for transactions from {}".format(bank)
+            instruction = "No YNAB {} for transactions from {} set!\n Pick {}"
+            # if no default budget, build budget list and select budget
+            if self.budget_id is None:
+                # msg = "No YNAB budget for {} set! \nPick a budget".format(bank)
+                msg = instruction.format("budget", bank, "a budget")
+                budget_ids = self.list_budgets()
+                budget_id = option_selection(budget_ids, msg)
+            else:
+                budget_id = self.budget_id
+            
+            # build account list and select account
+            account_ids = self.list_accounts(budget_id)
+            # msg = "Pick a YNAB account for transactions from {}".format(bank)
+            msg = instruction.format("account", bank, "an account")
             account_id = option_selection(account_ids, msg)
             # save account selection for bank
-            self.save_account_selection(bank, account_id)
-        return account_id
+            self.save_account_selection(bank, budget_id, account_id)
+        return budget_id, account_id
+        
 
     def save_account_selection(self, bank, budget_id, account_id):
         """

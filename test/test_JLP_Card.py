@@ -6,13 +6,11 @@ from bank2ynab import fix_conf_params
 from plugins.JLP_Card_UK import JLP_Card_UKPlugin
 from test.utils import get_test_confparser
 
-_PY2 = False
 
 
 class TestJLP_Card_UKPlugin(TestCase):
     def setUp(self):
-        global _PY2
-        self.cp, self.py2, = get_test_confparser()
+        self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None
 
@@ -29,7 +27,7 @@ class TestJLP_Card_UKPlugin(TestCase):
         )
 
         config = fix_conf_params(self.cp, section_name)
-        b = JLP_Card_UKPlugin(config, self.py2)
+        b = JLP_Card_UKPlugin(config)
         records = b.read_data(join("test-data", fpath))
         self.assertEqual(len(records), num_records)
         self.assertEqual(records[10][5], "1100.00")

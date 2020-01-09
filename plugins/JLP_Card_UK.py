@@ -1,13 +1,13 @@
 # Plugin to work with John Lewis Partnership Card [UK]
 
-from bank2ynab import B2YBank, CrossversionCsvReader
+from bank2ynab import B2YBank
 import re
 import datetime
-
+import csv
 
 class JLP_Card_UKPlugin(B2YBank):
-    def __init__(self, config_object, is_py2):
-        super(JLP_Card_UKPlugin, self).__init__(config_object, is_py2)
+    def __init__(self, config_object):
+        super(JLP_Card_UKPlugin, self).__init__(config_object)
         self.name = "JLP_Card_UK"
 
     def read_data(self, file_path):
@@ -17,7 +17,9 @@ class JLP_Card_UKPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as reader:
+        with csv.reader(
+            file_path, delimiter=delim
+        ) as reader:
             for index, row in enumerate(reader):
                 # skip first row if headers
                 if index == 0 and header_rows != 0:
@@ -31,9 +33,9 @@ class JLP_Card_UKPlugin(B2YBank):
                 YNAB's date format is "DD/MM/YYYY".
                 This bank's date format is "DD-MON-YYYY".
                 """
-                tmp["Date"] = datetime.datetime.strptime(row[0], "%d-%b-%Y").strftime(
-                    "%d/%m/%Y"
-                )
+                tmp["Date"] = datetime.datetime.strptime(
+                    row[0], "%d-%b-%Y"
+                ).strftime("%d/%m/%Y")
                 # PAYEE STUFF:
                 tmp["Payee"] = row[1]
                 # CATEGORY STUFF:
@@ -58,5 +60,5 @@ class JLP_Card_UKPlugin(B2YBank):
         return output_data
 
 
-def build_bank(config, is_py2):
-    return JLP_Card_UKPlugin(config, is_py2)
+def build_bank(config):
+    return JLP_Card_UKPlugin(config)

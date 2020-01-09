@@ -789,15 +789,16 @@ class YNAB_API(object):  # in progress (2)
             if error_code[0] == "ERROR":
                 return error_code
             else:
-
-                transactions = self.process_transactions(transaction_data)
-                if transactions["transactions"] != []:
-                    self.post_transactions(transactions)
                 # generate our list of budgets
                 budget_ids = self.list_budgets()
                 # if there's only one budget, silently set a default budget
                 if len(budget_ids) == 1:
                     self.budget_id = budget_ids[0]
+
+                budget_t_data = self.process_transactions(transaction_data)
+                for budget in budget_ids:
+                    if budget_t_data[budget]["transactions"] != []:
+                        self.post_transactions(budget_t_data[budget])
         else:
             logging.info("No API-token provided.")
 
@@ -828,21 +829,24 @@ class YNAB_API(object):  # in progress (2)
     def process_transactions(self, transaction_data):
         """
         :param transaction_data: dictionary of bank names to transaction lists
+        :param transactions: list of individual transaction dictionaries
+        :return budget_t_data: dictionary of budget_ids ready-to-post transaction data
         """
         logging.info("Processing transactions...")
         # go through each bank's data
-        transactions = []
+        budget_t_data = {}
+        budget_transactions = []
         for bank in transaction_data:
-            # choose what account to write this bank's transactions to
-            account_id = self.select_account(bank)
-            # save transaction data for each bank in main dict
+            # what budget and account to write this bank's transactions to
+            budget_id, account_id = self.select_account(bank)
+            # save transaction data for each bank in main list
             account_transactions = transaction_data[bank]
+            budget_transactions = budget_t_data[budget_id]["transactions"]
             for t in account_transactions[1:]:
-                trans_dict = self.create_transaction(account_id, t, transactions)
-                transactions.append(trans_dict)
-        # compile our data to post
-        data = {"transactions": transactions}
-        return data
+                trans_dict = self.create_transaction(account_id, t, budget_transactions)
+                budget_transactions.append(trans_dict)
+            budget_t_data[budget_id]["transactions"] = budget_transactions
+        return budget_t_data
 
     def create_transaction(self, account_id, this_trans, transactions):
         date = this_trans[0]

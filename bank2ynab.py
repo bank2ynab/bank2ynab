@@ -39,6 +39,48 @@ try:
 except NameError:
     FileNotFoundError = OSError
 
+# classes dealing with input and output charsets
+class EncodingFileContext(object):
+    """ ContextManager class for common operations on files"""
+
+    def __init__(self, file_path, **kwds):
+        self.file_path = os.path.abspath(file_path)
+        self.stream = None
+        self.csv_object = None
+        self.params = kwds
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # cleanup
+        del self.csv_object
+        if self.stream is not None:
+            self.stream.close()
+        if exc_type is not None:
+            # this signals not to suppress any exception
+            return False
+
+
+class EncodingCsvReader(EncodingFileContext):
+    """ context manager returning a csv.Reader-compatible object"""
+
+    def __enter__(self):
+        encoding = detect_encoding(self.file_path)
+        self.stream = open(self.file_path, encoding=encoding)
+        self.csv_object = csv.reader(self.stream, **self.params)
+        return self.csv_object
+
+
+class EncodingCsvWriter(EncodingFileContext):
+    """ context manager returning a csv.Writer-compatible object
+    regardless of Python version"""
+
+    def __enter__(self):
+        self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
+        self.csv_object = csv.writer(self.stream, **self.params)
+        return self.csv_object
+
 
 def detect_encoding(filepath):
     """
@@ -169,49 +211,6 @@ def get_configs():
     config = configparser.RawConfigParser()
     config.read(conf_files, encoding="utf-8")
     return config
-
-
-# classes dealing with input and output charsets
-class EncodingFileContext(object):
-    """ ContextManager class for common operations on files"""
-
-    def __init__(self, file_path, **kwds):
-        self.file_path = os.path.abspath(file_path)
-        self.stream = None
-        self.csv_object = None
-        self.params = kwds
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # cleanup
-        del self.csv_object
-        if self.stream is not None:
-            self.stream.close()
-        if exc_type is not None:
-            # this signals not to suppress any exception
-            return False
-
-
-class EncodingCsvReader(EncodingFileContext):
-    """ context manager returning a csv.Reader-compatible object"""
-
-    def __enter__(self):
-        encoding = detect_encoding(self.file_path)
-        self.stream = open(self.file_path, encoding=encoding)
-        self.csv_object = csv.reader(self.stream, **self.params)
-        return self.csv_object
-
-
-class EncodingCsvWriter(EncodingFileContext):
-    """ context manager returning a csv.Writer-compatible object
-    regardless of Python version"""
-
-    def __enter__(self):
-        self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
-        self.csv_object = csv.writer(self.stream, **self.params)
-        return self.csv_object
 
 
 def fix_conf_params(conf_obj, section_name):

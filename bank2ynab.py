@@ -812,7 +812,7 @@ class YNAB_API(object):  # in progress (2)
         api_t = self.api_token
         base_url = "https://api.youneedabudget.com/v1/budgets/"
 
-        if budget is None:
+        if budget_id is None:
             # only happens when we're looking for the list of budgets
             url = base_url + "?access_token={}".format(api_t)
         else:

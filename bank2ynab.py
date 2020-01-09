@@ -1010,7 +1010,7 @@ class YNAB_API(object):  # in progress (2)
             self.save_account_selection(bank, account_id)
         return account_id
 
-    def save_account_selection(self, bank, account_id):
+    def save_account_selection(self, bank, budget_id, account_id):
         """
         saves YNAB account to use for each bank
         """

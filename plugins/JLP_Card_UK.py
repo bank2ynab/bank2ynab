@@ -1,6 +1,6 @@
 # Plugin to work with John Lewis Partnership Card [UK]
 
-from bank2ynab import B2YBank
+from bank2ynab import B2YBank, EncodingCsvReader
 import re
 import datetime
 import csv
@@ -18,7 +18,7 @@ class JLP_Card_UKPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with csv.reader(file_path, delimiter=delim) as reader:
+        with EncodingCsvReader(file_path, delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 # skip first row if headers
                 if index == 0 and header_rows != 0:

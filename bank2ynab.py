@@ -458,6 +458,8 @@ class B2YBank(object):
                     fixed_row = self._fix_row(row)
                     # convert negative inflows to standard outflows
                     fixed_row = self._fix_outflow(fixed_row)
+                    # convert positive outflows to standard inflows
+                    fixed_row = self._fix_inflow(fixed_row)
                     # fill in blank memo fields
                     fixed_row = self._auto_memo(fixed_row, fill_memo)
                     # convert decimal point
@@ -520,6 +522,20 @@ class B2YBank(object):
         if inflow.startswith("-"):
             row[inflow_index] = ""
             row[outflow_index] = inflow[1:]
+        return row
+
+    def _fix_inflow(self, row):
+        """
+        convert positive outflow into inflow
+        :param row: list of values
+        :return: list of values with corrected outflow column
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        outflow = row[outflow_index]
+        if outflow.startswith("+"):
+            row[outflow_index] = ""
+            row[inflow_index] = outflow[1:]
         return row
 
     def _fix_decimal_point(self, row):

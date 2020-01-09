@@ -1003,7 +1003,7 @@ class YNAB_API(object):  # in progress (2)
             logging.info("Previously-saved account for {} found.".format(bank))
         except configparser.NoSectionError:
             logging.info("No user configuration for {} found.".format(bank))
-        
+
         if account_id == "":
             instruction = "No YNAB {} for transactions from {} set!\n Pick {}"
             # if no default budget, build budget list and select budget
@@ -1014,7 +1014,7 @@ class YNAB_API(object):  # in progress (2)
                 budget_id = option_selection(budget_ids, msg)
             else:
                 budget_id = self.budget_id
-            
+
             # build account list and select account
             account_ids = self.list_accounts(budget_id)
             # msg = "Pick a YNAB account for transactions from {}".format(bank)
@@ -1023,7 +1023,6 @@ class YNAB_API(object):  # in progress (2)
             # save account selection for bank
             self.save_account_selection(bank, budget_id, account_id)
         return budget_id, account_id
-        
 
     def save_account_selection(self, bank, budget_id, account_id):
         """
@@ -1041,7 +1040,7 @@ class YNAB_API(object):  # in progress (2)
         logging.info("Saving default account for {}...".format(bank))
         with open(self.user_config_path, "w", encoding="utf-8") as config_file:
             self.user_config.write(config_file)
-            
+
 
 # Let's run this thing!
 if __name__ == "__main__":

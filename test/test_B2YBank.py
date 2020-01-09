@@ -169,6 +169,27 @@ class TestB2YBank(TestCase):
             is_valid = b._valid_row(row)
             self.assertEqual(is_valid, row_validity)
 
+    def test_clean_monetary_values(self):
+        """ Test cleaning of outflow and inflow of unneeded characters """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config, self.py2)
+
+        for row, expected_row in [
+            (
+                ["28.09.2017", "Payee", "", "", "+ £300.01", ""],
+                ["28.09.2017", "Payee", "", "", "300.01", ""],
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "- $300"],
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
+        ]:
+            result_row = b._clean_monetary_values(row)
+            if self.py2:
+                self.assertItemsEqual(expected_row, result_row)
+            else:
+                self.assertCountEqual(expected_row, result_row)
+
     def test_auto_memo(self):
         """ Test auto-filling empty memo field with payee data """
         config = fix_conf_params(self.cp, "test_row_format_default")

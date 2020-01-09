@@ -462,6 +462,8 @@ class B2YBank(object):
                     fixed_row = self._auto_memo(fixed_row, fill_memo)
                     # convert decimal point
                     fixed_row = self._fix_decimal_point(fixed_row)
+                    # remove extra characters in the inflow and outflow
+                    fixed_row = self._clean_monetary_values(fixed_row)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
@@ -534,6 +536,19 @@ class B2YBank(object):
         row[inflow_index] = inflow.replace(".", "", dot_count)
         dot_count = outflow.count(".") - 1
         row[outflow_index] = outflow.replace(".", "", dot_count)
+
+        return row
+
+    def _clean_monetary_values(self, row):
+        """
+        remove any characters from inflow or outflow strings except
+        digits and '.'
+        :param row: list of values
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        row[inflow_index] = re.sub(r"[^\d\.]", "", row[inflow_index])
+        row[outflow_index] = re.sub(r"[^\d\.]", "", row[outflow_index])
 
         return row
 

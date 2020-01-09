@@ -7,8 +7,6 @@ from shutil import copyfile
 from bank2ynab import YNAB_API
 import configparser
 
-_PY2 = False
-
 
 class Test_YNAB_API(TestCase):
     def setUp(self):

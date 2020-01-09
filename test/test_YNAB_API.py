@@ -12,10 +12,9 @@ _PY2 = False
 
 class Test_YNAB_API(TestCase):
     def setUp(self):
-        global _PY2
         self.TESTCONFPATH = join("test-data", "test.conf")
         self.TEMPCONFPATH = join("test-data", "temp-test.conf")
-        self.cp, self.py2, = get_test_confparser()
+        self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.test_class = None
         # copy config file to temp location

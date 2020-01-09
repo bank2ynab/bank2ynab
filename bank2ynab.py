@@ -770,7 +770,6 @@ class YNAB_API(object):  # in progress (2)
 
     def __init__(self, config_object, transactions=None):
         self.transactions = []
-        self.account_ids = []
         self.budget_id = None
         self.config = get_configs()
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")

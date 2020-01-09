@@ -7,7 +7,6 @@ from plugins.JLP_Card_UK import JLP_Card_UKPlugin
 from test.utils import get_test_confparser
 
 
-
 class TestJLP_Card_UKPlugin(TestCase):
     def setUp(self):
         self.cp = get_test_confparser()

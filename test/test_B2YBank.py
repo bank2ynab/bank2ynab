@@ -138,7 +138,6 @@ class TestB2YBank(TestCase):
                 ]:
                     result_row = output_data[row]
 
-                    
                     self.assertCountEqual(expected_row, result_row)
 
     def test_valid_row(self):

@@ -5,6 +5,7 @@ import re
 import datetime
 import csv
 
+
 class JLP_Card_UKPlugin(B2YBank):
     def __init__(self, config_object):
         super(JLP_Card_UKPlugin, self).__init__(config_object)
@@ -17,9 +18,7 @@ class JLP_Card_UKPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with csv.reader(
-            file_path, delimiter=delim
-        ) as reader:
+        with csv.reader(file_path, delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 # skip first row if headers
                 if index == 0 and header_rows != 0:

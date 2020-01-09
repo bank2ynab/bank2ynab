@@ -6,6 +6,7 @@ TESTCONFPATH = join("test-data", "test.conf")
 
 def get_test_confparser():
     import configparser
+
     cp = configparser.RawConfigParser()
     # first read prod to get all defaults
     cp.read([PRODPATH])

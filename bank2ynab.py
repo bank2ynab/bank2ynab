@@ -399,15 +399,10 @@ class B2YBank(object):
         self._preprocess_file(file_path)
 
         # get total number of rows in transaction file using a generator
-        with csv.reader(
-            file_path, delimiter=delim
-        ) as row_count_reader:
+        with csv.reader(file_path, delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        
-        with csv.reader(
-            file_path, delimiter=delim
-        ) as transaction_reader:
+        with csv.reader(file_path, delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 line = transaction_reader.line_num

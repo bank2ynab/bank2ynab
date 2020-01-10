@@ -116,7 +116,7 @@ class TestB2YBank(TestCase):
                     (
                         23,
                         [
-                            "28.09.2017",
+                            "2017-09-28",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
                             "",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
@@ -127,7 +127,7 @@ class TestB2YBank(TestCase):
                     (
                         24,
                         [
-                            "28.09.2017",
+                            "2017-09-28",
                             "SOFTWARE Wien",
                             "",
                             "SOFTWARE Wien",

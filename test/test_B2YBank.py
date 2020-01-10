@@ -9,16 +9,13 @@ from bank2ynab import B2YBank, fix_conf_params, build_bank
 from plugins.null import NullBank
 from test.utils import get_test_confparser
 
-_PY2 = False
-
 
 class TestB2YBank(TestCase):
 
     TESTCONFPATH = join("test-data", "test.conf")
 
     def setUp(self):
-        global _PY2
-        self.cp, self.py2, = get_test_confparser()
+        self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None
 
@@ -27,7 +24,7 @@ class TestB2YBank(TestCase):
 
     def test_init_and_name(self):
         """ Check parameters are correctly stored in the object."""
-        self.b = B2YBank(self.defaults, self.py2)
+        self.b = B2YBank(self.defaults)
         cfe = copy(self.defaults)
         self.assertEqual(self.b.config, cfe)
         self.assertEqual("DEFAULT", self.b.name)
@@ -44,7 +41,7 @@ class TestB2YBank(TestCase):
         ]:
 
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
+            b = B2YBank(config)
             files = b.get_files()
             self.assertEqual(len(files), num_files)
             # hack config to make sure we can deal with absolute paths too
@@ -61,7 +58,7 @@ class TestB2YBank(TestCase):
             ("test_delimiter_tab", 74, "test_delimiter_tab.csv"),
         ]:
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
+            b = B2YBank(config)
             records = b.read_data(join("test-data", fpath))
             self.assertEqual(len(records), num_records)
 
@@ -79,7 +76,7 @@ class TestB2YBank(TestCase):
             ("test_record_headers", 74, "fixed_test_headers.csv"),
         ]:
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
+            b = B2YBank(config)
             for f in b.get_files():
                 output_data = b.read_data(f)
                 self.assertEqual(len(output_data), num_records)
@@ -111,7 +108,7 @@ class TestB2YBank(TestCase):
             "test_row_format_invalid",
         ]:
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
+            b = B2YBank(config)
             for f in b.get_files():
                 output_data = b.read_data(f)
                 # test the same two rows in each scenario
@@ -141,15 +138,12 @@ class TestB2YBank(TestCase):
                 ]:
                     result_row = output_data[row]
 
-                    if self.py2:
-                        self.assertItemsEqual(expected_row, result_row)
-                    else:
-                        self.assertCountEqual(expected_row, result_row)
+                    self.assertCountEqual(expected_row, result_row)
 
     def test_valid_row(self):
         """ Test making sure row has an outflow or an inflow """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
 
         for row, row_validity in [
             (["28.09.2017", "Payee", "", "", "300", ""], True),
@@ -162,7 +156,7 @@ class TestB2YBank(TestCase):
     def test_auto_memo(self):
         """ Test auto-filling empty memo field with payee data """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
         memo_index = b.config["output_columns"].index("Memo")
 
         for row, test_memo, fill_memo in [
@@ -177,7 +171,7 @@ class TestB2YBank(TestCase):
     def test_fix_outflow(self):
         """ Test conversion of negative Inflow into Outflow """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
 
         for row, expected_row in [
             (
@@ -194,10 +188,7 @@ class TestB2YBank(TestCase):
             ),
         ]:
             result_row = b._fix_outflow(row)
-            if self.py2:
-                self.assertItemsEqual(expected_row, result_row)
-            else:
-                self.assertCountEqual(expected_row, result_row)
+            self.assertCountEqual(expected_row, result_row)
 
     """
     def test_fix_date(self):

@@ -6,13 +6,11 @@ from bank2ynab import B2YBank
 class OCBC_Bank_SG(B2YBank):
     """ Example subclass used for testing the plugin system."""
 
-    def __init__(self, config_object, is_py2):
+    def __init__(self, config_object):
         """
         :param config_object: a dictionary of conf parameters
-        :param is_py2: boolean indicating if we're running under
-                        Python 2.x
         """
-        super(OCBC_Bank_SG, self).__init__(config_object, is_py2)
+        super(OCBC_Bank_SG, self).__init__(config_object)
         self.name = "OCBC_Bank_SG"
 
     def _preprocess_file(self, file_path):
@@ -53,13 +51,12 @@ class OCBC_Bank_SG(B2YBank):
         return
 
 
-def build_bank(config, is_py2):
+def build_bank(config):
     """ This factory function is called from the main program,
     and expected to return a B2YBank subclass.
     Without this, the module will fail to load properly.
 
     :param config: dict containing all available configuration parameters
-    :param is_py2: boolean indicating whether we are running under Python 2.x
     :return: a B2YBank subclass instance
     """
-    return OCBC_Bank_SG(config, is_py2)
+    return OCBC_Bank_SG(config)

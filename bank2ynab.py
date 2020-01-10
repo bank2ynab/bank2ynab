@@ -775,7 +775,9 @@ class YNAB_API(object):  # in progress (2)
             # only happens when we're looking for the list of budgets
             url = base_url + "?access_token={}".format(api_t)
         else:
-            url = base_url + "{}/{}?access_token={}".format(budget_id, kwd, api_t)
+            url = base_url + "{}/{}?access_token={}".format(
+                budget_id, kwd, api_t
+            )
 
         response = requests.get(url)
         try:
@@ -802,7 +804,9 @@ class YNAB_API(object):  # in progress (2)
             account_transactions = transaction_data[bank]
             budget_transactions = budget_t_data[budget_id]["transactions"]
             for t in account_transactions[1:]:
-                trans_dict = self.create_transaction(account_id, t, budget_transactions)
+                trans_dict = self.create_transaction(
+                    account_id, t, budget_transactions
+                )
                 budget_transactions.append(trans_dict)
             budget_t_data[budget_id]["transactions"] = budget_transactions
         return budget_t_data

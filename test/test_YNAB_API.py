@@ -197,7 +197,9 @@ class Test_YNAB_API(TestCase):
             transactions.append(test_transaction)
 
             for key in test_transaction:
-                self.assertEqual(target_transaction[key], test_transaction[key])
+                self.assertEqual(
+                    target_transaction[key], test_transaction[key]
+                )
 
     def test_create_import_id(self):
         test_class = YNAB_API(self.cp)

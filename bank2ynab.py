@@ -329,12 +329,16 @@ def int_input(min, max, msg):
     """
     while True:
         try:
-            user_input = int(input("{} (range {} - {}): ".format(msg, min, max)))
+            user_input = int(
+                input("{} (range {} - {}): ".format(msg, min, max))
+            )
             if user_input not in range(min, max + 1):
                 raise ValueError
             break
         except ValueError:
-            logging.info("This integer is not in the acceptable range, try again!")
+            logging.info(
+                "This integer is not in the acceptable range, try again!"
+            )
     return user_input
 
 
@@ -440,7 +444,9 @@ class B2YBank(object):
         with EncodingCsvReader(file_path, delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
+        with EncodingCsvReader(
+            file_path, delimiter=delim
+        ) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 line = transaction_reader.line_num
@@ -457,10 +463,14 @@ class B2YBank(object):
                     fixed_row = self._fix_row(row)
                     # convert negative inflows to standard outflows
                     fixed_row = self._fix_outflow(fixed_row)
+                    # convert positive outflows to standard inflows
+                    fixed_row = self._fix_inflow(fixed_row)
                     # fill in blank memo fields
                     fixed_row = self._auto_memo(fixed_row, fill_memo)
                     # convert decimal point
                     fixed_row = self._fix_decimal_point(fixed_row)
+                    # remove extra characters in the inflow and outflow
+                    fixed_row = self._clean_monetary_values(fixed_row)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
@@ -519,6 +529,20 @@ class B2YBank(object):
             row[outflow_index] = inflow[1:]
         return row
 
+    def _fix_inflow(self, row):
+        """
+        convert positive outflow into inflow
+        :param row: list of values
+        :return: list of values with corrected outflow column
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        outflow = row[outflow_index]
+        if outflow.startswith("+"):
+            row[outflow_index] = ""
+            row[inflow_index] = outflow[1:]
+        return row
+
     def _fix_decimal_point(self, row):
         """
         convert , to . in inflow and outflow strings
@@ -536,13 +560,31 @@ class B2YBank(object):
 
         return row
 
+    def _clean_monetary_values(self, row):
+        """
+        remove any characters from inflow or outflow strings except
+        digits and '.'
+        :param row: list of values
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        row[inflow_index] = re.sub(r"[^\d\.]", "", row[inflow_index])
+        row[outflow_index] = re.sub(r"[^\d\.]", "", row[outflow_index])
+
+        return row
+
     def _valid_row(self, row):
-        """ if our row doesn't have an inflow or outflow, mark as invalid
+        """ if our row doesn't have an inflow, outflow or a valid date,
+        mark as invalid
         :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
         if row[inflow_index] == "" and row[outflow_index] == "":
+            return False
+        # check that date matches YYYY-MM-DD format
+        date_index = self.config["output_columns"].index("Date")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row[date_index]):
             return False
         return True
 
@@ -602,7 +644,9 @@ class B2YBank(object):
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
-        new_filename = "{}{}.csv".format(self.config["fixed_prefix"], target_fname)
+        new_filename = "{}{}.csv".format(
+            self.config["fixed_prefix"], target_fname
+        )
         while os.path.isfile(new_filename):
             counter = 1
             new_filename = "{}{}_{}.csv".format(
@@ -659,7 +703,9 @@ class Bank2Ynab(object):
             bank_name = bank.name
             for src_file in files:
                 logging.info(
-                    "\nParsing input file:  {} (format: {})".format(src_file, bank_name)
+                    "\nParsing input file:  {} (format: {})".format(
+                        src_file, bank_name
+                    )
                 )
                 # increment for the summary:
                 files_processed += 1
@@ -711,7 +757,7 @@ class YNAB_API(object):  # in progress (2)
                 budget_t_data = self.process_transactions(transaction_data)
                 for budget in budget_ids:
                     if budget_t_data[budget]["transactions"] != []:
-                        self.post_transactions(budget_t_data[budget])
+                        self.post_transactions(budget, budget_t_data[budget])
         else:
             logging.info("No API-token provided.")
 
@@ -808,12 +854,14 @@ class YNAB_API(object):  # in progress (2)
                 pass
         return "YNAB:{}:{}:{}".format(amount, date, count)
 
-    def post_transactions(self, data):
+    def post_transactions(self, budget_id, data):
         # send our data to API
         logging.info("Uploading transactions to YNAB...")
         url = (
             "https://api.youneedabudget.com/v1/budgets/"
-            + "{}/transactions?access_token={}".format(self.budget_id, self.api_token)
+            + "{}/transactions?access_token={}".format(
+                budget_id, self.api_token
+            )
         )
 
         post_response = requests.post(url, json=data)

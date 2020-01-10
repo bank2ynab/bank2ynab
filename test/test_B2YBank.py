@@ -116,7 +116,7 @@ class TestB2YBank(TestCase):
                     (
                         23,
                         [
-                            "28.09.2017",
+                            "2017-09-28",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
                             "",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
@@ -127,7 +127,7 @@ class TestB2YBank(TestCase):
                     (
                         24,
                         [
-                            "28.09.2017",
+                            "2017-09-28",
                             "SOFTWARE Wien",
                             "",
                             "SOFTWARE Wien",
@@ -146,12 +146,33 @@ class TestB2YBank(TestCase):
         b = B2YBank(config)
 
         for row, row_validity in [
-            (["28.09.2017", "Payee", "", "", "300", ""], True),
-            (["28.09.2017", "Payee", "", "", "", "400"], True),
+            (["Pending", "Payee", "", "", "300", ""], False),
+            (["28.09.2017", "Payee", "", "", "", "400"], False),
             (["28.09.2017", "Payee", "", "", "", ""], False),
+            (["2017-09-28", "Payee", "", "", "300", ""], True),
+            (["2017-09-28", "Payee", "", "", "", "400"], True),
+            (["2017-09-28", "Payee", "", "", "", ""], False),
         ]:
             is_valid = b._valid_row(row)
             self.assertEqual(is_valid, row_validity)
+
+    def test_clean_monetary_values(self):
+        """ Test cleaning of outflow and inflow of unneeded characters """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config)
+
+        for row, expected_row in [
+            (
+                ["28.09.2017", "Payee", "", "", "+ £300.01", ""],
+                ["28.09.2017", "Payee", "", "", "300.01", ""],
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "- $300"],
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
+        ]:
+            result_row = b._clean_monetary_values(row)
+            self.assertCountEqual(expected_row, result_row)
 
     def test_auto_memo(self):
         """ Test auto-filling empty memo field with payee data """
@@ -188,6 +209,28 @@ class TestB2YBank(TestCase):
             ),
         ]:
             result_row = b._fix_outflow(row)
+            self.assertCountEqual(expected_row, result_row)
+
+    def test_fix_inflow(self):
+        """ Test conversion of positive Outflow into Inflow """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config)
+
+        for row, expected_row in [
+            (
+                ["28.09.2017", "Payee", "", "", "300", ""],
+                ["28.09.2017", "Payee", "", "", "300", ""],
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "+300", ""],
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "300"],
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
+        ]:
+            result_row = b._fix_inflow(row)
             self.assertCountEqual(expected_row, result_row)
 
     """

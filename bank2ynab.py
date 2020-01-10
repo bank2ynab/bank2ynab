@@ -39,6 +39,7 @@ try:
 except NameError:
     FileNotFoundError = OSError
 
+
 # classes dealing with input and output charsets
 class EncodingFileContext(object):
     """ ContextManager class for common operations on files"""

@@ -146,20 +146,7 @@ class TestB2YBank(TestCase):
         b = B2YBank(config)
 
         for row, row_validity in [
-            (["28.09.2017", "Payee", "", "", "300", ""], True),
-            (["28.09.2017", "Payee", "", "", "", "400"], True),
-            (["28.09.2017", "Payee", "", "", "", ""], False),
-        ]:
-            is_valid = b._valid_row(row)
-            self.assertEqual(is_valid, row_validity)
-
-    def test_valid_row_dates(self):
-        """ Test making sure row has valid dates as well as inflow/outflow """
-        config = fix_conf_params(self.cp, "test_row_format_invalid_dates")
-        b = B2YBank(config, self.py2)
-
-        for row, row_validity in [
-            (["28.09.2017", "Payee", "", "", "300", ""], False),
+            (["Pending", "Payee", "", "", "300", ""], False),
             (["28.09.2017", "Payee", "", "", "", "400"], False),
             (["28.09.2017", "Payee", "", "", "", ""], False),
             (["2017-09-28", "Payee", "", "", "300", ""], True),
@@ -172,7 +159,7 @@ class TestB2YBank(TestCase):
     def test_clean_monetary_values(self):
         """ Test cleaning of outflow and inflow of unneeded characters """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
 
         for row, expected_row in [
             (
@@ -185,10 +172,7 @@ class TestB2YBank(TestCase):
             ),
         ]:
             result_row = b._clean_monetary_values(row)
-            if self.py2:
-                self.assertItemsEqual(expected_row, result_row)
-            else:
-                self.assertCountEqual(expected_row, result_row)
+            self.assertCountEqual(expected_row, result_row)
 
     def test_auto_memo(self):
         """ Test auto-filling empty memo field with payee data """
@@ -230,7 +214,7 @@ class TestB2YBank(TestCase):
     def test_fix_inflow(self):
         """ Test conversion of positive Outflow into Inflow """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
 
         for row, expected_row in [
             (
@@ -247,10 +231,7 @@ class TestB2YBank(TestCase):
             ),
         ]:
             result_row = b._fix_inflow(row)
-            if self.py2:
-                self.assertItemsEqual(expected_row, result_row)
-            else:
-                self.assertCountEqual(expected_row, result_row)
+            self.assertCountEqual(expected_row, result_row)
 
     """
     def test_fix_date(self):

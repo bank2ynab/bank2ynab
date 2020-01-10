@@ -24,7 +24,7 @@ class TestJLP_Card_UK(TestCase):
         )
 
         config = fix_conf_params(self.cp, section_name)
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
         records = b.read_data(join("test-data", fpath))
         self.assertEqual(len(records), num_records)
         self.assertEqual(records[10][5], "1100.00")

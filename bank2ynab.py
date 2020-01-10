@@ -457,10 +457,14 @@ class B2YBank(object):
                     fixed_row = self._fix_row(row)
                     # convert negative inflows to standard outflows
                     fixed_row = self._fix_outflow(fixed_row)
+                    # convert positive outflows to standard inflows
+                    fixed_row = self._fix_inflow(fixed_row)
                     # fill in blank memo fields
                     fixed_row = self._auto_memo(fixed_row, fill_memo)
                     # convert decimal point
                     fixed_row = self._fix_decimal_point(fixed_row)
+                    # remove extra characters in the inflow and outflow
+                    fixed_row = self._clean_monetary_values(fixed_row)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
@@ -519,6 +523,20 @@ class B2YBank(object):
             row[outflow_index] = inflow[1:]
         return row
 
+    def _fix_inflow(self, row):
+        """
+        convert positive outflow into inflow
+        :param row: list of values
+        :return: list of values with corrected outflow column
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        outflow = row[outflow_index]
+        if outflow.startswith("+"):
+            row[outflow_index] = ""
+            row[inflow_index] = outflow[1:]
+        return row
+
     def _fix_decimal_point(self, row):
         """
         convert , to . in inflow and outflow strings
@@ -536,13 +554,31 @@ class B2YBank(object):
 
         return row
 
+    def _clean_monetary_values(self, row):
+        """
+        remove any characters from inflow or outflow strings except
+        digits and '.'
+        :param row: list of values
+        """
+        inflow_index = self.config["output_columns"].index("Inflow")
+        outflow_index = self.config["output_columns"].index("Outflow")
+        row[inflow_index] = re.sub(r"[^\d\.]", "", row[inflow_index])
+        row[outflow_index] = re.sub(r"[^\d\.]", "", row[outflow_index])
+
+        return row
+
     def _valid_row(self, row):
-        """ if our row doesn't have an inflow or outflow, mark as invalid
+        """ if our row doesn't have an inflow, outflow or a valid date,
+        mark as invalid
         :param row: list of values
         """
         inflow_index = self.config["output_columns"].index("Inflow")
         outflow_index = self.config["output_columns"].index("Outflow")
         if row[inflow_index] == "" and row[outflow_index] == "":
+            return False
+        # check that date matches YYYY-MM-DD format
+        date_index = self.config["output_columns"].index("Date")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row[date_index]):
             return False
         return True
 

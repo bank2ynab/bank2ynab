@@ -24,6 +24,7 @@ import importlib
 import re
 from datetime import datetime
 import logging
+import configparser
 
 # API testing stuff
 import requests
@@ -32,32 +33,21 @@ import json
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
-# main Python2 switch
-# any module with different naming should be handled here
-__PY2 = False
-try:
-    import configparser
-except ImportError:
-    __PY2 = True
-    import ConfigParser as configparser
-    import cStringIO
+
 try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = OSError
 
-
-# classes dealing with input and output charsets across python versions
-# (well, really just for py2...)
-class CrossversionFileContext(object):
+# classes dealing with input and output charsets
+class EncodingFileContext(object):
     """ ContextManager class for common operations on files"""
 
-    def __init__(self, file_path, is_py2, **kwds):
+    def __init__(self, file_path, **kwds):
         self.file_path = os.path.abspath(file_path)
         self.stream = None
         self.csv_object = None
         self.params = kwds
-        self.is_py2 = is_py2
 
     def __enter__(self):
         pass
@@ -72,36 +62,23 @@ class CrossversionFileContext(object):
             return False
 
 
-class CrossversionCsvReader(CrossversionFileContext):
-    """ context manager returning a csv.Reader-compatible object
-    regardless of Python version"""
+class EncodingCsvReader(EncodingFileContext):
+    """ context manager returning a csv.Reader-compatible object"""
 
     def __enter__(self):
         encoding = detect_encoding(self.file_path)
-        if self.is_py2:
-            self.stream = open(self.file_path, "rb")
-            self.csv_object = UnicodeReader(
-                self.stream, encoding=encoding, **self.params
-            )
-        else:
-            self.stream = open(self.file_path, encoding=encoding)
-            self.csv_object = csv.reader(self.stream, **self.params)
+        self.stream = open(self.file_path, encoding=encoding)
+        self.csv_object = csv.reader(self.stream, **self.params)
         return self.csv_object
 
 
-class CrossversionCsvWriter(CrossversionFileContext):
+class EncodingCsvWriter(EncodingFileContext):
     """ context manager returning a csv.Writer-compatible object
     regardless of Python version"""
 
     def __enter__(self):
-        if self.is_py2:
-            self.stream = open(self.file_path, "wb")
-            self.csv_object = UnicodeWriter(
-                self.stream, encoding="utf-8", **self.params
-            )
-        else:
-            self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
-            self.csv_object = csv.writer(self.stream, **self.params)
+        self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
+        self.csv_object = csv.writer(self.stream, **self.params)
         return self.csv_object
 
 
@@ -110,8 +87,7 @@ def detect_encoding(filepath):
     Utility to detect file encoding. This is imperfect, but
     should work for the most common cases.
     :param filepath: string path to a given file
-    :return: encoding alias that can be used with open()in py3
-    or codecs.open in py2
+    :return: encoding alias that can be used with open()
     """
     # because some encodings will happily encode anything even if wrong,
     # keeping the most common near the top should make it more likely that
@@ -226,59 +202,6 @@ def detect_encoding(filepath):
     return result
 
 
-# utilities to be used only by py2
-# see https://docs.python.org/2/library/csv.html#examples for explanation
-class UTF8Recoder:
-    def __init__(self, f, encoding):
-        self.reader = codecs.getreader(encoding)(f)
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        return self.reader.next().encode("utf-8")
-
-
-class UnicodeReader:
-    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
-        f = UTF8Recoder(f, encoding)
-        self.reader = csv.reader(f, dialect=dialect, **kwds)
-
-    def next(self):
-        row = self.reader.next()
-        return [unicode(s, "utf-8") for s in row]  # noqa
-
-    def __iter__(self):
-        return self
-
-    @property
-    def line_num(self):
-        return self.reader.line_num
-
-
-class UnicodeWriter:
-    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
-        self.queue = cStringIO.StringIO()
-        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
-        self.stream = f
-        self.encoder = codecs.getincrementalencoder(encoding)()
-
-    def writerow(self, row):
-        self.writer.writerow([s.encode("utf-8") for s in row])
-        data = self.queue.getvalue().decode("utf-8")
-        data = self.encoder.encode(data)
-        self.stream.write(data)
-        self.queue.truncate(0)
-
-    def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)
-
-
-# -- end of py2 utilities
-# -- end of charset-handling classes
-
-
 # Generic utilities
 def get_configs():
     """ Retrieve all configuration parameters."""
@@ -286,10 +209,7 @@ def get_configs():
     if not os.path.exists(conf_files[0]):
         logging.error("Configuration file not found: {}".format(conf_files[0]))
     config = configparser.RawConfigParser()
-    if __PY2:
-        config.read(conf_files)
-    else:
-        config.read(conf_files, encoding="utf-8")
+    config.read(conf_files, encoding="utf-8")
     return config
 
 
@@ -445,14 +365,12 @@ class B2YBank(object):
     This can be subclassed to handle formats requiring special handling,
     overriding any of get_files(), read_data() or write_data()."""
 
-    def __init__(self, config_object, is_py2=False):
+    def __init__(self, config_object):
         """
         :param config_object: dict containing config parameters
-        :param is_py2: flag signalling we are running under python 2
         """
         self.name = config_object.get("bank_name", "DEFAULT")
         self.config = config_object
-        self._is_py2 = is_py2
 
     def get_files(self):
         """ find the transaction file
@@ -519,14 +437,10 @@ class B2YBank(object):
         self._preprocess_file(file_path)
 
         # get total number of rows in transaction file using a generator
-        with CrossversionCsvReader(
-            file_path, self._is_py2, delimiter=delim
-        ) as row_count_reader:
+        with EncodingCsvReader(file_path, delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        with CrossversionCsvReader(
-            file_path, self._is_py2, delimiter=delim
-        ) as transaction_reader:
+        with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
             for row in transaction_reader:
                 line = transaction_reader.line_num
@@ -697,7 +611,7 @@ class B2YBank(object):
             counter += 1
         target_filename = join(target_dir, new_filename)
         logging.info("Writing output file: {}".format(target_filename))
-        with CrossversionCsvWriter(target_filename, self._is_py2) as writer:
+        with EncodingCsvWriter(target_filename) as writer:
             for row in data:
                 writer.writerow(row)
         return target_filename
@@ -712,21 +626,20 @@ def build_bank(bank_config):
             s = (
                 "The specified plugin {}.py".format(plugin_module)
                 + "does not contain the required "
-                "build_bank(config, is_py2) method."
+                "build_bank(config) method."
             )
             raise ImportError(s)
-        bank = p_mod.build_bank(bank_config, __PY2)
+        bank = p_mod.build_bank(bank_config)
         return bank
     else:
-        return B2YBank(bank_config, __PY2)
+        return B2YBank(bank_config)
 
 
 class Bank2Ynab(object):
     """ Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
 
-    def __init__(self, config_object, is_py2=False):
-        self._is_py2 = is_py2
+    def __init__(self, config_object):
         self.banks = []
         self.transaction_data = {}
 
@@ -1044,7 +957,7 @@ class YNAB_API(object):  # in progress (2)
 
 # Let's run this thing!
 if __name__ == "__main__":
-    b2y = Bank2Ynab(get_configs(), __PY2)
+    b2y = Bank2Ynab(get_configs())
     b2y.run()
     api = YNAB_API(get_configs())
     api.run(b2y.transaction_data)

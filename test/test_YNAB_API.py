@@ -197,9 +197,7 @@ class Test_YNAB_API(TestCase):
             transactions.append(test_transaction)
 
             for key in test_transaction:
-                self.assertEqual(
-                    target_transaction[key], test_transaction[key]
-                )
+                self.assertEqual(target_transaction[key], test_transaction[key])
 
     def test_create_import_id(self):
         test_class = YNAB_API(self.cp)
@@ -438,6 +436,4 @@ class Test_YNAB_API(TestCase):
         config.read(test_class.user_config_path)
         for test_bank in test_banks:
             test_id = config.get(test_bank, "YNAB Account ID")
-            self.assertEqual(
-                test_id, "{}||{}".format(test_budget_id, test_account_id)
-            )
+            self.assertEqual(test_id, "{}||{}".format(test_budget_id, test_account_id))

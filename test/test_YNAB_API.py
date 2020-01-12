@@ -278,12 +278,12 @@ class Test_YNAB_API(TestCase):
 
     def test_post_transactions(self):  # todo
         """
-        def post_transactions(self, data):
+        def post_transactions(self, budget_id, data):
             # send our data to API
             logging.info("Uploading transactions to YNAB...")
             url = ("https://api.youneedabudget.com/v1/budgets/" +
                    "{}/transactions?access_token={}".format(
-                       self.budget_id,
+                       budget_id,
                        self.api_token))
 
             post_response = requests.post(url, json=data)

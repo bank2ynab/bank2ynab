@@ -140,6 +140,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL Bunq checking
 1. NL bunqDesktop software
 1. NL ING Bank
+1. NL ING Bank checking 2020 format
 1. NL Rabobank (2017 format)
 1. NL Rabobank (2018 format)
 1. NO DNB

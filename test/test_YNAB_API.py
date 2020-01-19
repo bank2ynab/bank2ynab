@@ -7,15 +7,12 @@ from shutil import copyfile
 from bank2ynab import YNAB_API
 import configparser
 
-_PY2 = False
-
 
 class Test_YNAB_API(TestCase):
     def setUp(self):
-        global _PY2
         self.TESTCONFPATH = join("test-data", "test.conf")
         self.TEMPCONFPATH = join("test-data", "temp-test.conf")
-        self.cp, self.py2, = get_test_confparser()
+        self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.test_class = None
         # copy config file to temp location
@@ -200,7 +197,9 @@ class Test_YNAB_API(TestCase):
             transactions.append(test_transaction)
 
             for key in test_transaction:
-                self.assertEqual(target_transaction[key], test_transaction[key])
+                self.assertEqual(
+                    target_transaction[key], test_transaction[key]
+                )
 
     def test_create_import_id(self):
         test_class = YNAB_API(self.cp)

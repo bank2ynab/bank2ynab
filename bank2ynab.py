@@ -445,7 +445,7 @@ class B2YBank(object):
             # make each row of our new transaction file
             for line, row in enumerate(transaction_reader):
                 # skip header & footer rows
-                if header_rows < line <= (row_count - footer_rows):
+                if header_rows <= line <= (row_count - footer_rows):
                     # skip blank rows
                     if len(row) == 0:
                         continue

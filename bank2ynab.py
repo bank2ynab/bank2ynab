@@ -25,6 +25,7 @@ import re
 from datetime import datetime
 import logging
 import configparser
+import chardet
 
 # API testing stuff
 import requests
@@ -90,6 +91,17 @@ def detect_encoding(filepath):
     :param filepath: string path to a given file
     :return: encoding alias that can be used with open()
     """
+    # First try to guess the encoding with chardet. Take it if the
+    # confidence is >50% (randomly chosen)
+    with open(filepath, 'rb') as f:
+        file_content = f.read()
+        rslt = chardet.detect(file_content)
+        confidence, encoding = rslt['confidence'], rslt['encoding']
+        if confidence > 0.5:
+            logging.info("Using encoding {} with confidence {}".format(encoding, confidence))
+            return encoding
+        
+
     # because some encodings will happily encode anything even if wrong,
     # keeping the most common near the top should make it more likely that
     # we're doing the right thing.

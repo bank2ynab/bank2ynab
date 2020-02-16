@@ -443,10 +443,9 @@ class B2YBank(object):
 
         with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
-            for row in transaction_reader:
-                line = transaction_reader.line_num
+            for line, row in enumerate(transaction_reader):
                 # skip header & footer rows
-                if header_rows < line <= (row_count - footer_rows):
+                if header_rows <= line <= (row_count - footer_rows):
                     # skip blank rows
                     if len(row) == 0:
                         continue

@@ -3,7 +3,7 @@
 -->
 # bank2ynab
 
-A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
+This project consolidates other conversion efforts into one universal tool that easily converts and imports your bank's statements into YNAB.
 
 Development:
 [![GitHub issues by-label](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab/bug.svg)](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)

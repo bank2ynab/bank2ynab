@@ -1,4 +1,4 @@
-on: [pull_request]
+on: [push]
 name: Python Style Check
 jobs:
   run-linters:

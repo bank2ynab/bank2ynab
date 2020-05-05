@@ -715,13 +715,17 @@ class Bank2Ynab(object):
                 files_processed += 1
                 # create cleaned csv for each file
                 output = bank.read_data(src_file)
-                bank.write_data(src_file, output)
-                # save transaction data for each bank to object
-                self.transaction_data[bank_name] = output
-                # delete original csv file
-                if bank.config["delete_original"] is True:
-                    logging.info("Removing input file: {}".format(src_file))
-                    os.remove(src_file)
+                if output != []:
+                    bank.write_data(src_file, output)
+                    # save transaction data for each bank to object
+                    self.transaction_data[bank_name] = output
+                    # delete original csv file
+                    if bank.config["delete_original"] is True:
+                        logging.info("Removing input file: {}".format(src_file))
+                        os.remove(src_file)
+                else: 
+                    logging.info("No output data from this file for this bank.")
+
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 

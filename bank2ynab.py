@@ -93,14 +93,17 @@ def detect_encoding(filepath):
     """
     # First try to guess the encoding with chardet. Take it if the
     # confidence is >50% (randomly chosen)
-    with open(filepath, 'rb') as f:
+    with open(filepath, "rb") as f:
         file_content = f.read()
         rslt = chardet.detect(file_content)
-        confidence, encoding = rslt['confidence'], rslt['encoding']
+        confidence, encoding = rslt["confidence"], rslt["encoding"]
         if confidence > 0.5:
-            logging.info("Using encoding {} with confidence {}".format(encoding, confidence))
+            logging.info(
+                "Using encoding {} with confidence {}".format(
+                    encoding, confidence
+                )
+            )
             return encoding
-        
 
     # because some encodings will happily encode anything even if wrong,
     # keeping the most common near the top should make it more likely that
@@ -342,12 +345,16 @@ def int_input(min, max, msg):
     """
     while True:
         try:
-            user_input = int(input("{} (range {} - {}): ".format(msg, min, max)))
+            user_input = int(
+                input("{} (range {} - {}): ".format(msg, min, max))
+            )
             if user_input not in range(min, max + 1):
                 raise ValueError
             break
         except ValueError:
-            logging.info("This integer is not in the acceptable range, try again!")
+            logging.info(
+                "This integer is not in the acceptable range, try again!"
+            )
     return user_input
 
 
@@ -453,7 +460,9 @@ class B2YBank(object):
         with EncodingCsvReader(file_path, delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
+        with EncodingCsvReader(
+            file_path, delimiter=delim
+        ) as transaction_reader:
             # make each row of our new transaction file
             for line, row in enumerate(transaction_reader):
                 # skip header & footer rows
@@ -481,8 +490,10 @@ class B2YBank(object):
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
         # add in column headers
-        logging.info("Parsed {} lines".format(len(output_data)))
-        output_data.insert(0, output_columns)
+        line_count = len(output_data)
+        logging.info("Parsed {} lines".format(line_count))
+        if line_count > 0:
+            output_data.insert(0, output_columns)
         return output_data
 
     def _preprocess_file(self, file_path):
@@ -650,7 +661,9 @@ class B2YBank(object):
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
-        new_filename = "{}{}.csv".format(self.config["fixed_prefix"], target_fname)
+        new_filename = "{}{}.csv".format(
+            self.config["fixed_prefix"], target_fname
+        )
         while os.path.isfile(new_filename):
             counter = 1
             new_filename = "{}{}_{}.csv".format(
@@ -707,19 +720,29 @@ class Bank2Ynab(object):
             bank_name = bank.name
             for src_file in files:
                 logging.info(
-                    "\nParsing input file:  {} (format: {})".format(src_file, bank_name)
+                    "\nParsing input file:  {} (format: {})".format(
+                        src_file, bank_name
+                    )
                 )
                 # increment for the summary:
                 files_processed += 1
                 # create cleaned csv for each file
                 output = bank.read_data(src_file)
-                bank.write_data(src_file, output)
-                # save transaction data for each bank to object
-                self.transaction_data[bank_name] = output
-                # delete original csv file
-                if bank.config["delete_original"] is True:
-                    logging.info("Removing input file: {}".format(src_file))
-                    os.remove(src_file)
+                if output != []:
+                    bank.write_data(src_file, output)
+                    # save transaction data for each bank to object
+                    self.transaction_data[bank_name] = output
+                    # delete original csv file
+                    if bank.config["delete_original"] is True:
+                        logging.info(
+                            "Removing input file: {}".format(src_file)
+                        )
+                        os.remove(src_file)
+                else:
+                    logging.info(
+                        "No output data from this file for this bank."
+                    )
+
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 
@@ -801,7 +824,9 @@ class YNAB_API(object):  # in progress (2)
             # save transaction data for each bank in main dict
             account_transactions = transaction_data[bank]
             for t in account_transactions[1:]:
-                trans_dict = self.create_transaction(account_id, t, transactions)
+                trans_dict = self.create_transaction(
+                    account_id, t, transactions
+                )
                 transactions.append(trans_dict)
         # compile our data to post
         data = {"transactions": transactions}
@@ -859,7 +884,9 @@ class YNAB_API(object):  # in progress (2)
         logging.info("Uploading transactions to YNAB...")
         url = (
             "https://api.youneedabudget.com/v1/budgets/"
-            + "{}/transactions?access_token={}".format(self.budget_id, self.api_token)
+            + "{}/transactions?access_token={}".format(
+                self.budget_id, self.api_token
+            )
         )
 
         post_response = requests.post(url, json=data)
@@ -960,7 +987,9 @@ class YNAB_API(object):  # in progress (2)
             # make sure the budget ID matches
             if config_line[0] == self.budget_id:
                 account_id = config_line[1]
-                logging.info("Previously-saved account for {} found.".format(bank))
+                logging.info(
+                    "Previously-saved account for {} found.".format(bank)
+                )
             else:
                 raise configparser.NoSectionError(bank)
         except configparser.NoSectionError:
@@ -983,7 +1012,9 @@ class YNAB_API(object):  # in progress (2)
         except configparser.DuplicateSectionError:
             pass
         self.user_config.set(
-            bank, "YNAB Account ID", "{}||{}".format(self.budget_id, account_id),
+            bank,
+            "YNAB Account ID",
+            "{}||{}".format(self.budget_id, account_id),
         )
 
         logging.info("Saving default account for {}...".format(bank))

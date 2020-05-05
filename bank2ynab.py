@@ -481,8 +481,10 @@ class B2YBank(object):
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
         # add in column headers
-        logging.info("Parsed {} lines".format(len(output_data)))
-        output_data.insert(0, output_columns)
+        line_count = len(output_data)
+        logging.info("Parsed {} lines".format(line_count))
+        if line_count > 0:
+            output_data.insert(0, output_columns)
         return output_data
 
     def _preprocess_file(self, file_path):

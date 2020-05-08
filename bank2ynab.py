@@ -25,6 +25,7 @@ import re
 from datetime import datetime
 import logging
 import configparser
+import chardet
 
 # API testing stuff
 import requests
@@ -38,6 +39,7 @@ try:
     FileNotFoundError
 except NameError:
     FileNotFoundError = OSError
+
 
 # classes dealing with input and output charsets
 class EncodingFileContext(object):
@@ -89,6 +91,20 @@ def detect_encoding(filepath):
     :param filepath: string path to a given file
     :return: encoding alias that can be used with open()
     """
+    # First try to guess the encoding with chardet. Take it if the
+    # confidence is >50% (randomly chosen)
+    with open(filepath, "rb") as f:
+        file_content = f.read()
+        rslt = chardet.detect(file_content)
+        confidence, encoding = rslt["confidence"], rslt["encoding"]
+        if confidence > 0.5:
+            logging.info(
+                "Using encoding {} with confidence {}".format(
+                    encoding, confidence
+                )
+            )
+            return encoding
+
     # because some encodings will happily encode anything even if wrong,
     # keeping the most common near the top should make it more likely that
     # we're doing the right thing.
@@ -442,10 +458,9 @@ class B2YBank(object):
 
         with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
             # make each row of our new transaction file
-            for row in transaction_reader:
-                line = transaction_reader.line_num
+            for line, row in enumerate(transaction_reader):
                 # skip header & footer rows
-                if header_rows < line <= (row_count - footer_rows):
+                if header_rows <= line <= (row_count - footer_rows):
                     # skip blank rows
                     if len(row) == 0:
                         continue
@@ -469,8 +484,10 @@ class B2YBank(object):
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
         # add in column headers
-        logging.info("Parsed {} lines".format(len(output_data)))
-        output_data.insert(0, output_columns)
+        line_count = len(output_data)
+        logging.info("Parsed {} lines".format(line_count))
+        if line_count > 0:
+            output_data.insert(0, output_columns)
         return output_data
 
     def _preprocess_file(self, file_path):
@@ -701,13 +718,21 @@ class Bank2Ynab(object):
                 files_processed += 1
                 # create cleaned csv for each file
                 output = bank.read_data(src_file)
-                bank.write_data(src_file, output)
-                # save transaction data for each bank to object
-                self.transaction_data[bank_name] = output
-                # delete original csv file
-                if bank.config["delete_original"] is True:
-                    logging.info("Removing input file: {}".format(src_file))
-                    os.remove(src_file)
+                if output != []:
+                    bank.write_data(src_file, output)
+                    # save transaction data for each bank to object
+                    self.transaction_data[bank_name] = output
+                    # delete original csv file
+                    if bank.config["delete_original"] is True:
+                        logging.info(
+                            "Removing input file: {}".format(src_file)
+                        )
+                        os.remove(src_file)
+                else:
+                    logging.info(
+                        "No output data from this file for this bank."
+                    )
+
         logging.info("\nDone! {} files processed.\n".format(files_processed))
 
 

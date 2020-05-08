@@ -3,7 +3,7 @@
 -->
 # bank2ynab
 
-A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
+This project consolidates other conversion efforts into one universal tool that easily converts and imports your bank's statements into YNAB.
 
 Development:
 [![GitHub issues by-label](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab/bug.svg)](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
@@ -132,6 +132,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DK Nordea
 1. DK Sparkassen Thy
 1. HU Erste Bank checking
+1. HU OTP
 1. IE AIB Ireland
 1. IE Bank of Ireland
 1. IE N26
@@ -140,6 +141,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL Bunq checking
 1. NL bunqDesktop software
 1. NL ING Bank
+1. NL ING Bank checking 2020 format
 1. NL Rabobank (2017 format)
 1. NL Rabobank (2018 format)
 1. NO DNB

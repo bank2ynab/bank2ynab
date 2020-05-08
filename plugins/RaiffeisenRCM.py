@@ -15,7 +15,7 @@ class RaiffeisenRCMPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with CrossversionCsvReader(file_path, delimiter=delim) as reader:
+        with EncodingCsvReader(file_path, delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 tmp = {}
 

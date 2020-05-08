@@ -754,7 +754,6 @@ class YNAB_API(object):  # in progress (2)
 
     def __init__(self, config_object, transactions=None):
         self.transactions = []
-        self.account_ids = []
         self.budget_id = None
         self.config = get_configs()
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
@@ -774,34 +773,36 @@ class YNAB_API(object):  # in progress (2)
             if error_code[0] == "ERROR":
                 return error_code
             else:
-                # if no default budget, build budget list and select default
-                if self.budget_id is None:
-                    msg = "No default budget set! \nPick a budget"
-                    budget_ids = self.list_budgets()
-                    self.budget_id = option_selection(budget_ids, msg)
+                # generate our list of budgets
+                budget_ids = self.list_budgets()
+                # if there's only one budget, silently set a default budget
+                if len(budget_ids) == 1:
+                    self.budget_id = budget_ids[0]
 
-                transactions = self.process_transactions(transaction_data)
-                if transactions["transactions"] != []:
-                    self.post_transactions(transactions)
+                budget_t_data = self.process_transactions(transaction_data)
+                for budget in budget_ids:
+                    if budget_t_data[budget]["transactions"] != []:
+                        self.post_transactions(budget, budget_t_data[budget])
         else:
             logging.info("No API-token provided.")
 
-    def api_read(self, budget, kwd):
+    def api_read(self, budget_id, kwd):
         """
         General function for reading data from YNAB API
         :param  budget: boolean indicating if there's a default budget
         :param  kwd: keyword for data type, e.g. transactions
         :return error_codes: if it fails we return our error
         """
-        id = self.budget_id
         api_t = self.api_token
         base_url = "https://api.youneedabudget.com/v1/budgets/"
 
-        if budget is False:
+        if budget_id is None:
             # only happens when we're looking for the list of budgets
             url = base_url + "?access_token={}".format(api_t)
         else:
-            url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
+            url = base_url + "{}/{}?access_token={}".format(
+                budget_id, kwd, api_t
+            )
 
         response = requests.get(url)
         try:
@@ -814,23 +815,26 @@ class YNAB_API(object):  # in progress (2)
     def process_transactions(self, transaction_data):
         """
         :param transaction_data: dictionary of bank names to transaction lists
+        :param transactions: list of individual transaction dictionaries
+        :return budget_t_data: dictionary of budget_ids ready-to-post transaction data
         """
         logging.info("Processing transactions...")
         # go through each bank's data
-        transactions = []
+        budget_t_data = {}
+        budget_transactions = []
         for bank in transaction_data:
-            # choose what account to write this bank's transactions to
-            account_id = self.select_account(bank)
-            # save transaction data for each bank in main dict
+            # what budget and account to write this bank's transactions to
+            budget_id, account_id = self.select_account(bank)
+            # save transaction data for each bank in main list
             account_transactions = transaction_data[bank]
+            budget_transactions = budget_t_data[budget_id]["transactions"]
             for t in account_transactions[1:]:
                 trans_dict = self.create_transaction(
-                    account_id, t, transactions
+                    account_id, t, budget_transactions
                 )
-                transactions.append(trans_dict)
-        # compile our data to post
-        data = {"transactions": transactions}
-        return data
+                budget_transactions.append(trans_dict)
+            budget_t_data[budget_id]["transactions"] = budget_transactions
+        return budget_t_data
 
     def create_transaction(self, account_id, this_trans, transactions):
         date = this_trans[0]
@@ -879,13 +883,13 @@ class YNAB_API(object):  # in progress (2)
                 pass
         return "YNAB:{}:{}:{}".format(amount, date, count)
 
-    def post_transactions(self, data):
+    def post_transactions(self, budget_id, data):
         # send our data to API
         logging.info("Uploading transactions to YNAB...")
         url = (
             "https://api.youneedabudget.com/v1/budgets/"
             + "{}/transactions?access_token={}".format(
-                self.budget_id, self.api_token
+                budget_id, self.api_token
             )
         )
 
@@ -909,8 +913,8 @@ class YNAB_API(object):  # in progress (2)
         else:
             logging.debug("no transactions found")
 
-    def list_accounts(self):
-        accounts = self.api_read(True, "accounts")
+    def list_accounts(self, budget_id):
+        accounts = self.api_read(budget_id, "accounts")
         if accounts[0] == "ERROR":
             return accounts
 
@@ -928,7 +932,7 @@ class YNAB_API(object):  # in progress (2)
         return account_ids
 
     def list_budgets(self):
-        budgets = self.api_read(False, "budgets")
+        budgets = self.api_read(None, "budgets")
         if budgets[0] == "ERROR":
             return budgets
 
@@ -984,25 +988,33 @@ class YNAB_API(object):  # in progress (2)
             config_line = get_config_line(
                 self.config, bank, ["YNAB Account ID", False, "||"]
             )
-            # make sure the budget ID matches
-            if config_line[0] == self.budget_id:
-                account_id = config_line[1]
-                logging.info(
-                    "Previously-saved account for {} found.".format(bank)
-                )
-            else:
-                raise configparser.NoSectionError(bank)
+            budget_id = config_line[0]
+            account_id = config_line[1]
+            logging.info("Previously-saved account for {} found.".format(bank))
         except configparser.NoSectionError:
             logging.info("No user configuration for {} found.".format(bank))
+
         if account_id == "":
-            account_ids = self.list_accounts()  # create list of account_ids
-            msg = "Pick a YNAB account for transactions from {}".format(bank)
+            instruction = "No YNAB {} for transactions from {} set!\n Pick {}"
+            # if no default budget, build budget list and select budget
+            if self.budget_id is None:
+                # msg = "No YNAB budget for {} set! \nPick a budget".format(bank)
+                msg = instruction.format("budget", bank, "a budget")
+                budget_ids = self.list_budgets()
+                budget_id = option_selection(budget_ids, msg)
+            else:
+                budget_id = self.budget_id
+
+            # build account list and select account
+            account_ids = self.list_accounts(budget_id)
+            # msg = "Pick a YNAB account for transactions from {}".format(bank)
+            msg = instruction.format("account", bank, "an account")
             account_id = option_selection(account_ids, msg)
             # save account selection for bank
-            self.save_account_selection(bank, account_id)
-        return account_id
+            self.save_account_selection(bank, budget_id, account_id)
+        return budget_id, account_id
 
-    def save_account_selection(self, bank, account_id):
+    def save_account_selection(self, bank, budget_id, account_id):
         """
         saves YNAB account to use for each bank
         """
@@ -1012,9 +1024,7 @@ class YNAB_API(object):  # in progress (2)
         except configparser.DuplicateSectionError:
             pass
         self.user_config.set(
-            bank,
-            "YNAB Account ID",
-            "{}||{}".format(self.budget_id, account_id),
+            bank, "YNAB Account ID", "{}||{}".format(budget_id, account_id)
         )
 
         logging.info("Saving default account for {}...".format(bank))

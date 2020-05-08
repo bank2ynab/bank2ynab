@@ -101,7 +101,7 @@ For details, please see our [issue list labeled "Bug"](https://github.com/bank2y
 ## <a name="formats"></a>List of Supported Banks
 
 Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
-
+<!--AUTO BANK UPDATE START-->
 1. AT easybank credit card
 1. AT Raiffeisen Bank 2018 checking
 1. AT Raiffeisen Bank 2019 checking
@@ -172,7 +172,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. (software) Mint
 1. (software) Neteller
 1. (software) Personal Capital
-
+<!--AUTO BANK UPDATE END-->
 ----
 
 [![XKCD on standards: Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.](https://imgs.xkcd.com/comics/standards.png)](https://xkcd.com/927/)

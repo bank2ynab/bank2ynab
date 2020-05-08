@@ -345,12 +345,16 @@ def int_input(min, max, msg):
     """
     while True:
         try:
-            user_input = int(input("{} (range {} - {}): ".format(msg, min, max)))
+            user_input = int(
+                input("{} (range {} - {}): ".format(msg, min, max))
+            )
             if user_input not in range(min, max + 1):
                 raise ValueError
             break
         except ValueError:
-            logging.info("This integer is not in the acceptable range, try again!")
+            logging.info(
+                "This integer is not in the acceptable range, try again!"
+            )
     return user_input
 
 
@@ -456,7 +460,9 @@ class B2YBank(object):
         with EncodingCsvReader(file_path, delimiter=delim) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
-        with EncodingCsvReader(file_path, delimiter=delim) as transaction_reader:
+        with EncodingCsvReader(
+            file_path, delimiter=delim
+        ) as transaction_reader:
             # make each row of our new transaction file
             for line, row in enumerate(transaction_reader):
                 # skip header & footer rows
@@ -655,7 +661,9 @@ class B2YBank(object):
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
-        new_filename = "{}{}.csv".format(self.config["fixed_prefix"], target_fname)
+        new_filename = "{}{}.csv".format(
+            self.config["fixed_prefix"], target_fname
+        )
         while os.path.isfile(new_filename):
             counter = 1
             new_filename = "{}{}_{}.csv".format(
@@ -712,7 +720,9 @@ class Bank2Ynab(object):
             bank_name = bank.name
             for src_file in files:
                 logging.info(
-                    "\nParsing input file:  {} (format: {})".format(src_file, bank_name)
+                    "\nParsing input file:  {} (format: {})".format(
+                        src_file, bank_name
+                    )
                 )
                 # increment for the summary:
                 files_processed += 1
@@ -790,7 +800,9 @@ class YNAB_API(object):  # in progress (2)
             # only happens when we're looking for the list of budgets
             url = base_url + "?access_token={}".format(api_t)
         else:
-            url = base_url + "{}/{}?access_token={}".format(budget_id, kwd, api_t)
+            url = base_url + "{}/{}?access_token={}".format(
+                budget_id, kwd, api_t
+            )
 
         response = requests.get(url)
         try:
@@ -817,7 +829,9 @@ class YNAB_API(object):  # in progress (2)
             account_transactions = transaction_data[bank]
             budget_transactions = budget_t_data[budget_id]["transactions"]
             for t in account_transactions[1:]:
-                trans_dict = self.create_transaction(account_id, t, budget_transactions)
+                trans_dict = self.create_transaction(
+                    account_id, t, budget_transactions
+                )
                 budget_transactions.append(trans_dict)
             budget_t_data[budget_id]["transactions"] = budget_transactions
         return budget_t_data
@@ -874,7 +888,9 @@ class YNAB_API(object):  # in progress (2)
         logging.info("Uploading transactions to YNAB...")
         url = (
             "https://api.youneedabudget.com/v1/budgets/"
-            + "{}/transactions?access_token={}".format(budget_id, self.api_token)
+            + "{}/transactions?access_token={}".format(
+                budget_id, self.api_token
+            )
         )
 
         post_response = requests.post(url, json=data)

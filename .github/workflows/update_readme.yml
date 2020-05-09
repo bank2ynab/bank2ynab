@@ -14,6 +14,6 @@ jobs:
           with:
             python-version: 3.8
               
-        - name: Update bank list
+        - name: Update README.md
           id: update_readme
           uses: bank2ynab/bank2ynab-update-readme@master

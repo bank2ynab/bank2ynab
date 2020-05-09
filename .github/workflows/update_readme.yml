@@ -1,5 +1,6 @@
 on: [push]
 
+name: Update README
 jobs:
   update_readme:
     runs-on: ubuntu-latest

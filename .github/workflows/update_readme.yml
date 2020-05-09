@@ -18,13 +18,9 @@ jobs:
           id: update_readme
           uses: bank2ynab/bank2ynab-update-readme@master
           
-        - name: Commit changes
+        - name: Commit and push changes
           run: |
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
-            git commit -m "Update README.md" -a
-        
-        - name: Push changes
-          uses: ad-m/github-push-action@master
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
+            git commit -m "Automated update to README.md" -a
+            git push

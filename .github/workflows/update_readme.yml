@@ -3,8 +3,17 @@ on: [push]
 jobs:
   update_readme:
     runs-on: ubuntu-latest
-    name: Update bank list in README.md
+    name: Update bank list
     steps:
+    
+    - name: Check out Git repository
+        uses: actions/checkout@v2
+    
+    - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+          
     - name: Update bank list
       id: update_readme
       uses: bank2ynab/bank2ynab-update-readme@master

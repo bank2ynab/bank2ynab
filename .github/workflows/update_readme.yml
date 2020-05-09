@@ -8,6 +8,8 @@ jobs:
     steps:    
         - name: Check out Git repository
           uses: actions/checkout@master
+          with:
+            ref: ${{ github.event.pull_request.head.ref }}
         
         - name: Set up Python
           uses: actions/setup-python@master

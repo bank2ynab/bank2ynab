@@ -1,0 +1,10 @@
+on: [push]
+
+jobs:
+  update_readme:
+    runs-on: ubuntu-latest
+    name: Update bank list in README.md
+    steps:
+    - name: Hello world action step
+      id: update_readme
+      uses: bank2ynab/bank2ynab-update-readme

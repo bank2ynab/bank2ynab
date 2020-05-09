@@ -1,4 +1,4 @@
-on: [push]
+on: [pull_request]
 name: Update README
 jobs:
   update_readme:

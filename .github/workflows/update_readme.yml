@@ -24,5 +24,6 @@ jobs:
           run: |
             git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"
+            git add -A
             git diff-index --quiet HEAD || git commit -m "Automated update to README.md" -a
             git push

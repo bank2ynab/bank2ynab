@@ -5,6 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Update bank list in README.md
     steps:
-    - name: Hello world action step
+    - name: Update bank list
       id: update_readme
-      uses: bank2ynab/bank2ynab-update-readme@v1
+      uses: bank2ynab/bank2ynab-update-readme@master

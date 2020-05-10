@@ -4,7 +4,7 @@ from unittest.mock import patch
 from os.path import join
 import os
 from shutil import copyfile
-from bank2ynab import YNAB_API
+from bank2ynab.bank2ynab import YNAB_API
 import configparser
 
 
@@ -387,7 +387,7 @@ class Test_YNAB_API(TestCase):
             return ["ERROR", id, detail]
         """
 
-    @patch("bank2ynab.option_selection")
+    @patch("bank2ynab.bank2ynab.option_selection")
     @patch.object(YNAB_API, "list_accounts")
     def test_select_account(self, mock_list_acs, mock_option_sel):
         """

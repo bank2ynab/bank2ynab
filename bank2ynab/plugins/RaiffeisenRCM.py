@@ -1,6 +1,6 @@
 # Plugin for handling [AT Raiffeisen RCM] format
 
-from bank2ynab import B2YBank, EncodingCsvReader
+from bank2ynab.bank2ynab import B2YBank, EncodingCsvReader
 
 
 class RaiffeisenRCMPlugin(B2YBank):

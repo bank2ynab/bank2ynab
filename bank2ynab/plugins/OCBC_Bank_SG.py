@@ -1,6 +1,6 @@
 # Plugin for handling OCBC Bank [SG] files
 
-from bank2ynab import B2YBank
+from bank2ynab.bank2ynab import B2YBank
 
 
 class OCBC_Bank_SG(B2YBank):

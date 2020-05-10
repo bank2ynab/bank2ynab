@@ -8,7 +8,7 @@
 # At that point, you can reference the plugin in conf files like this:
 #   Plugin = mymodule
 
-from bank2ynab.bank2ynab import B2YBank
+from __main__ import B2YBank
 
 
 class NullBank(B2YBank):

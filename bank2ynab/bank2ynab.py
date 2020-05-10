@@ -35,12 +35,6 @@ import json
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = OSError
-
-
 # classes dealing with input and output charsets
 class EncodingFileContext(object):
     """ ContextManager class for common operations on files"""

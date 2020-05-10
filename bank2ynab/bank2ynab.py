@@ -682,7 +682,9 @@ def build_bank(bank_config):
     """ Factory method loading the correct class for a given configuration. """
     plugin_module = bank_config.get("plugin", None)
     if plugin_module:
-        p_mod = importlib.import_module("bank2ynab.plugins.{}".format(plugin_module))
+        p_mod = importlib.import_module(
+            "bank2ynab.plugins.{}".format(plugin_module)
+        )
         if not hasattr(p_mod, "build_bank"):
             s = (
                 "The specified plugin {}.py".format(plugin_module)

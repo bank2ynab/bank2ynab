@@ -4,8 +4,22 @@ from unittest.mock import patch
 from os.path import join
 import os
 from shutil import copyfile
-from bank2ynab.bank2ynab import YNAB_API
 import configparser
+
+from bank2ynab.b2y_utilities import (
+    get_configs,
+    string_num_diff,
+    get_config_line,
+    option_selection,
+)
+
+from bank2ynab.ynab_api import YNAB_API
+from bank2ynab.b2y_utilities import (
+    get_configs,
+    string_num_diff,
+    get_config_line,
+    option_selection,
+)
 
 
 class Test_YNAB_API(TestCase):

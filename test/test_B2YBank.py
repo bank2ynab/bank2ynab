@@ -5,7 +5,8 @@ from os.path import join, abspath, exists
 
 import os
 
-from bank2ynab.bank2ynab import B2YBank, fix_conf_params, build_bank
+from bank2ynab.__main__ import B2YBank, fix_conf_params, build_bank
+from bank2ynab.ynab_api import YNAB_API
 from bank2ynab.plugins.null import NullBank
 from test.utils import get_test_confparser
 

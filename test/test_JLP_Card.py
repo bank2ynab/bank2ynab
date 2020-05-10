@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from os.path import join
 
-from bank2ynab.bank2ynab import B2YBank, fix_conf_params
+from bank2ynab.__main__ import B2YBank, fix_conf_params
 from test.utils import get_test_confparser
 
 

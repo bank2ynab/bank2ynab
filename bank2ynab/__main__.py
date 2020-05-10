@@ -451,8 +451,18 @@ class Bank2Ynab(object):
 
 # Let's run this thing!
 if __name__ == "__main__":
-    b2y = Bank2Ynab(get_configs())
-    b2y.run()
-    api = YNAB_API(get_configs())
-    if b2y.transaction_data:
-        api.run(b2y.transaction_data)
+    try:
+        config = get_configs()
+    except FileNotFoundError:
+        pass
+    else:
+        b2y = Bank2Ynab(config)
+        b2y.run()
+    try:
+        config = get_configs()
+    except FileNotFoundError:
+        pass
+    else:
+        api = YNAB_API(config)
+        if b2y.transaction_data:
+            api.run(b2y.transaction_data)

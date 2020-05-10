@@ -7,11 +7,17 @@ import logging
 def get_configs():
     """ Retrieve all configuration parameters."""
     conf_files = ["bank2ynab.conf", "user_configuration.conf"]
-    if not os.path.exists(conf_files[0]):
-        logging.error("Configuration file not found: {}".format(conf_files[0]))
-    config = configparser.RawConfigParser()
-    config.read(conf_files, encoding="utf-8")
-    return config
+    try:
+        if not os.path.exists(conf_files[0]):
+            raise FileNotFoundError
+    except FileNotFoundError:
+        s = "Configuration file not found: {}".format(conf_files[0])
+        logging.error(s)
+        raise FileNotFoundError(s)
+    else:
+        config = configparser.RawConfigParser()
+        config.read(conf_files, encoding="utf-8")
+        return config
 
 
 def fix_conf_params(conf_obj, section_name):

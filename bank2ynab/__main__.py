@@ -1,7 +1,8 @@
 import logging
 
-import b2y_utilities
-import ynab_api
+from bank_process import Bank2Ynab
+from b2y_utilities import get_configs
+from ynab_api import YNAB_API
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -9,7 +10,7 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 # Let's run this thing!
 if __name__ == "__main__":
     try:
-        config = b2y_utilities.get_configs()
+        config = get_configs()
     except FileNotFoundError:
         logging.error("No configuration file found, process aborted.")
         pass

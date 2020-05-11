@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bank2ynab",
-    version="1.2",
+    version="1.2dev",
     author="https://github.com/bank2ynab/bank2ynab/graphs/contributors",
     author_email="torben@g-b.dk",
     description="Easily convert and import your bank's statements into YNAB.",

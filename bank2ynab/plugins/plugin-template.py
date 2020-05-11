@@ -2,7 +2,7 @@
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
 
-from __main__ import B2YBank
+from bank_process import B2YBank
 
 
 class YourActualBankPlugin(B2YBank):

@@ -20,7 +20,8 @@ class YNAB_API(object):  # in progress (2)
         self.budget_id = None
         self.config = b2y_utilities.get_configs()
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
-        # TODO make user_config section play nice with b2y_utilities.get_configs()
+        # TODO make user_config section play nice with
+        # b2y_utilities.get_configs()
         self.user_config_path = "user_configuration.conf"
         self.user_config = configparser.RawConfigParser()
 
@@ -77,9 +78,9 @@ class YNAB_API(object):  # in progress (2)
 
     def process_transactions(self, transaction_data):
         """
-        :param transaction_data: dictionary of bank names to transaction lists
+        :param transaction_data: dict of bank names to transaction lists
         :param transactions: list of individual transaction dictionaries
-        :return budget_t_data: dictionary of budget_ids ready-to-post transaction data
+        :return budget_t_data: dict of budget_ids ready-to-post transactions
         """
         logging.info("Processing transactions...")
         # go through each bank's data
@@ -104,7 +105,7 @@ class YNAB_API(object):  # in progress (2)
         payee = this_trans[1]
         category = this_trans[2]
         memo = this_trans[3]
-        amount = string_num_diff(this_trans[4], this_trans[5])
+        amount = b2y_utilities.string_num_diff(this_trans[4], this_trans[5])
 
         # assign values to transaction dictionary
         transaction = {
@@ -248,7 +249,7 @@ class YNAB_API(object):  # in progress (2)
         account_id = ""
         # check if bank has account associated with it already
         try:
-            config_line = get_config_line(
+            config_line = b2y_utilities.get_config_line(
                 self.config, bank, ["YNAB Account ID", False, "||"]
             )
             budget_id = config_line[0]
@@ -261,7 +262,8 @@ class YNAB_API(object):  # in progress (2)
             instruction = "No YNAB {} for transactions from {} set!\n Pick {}"
             # if no default budget, build budget list and select budget
             if self.budget_id is None:
-                # msg = "No YNAB budget for {} set! \nPick a budget".format(bank)
+                # msg =
+                # "No YNAB budget for {} set! \nPick a budget".format(bank)
                 msg = instruction.format("budget", bank, "a budget")
                 budget_ids = self.list_budgets()
                 budget_id = b2y_utilities.option_selection(budget_ids, msg)

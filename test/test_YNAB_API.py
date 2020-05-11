@@ -1,10 +1,11 @@
-from test.utils import get_test_confparser
 from unittest import TestCase
 from unittest.mock import patch
 from os.path import join
 import os
 from shutil import copyfile
 import configparser
+
+from test.utils import get_test_confparser, get_project_dir
 
 from bank2ynab.b2y_utilities import (
     get_configs,
@@ -14,18 +15,14 @@ from bank2ynab.b2y_utilities import (
 )
 
 from bank2ynab.ynab_api import YNAB_API
-from bank2ynab.b2y_utilities import (
-    get_configs,
-    string_num_diff,
-    get_config_line,
-    option_selection,
-)
 
 
 class Test_YNAB_API(TestCase):
     def setUp(self):
-        self.TESTCONFPATH = join("test-data", "test.conf")
-        self.TEMPCONFPATH = join("test-data", "temp-test.conf")
+        self.TESTCONFPATH = join(get_project_dir(), "test-data", "test.conf")
+        self.TEMPCONFPATH = join(
+            get_project_dir(), "test-data", "temp-test.conf"
+        )
         self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.test_class = None
@@ -401,7 +398,7 @@ class Test_YNAB_API(TestCase):
             return ["ERROR", id, detail]
         """
 
-    # @patch("bank2ynab.bank2ynab.option_selection")
+    # @patch("bank2ynab.bank_process.option_selection")
     # @patch.object(YNAB_API, "list_accounts")
     # def test_select_account(self, mock_list_acs, mock_option_sel):
     # """

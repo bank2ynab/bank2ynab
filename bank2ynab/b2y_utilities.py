@@ -299,7 +299,9 @@ def detect_encoding(filepath):
                 return enc
         except error:
             continue
+
     return result
+
 
 # classes dealing with input and output charsets
 class EncodingFileContext(object):
@@ -328,13 +330,13 @@ class EncodingCsvReader(EncodingFileContext):
     """ context manager returning a csv.Reader-compatible object"""
 
     def __enter__(self):
-        encoding = b2y_utilities.detect_encoding(self.file_path)
+        encoding = detect_encoding(self.file_path)
         self.stream = open(self.file_path, encoding=encoding)
         self.csv_object = csv.reader(self.stream, **self.params)
         return self.csv_object
 
 
-class b2y_utilities.EncodingCsvWriter(EncodingFileContext):
+class EncodingCsvWriter(EncodingFileContext):
     """ context manager returning a csv.Writer-compatible object
     regardless of Python version"""
 
@@ -342,5 +344,6 @@ class b2y_utilities.EncodingCsvWriter(EncodingFileContext):
         self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
         self.csv_object = csv.writer(self.stream, **self.params)
         return self.csv_object
+
 
 # -- end of utilities

@@ -10,7 +10,13 @@ import csv
 def get_configs():
     """ Retrieve all configuration parameters."""
     # TODO - fix path for these
-    conf_files = ["bank2ynab.conf", "user_configuration.conf"]
+    path = os.path.realpath(__file__)
+    parent_dir = os.path.dirname(path)
+    project_dir = os.path.dirname(parent_dir)
+    conf_files = [
+        os.path.join(project_dir, "bank2ynab.conf"),
+        os.path.join(project_dir, "user_configuration.conf"),
+    ]
     try:
         if not os.path.exists(conf_files[0]):
             raise FileNotFoundError

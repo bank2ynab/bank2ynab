@@ -5,9 +5,10 @@ from os.path import join, abspath, exists
 
 import os
 
-from bank2ynab import B2YBank, fix_conf_params, build_bank
+from bank_process import B2YBank, build_bank
+from b2y_utilities import fix_conf_params
 from plugins.null import NullBank
-from test.utils import get_test_confparser
+from test.utils import get_test_confparser, get_project_dir
 
 
 class TestB2YBank(TestCase):
@@ -18,6 +19,7 @@ class TestB2YBank(TestCase):
         self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None
+        self.test_data = join(get_project_dir(), "test-data")
 
     def tearDown(self):
         pass
@@ -41,11 +43,12 @@ class TestB2YBank(TestCase):
         ]:
 
             config = fix_conf_params(self.cp, section_name)
+            config["path"] = join(get_project_dir(), config["path"])
             b = B2YBank(config)
             files = b.get_files()
             self.assertEqual(len(files), num_files)
             # hack config to make sure we can deal with absolute paths too
-            b.config["path"] = abspath("test-data")
+            b.config["path"] = abspath(self.test_data)
             files = b.get_files()
             self.assertEqual(len(files), num_files)
 
@@ -59,7 +62,7 @@ class TestB2YBank(TestCase):
         ]:
             config = fix_conf_params(self.cp, section_name)
             b = B2YBank(config)
-            records = b.read_data(join("test-data", fpath))
+            records = b.read_data(join(self.test_data, fpath))
             self.assertEqual(len(records), num_records)
 
     def test_write_data(self):
@@ -82,7 +85,7 @@ class TestB2YBank(TestCase):
                 self.assertEqual(len(output_data), num_records)
                 result_file = b.write_data(f, output_data)
                 # check the file is where we expect it to be
-                expected_file = abspath(join("test-data", fpath))
+                expected_file = abspath(join(self.test_data, fpath))
                 self.assertTrue(exists(expected_file))
                 self.assertEqual(expected_file, result_file)
                 # todo: check actual contents are what we expect

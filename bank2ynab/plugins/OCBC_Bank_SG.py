@@ -1,22 +1,19 @@
-# Step 1: See https://github.com/bank2ynab/bank2ynab/wiki/WorkingWithPlugins
-# Step 2: Copy this template into a new file.
-# Step 3: Replace "YourActualBank" below with a descriptive bank name
+# Plugin for handling OCBC Bank [SG] files
 
-from bank2ynab import B2YBank
+from bank_process import B2YBank
 
 
-class YourActualBankPlugin(B2YBank):
+class OCBC_Bank_SG(B2YBank):
+    """ Example subclass used for testing the plugin system."""
+
     def __init__(self, config_object):
-        super(YourActualBankPlugin, self).__init__(config_object)
-        self.name = "YourActualBank"
+        """
+        :param config_object: a dictionary of conf parameters
+        """
+        super(OCBC_Bank_SG, self).__init__(config_object)
+        self.name = "OCBC_Bank_SG"
 
     def _preprocess_file(self, file_path):
-        """
-        This is an example of how to preprocess the transaction file
-        prior to feeding the data into the main read_data function.
-        Any specialised string or format operations can easily
-        be done here.
-        """
         """
         For every row that doesn't have a valid date field
         strip out separators and append to preceding row.
@@ -55,4 +52,11 @@ class YourActualBankPlugin(B2YBank):
 
 
 def build_bank(config):
-    return YourActualBankPlugin(config)
+    """ This factory function is called from the main program,
+    and expected to return a B2YBank subclass.
+    Without this, the module will fail to load properly.
+
+    :param config: dict containing all available configuration parameters
+    :return: a B2YBank subclass instance
+    """
+    return OCBC_Bank_SG(config)

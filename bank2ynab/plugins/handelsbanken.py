@@ -4,7 +4,7 @@
         With thanks to @joacand's script from here:
         github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py
 """
-from bank2ynab import B2YBank
+from bank_process import B2YBank
 import re
 
 

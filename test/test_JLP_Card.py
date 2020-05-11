@@ -2,8 +2,10 @@ from unittest import TestCase
 
 from os.path import join
 
-from bank2ynab import B2YBank, fix_conf_params
-from test.utils import get_test_confparser
+from bank2ynab.bank_process import B2YBank
+from bank2ynab.b2y_utilities import fix_conf_params
+
+from test.utils import get_test_confparser, get_project_dir
 
 
 class TestJLP_Card_UK(TestCase):
@@ -25,7 +27,7 @@ class TestJLP_Card_UK(TestCase):
 
         config = fix_conf_params(self.cp, section_name)
         b = B2YBank(config)
-        records = b.read_data(join("test-data", fpath))
+        records = b.read_data(join(get_project_dir(), "test-data", fpath))
         self.assertEqual(len(records), num_records)
         self.assertEqual(records[10][5], "1100.00")
         self.assertEqual(records[4][4], "80.99")

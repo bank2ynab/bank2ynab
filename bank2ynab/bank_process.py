@@ -17,22 +17,16 @@
 #
 # don't edit below here unless you know what you're doing!
 from os.path import abspath, join, dirname, basename
-import codecs
-import csv
 import os
 import importlib
 import re
 from datetime import datetime
 import logging
-import configparser
 
 import b2y_utilities
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
-
-
-
 
 
 # Classes doing the actual work
@@ -113,7 +107,9 @@ class B2YBank(object):
         self._preprocess_file(file_path)
 
         # get total number of rows in transaction file using a generator
-        with b2y_utilities.EncodingCsvReader(file_path, delimiter=delim) as row_count_reader:
+        with b2y_utilities.EncodingCsvReader(
+            file_path, delimiter=delim
+        ) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 
         with b2y_utilities.EncodingCsvReader(
@@ -328,7 +324,7 @@ class B2YBank(object):
             counter += 1
         target_filename = join(target_dir, new_filename)
         logging.info("Writing output file: {}".format(target_filename))
-        with EncodingCsvWriter(target_filename) as writer:
+        with b2y_utilities.EncodingCsvWriter(target_filename) as writer:
             for row in data:
                 writer.writerow(row)
         return target_filename
@@ -400,4 +396,3 @@ class Bank2Ynab(object):
                     )
 
         logging.info("\nDone! {} files processed.\n".format(files_processed))
-

@@ -2,6 +2,9 @@ import os
 import configparser
 import chardet
 import logging
+import codecs
+import csv
+
 
 # Generic utilities
 def get_configs():

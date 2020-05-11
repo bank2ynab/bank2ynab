@@ -26,14 +26,8 @@ from datetime import datetime
 import logging
 import configparser
 
-from ynab_api import YNAB_API
-from b2y_utilities import (
-    get_configs,
-    fix_conf_params,
-    find_directory,
-    detect_encoding,
-    option_selection,
-)
+import b2y_utilities
+import ynab_api
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)

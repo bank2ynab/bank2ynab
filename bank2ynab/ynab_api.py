@@ -3,12 +3,7 @@ import json
 import configparser
 import logging
 
-from b2y_utilities import (
-    get_configs,
-    string_num_diff,
-    get_config_line,
-    option_selection,
-)
+import b2y_utilities
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -23,9 +18,9 @@ class YNAB_API(object):  # in progress (2)
     def __init__(self, config_object, transactions=None):
         self.transactions = []
         self.budget_id = None
-        self.config = get_configs()
+        self.config = b2y_utilities.get_configs()
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
-        # TODO make user_config section play nice with get_configs()
+        # TODO make user_config section play nice with b2y_utilities.get_configs()
         self.user_config_path = "user_configuration.conf"
         self.user_config = configparser.RawConfigParser()
 
@@ -269,7 +264,7 @@ class YNAB_API(object):  # in progress (2)
                 # msg = "No YNAB budget for {} set! \nPick a budget".format(bank)
                 msg = instruction.format("budget", bank, "a budget")
                 budget_ids = self.list_budgets()
-                budget_id = option_selection(budget_ids, msg)
+                budget_id = b2y_utilities.option_selection(budget_ids, msg)
             else:
                 budget_id = self.budget_id
 
@@ -277,7 +272,7 @@ class YNAB_API(object):  # in progress (2)
             account_ids = self.list_accounts(budget_id)
             # msg = "Pick a YNAB account for transactions from {}".format(bank)
             msg = instruction.format("account", bank, "an account")
-            account_id = option_selection(account_ids, msg)
+            account_id = b2y_utilities.option_selection(account_ids, msg)
             # save account selection for bank
             self.save_account_selection(bank, budget_id, account_id)
         return budget_id, account_id

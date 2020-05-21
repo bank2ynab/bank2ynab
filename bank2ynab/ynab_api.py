@@ -45,8 +45,15 @@ class YNAB_API(object):  # in progress (2)
 
                 budget_t_data = self.process_transactions(transaction_data)
                 for budget in budget_ids:
-                    if budget_t_data[budget]["transactions"] != []:
-                        self.post_transactions(budget, budget_t_data[budget])
+                    id = budget[1]
+                    try:
+                        self.post_transactions(id, budget_t_data[id])
+                    except KeyError:
+                        logging.info(
+                            "No transactions to upload for {}.".format(
+                                budget[0]
+                            )
+                        )
         else:
             logging.info("No API-token provided.")
 
@@ -91,7 +98,12 @@ class YNAB_API(object):  # in progress (2)
             budget_id, account_id = self.select_account(bank)
             # save transaction data for each bank in main list
             account_transactions = transaction_data[bank]
-            budget_transactions = budget_t_data[budget_id]["transactions"]
+
+            try:
+                budget_transactions = budget_t_data[budget_id]["transactions"]
+            except KeyError:
+                budget_transactions = []
+                budget_t_data[budget_id] = {"transactions": []}
             for t in account_transactions[1:]:
                 trans_dict = self.create_transaction(
                     account_id, t, budget_transactions
@@ -255,6 +267,8 @@ class YNAB_API(object):  # in progress (2)
             budget_id = config_line[0]
             account_id = config_line[1]
             logging.info("Previously-saved account for {} found.".format(bank))
+        except IndexError:
+            pass
         except configparser.NoSectionError:
             logging.info("No user configuration for {} found.".format(bank))
 

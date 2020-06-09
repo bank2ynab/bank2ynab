@@ -5,7 +5,6 @@ TESTCONFPATH = join("test-data", "test.conf")
 
 
 def get_test_confparser():
-
     import configparser
 
     cp = configparser.RawConfigParser()

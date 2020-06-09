@@ -5,7 +5,6 @@ import os
 from shutil import copyfile
 import configparser
 
-
 from test.utils import get_test_confparser, get_project_dir
 
 from bank2ynab.b2y_utilities import (
@@ -209,7 +208,6 @@ class Test_YNAB_API(TestCase):
             transactions.append(test_transaction)
 
             for key in test_transaction:
-
                 self.assertEqual(
                     target_transaction[key], test_transaction[key]
                 )

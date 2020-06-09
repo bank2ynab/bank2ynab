@@ -1,4 +1,3 @@
-
 formats:
   - ./bank2ynab.conf
   - plugins/**/*

@@ -85,7 +85,6 @@ class TestB2YBank(TestCase):
                 self.assertEqual(len(output_data), num_records)
                 result_file = b.write_data(f, output_data)
                 # check the file is where we expect it to be
-
                 expected_file = abspath(join(self.test_data, fpath))
                 self.assertTrue(exists(expected_file))
                 self.assertEqual(expected_file, result_file)
@@ -213,7 +212,6 @@ class TestB2YBank(TestCase):
             ),
         ]:
             result_row = b._fix_outflow(row)
-
             self.assertCountEqual(expected_row, result_row)
 
     def test_fix_inflow(self):

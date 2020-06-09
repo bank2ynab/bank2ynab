@@ -18,7 +18,6 @@ from bank2ynab.b2y_utilities import (
 from bank2ynab.ynab_api import YNAB_API
 
 
-
 class Test_YNAB_API(TestCase):
     def setUp(self):
         self.TESTCONFPATH = join(get_project_dir(), "test-data", "test.conf")
@@ -409,7 +408,6 @@ class Test_YNAB_API(TestCase):
         """
         test_class = YNAB_API(self.cp)
         test_banks = [
-
             ("test_api_existing_bank", "Test Budget ID 1", "Test Account ID"),
             ("New Bank", "Test Budget ID 2", "ID #2"),
         ]
@@ -418,7 +416,6 @@ class Test_YNAB_API(TestCase):
         test_class.config.read(test_class.config_path)
 
         mock_ids = [
-
             ("Account 1", "Test Budget ID 1", "ID #1"),
             ("Account 2", "Test Budget ID 2", "ID #2"),
             ("Account 3", "Test Budget ID 1", "ID #3"),
@@ -455,6 +452,5 @@ class Test_YNAB_API(TestCase):
         for test_bank in test_banks:
             test_id = config.get(test_bank, "YNAB Account ID")
             self.assertEqual(
-
                 test_id, "{}||{}".format(test_budget_id, test_account_id)
             )

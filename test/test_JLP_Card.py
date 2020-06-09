@@ -8,7 +8,6 @@ from bank2ynab.b2y_utilities import fix_conf_params
 from test.utils import get_test_confparser, get_project_dir
 
 
-
 class TestJLP_Card_UK(TestCase):
     def setUp(self):
         self.cp = get_test_confparser()

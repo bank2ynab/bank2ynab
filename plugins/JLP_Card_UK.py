@@ -17,7 +17,9 @@ class JLP_Card_UKPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as reader:
+        with CrossversionCsvReader(
+            file_path, self._is_py2, delimiter=delim
+        ) as reader:
             for index, row in enumerate(reader):
                 # skip first row if headers
                 if index == 0 and header_rows != 0:
@@ -31,9 +33,9 @@ class JLP_Card_UKPlugin(B2YBank):
                 YNAB's date format is "DD/MM/YYYY".
                 This bank's date format is "DD-MON-YYYY".
                 """
-                tmp["Date"] = datetime.datetime.strptime(row[0], "%d-%b-%Y").strftime(
-                    "%d/%m/%Y"
-                )
+                tmp["Date"] = datetime.datetime.strptime(
+                    row[0], "%d-%b-%Y"
+                ).strftime("%d/%m/%Y")
                 # PAYEE STUFF:
                 tmp["Payee"] = row[1]
                 # CATEGORY STUFF:

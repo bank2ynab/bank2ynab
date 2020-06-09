@@ -120,7 +120,6 @@ class TestB2YBank(TestCase):
                     (
                         23,
                         [
-
                             "2017-09-28",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
                             "",
@@ -132,7 +131,6 @@ class TestB2YBank(TestCase):
                     (
                         24,
                         [
-
                             "2017-09-28",
                             "SOFTWARE Wien",
                             "",
@@ -144,7 +142,6 @@ class TestB2YBank(TestCase):
                 ]:
                     result_row = output_data[row]
 
-
                     self.assertCountEqual(expected_row, result_row)
 
     def test_valid_row(self):
@@ -153,7 +150,6 @@ class TestB2YBank(TestCase):
         b = B2YBank(config)
 
         for row, row_validity in [
-
             (["Pending", "Payee", "", "", "300", ""], False),
             (["28.09.2017", "Payee", "", "", "", "400"], False),
             (["28.09.2017", "Payee", "", "", "", ""], False),

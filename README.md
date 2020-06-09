@@ -185,6 +185,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. US Chase Credit Card 2019
 1. US Schwab
 1. US TB Bank
+1. US USAA
 <!--AUTO BANK UPDATE END-->
 ----
 

@@ -4,3 +4,4 @@ test-data/temp-test.conf
 bank2ynab/main
 bank2ynab/plugins/plugins
 test/tests
+*.pyc

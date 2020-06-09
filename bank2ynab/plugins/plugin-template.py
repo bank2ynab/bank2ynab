@@ -2,12 +2,12 @@
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
 
-from bank2ynab import B2YBank
+from bank_process import B2YBank
 
 
 class YourActualBankPlugin(B2YBank):
-    def __init__(self, config_object, is_py2):
-        super(YourActualBankPlugin, self).__init__(config_object, is_py2)
+    def __init__(self, config_object):
+        super(YourActualBankPlugin, self).__init__(config_object)
         self.name = "YourActualBank"
 
     def _preprocess_file(self, file_path):
@@ -54,5 +54,5 @@ class YourActualBankPlugin(B2YBank):
         return
 
 
-def build_bank(config, is_py2):
-    return YourActualBankPlugin(config, is_py2)
+def build_bank(config):
+    return YourActualBankPlugin(config)

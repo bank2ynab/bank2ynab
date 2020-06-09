@@ -5,11 +5,10 @@ from os.path import join, abspath, exists
 
 import os
 
-from bank2ynab import B2YBank, fix_conf_params, build_bank
+from bank_process import B2YBank, build_bank
+from b2y_utilities import fix_conf_params
 from plugins.null import NullBank
-from test.utils import get_test_confparser
-
-_PY2 = False
+from test.utils import get_test_confparser, get_project_dir
 
 
 class TestB2YBank(TestCase):
@@ -17,17 +16,17 @@ class TestB2YBank(TestCase):
     TESTCONFPATH = join("test-data", "test.conf")
 
     def setUp(self):
-        global _PY2
-        self.cp, self.py2, = get_test_confparser()
+        self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None
+        self.test_data = join(get_project_dir(), "test-data")
 
     def tearDown(self):
         pass
 
     def test_init_and_name(self):
         """ Check parameters are correctly stored in the object."""
-        self.b = B2YBank(self.defaults, self.py2)
+        self.b = B2YBank(self.defaults)
         cfe = copy(self.defaults)
         self.assertEqual(self.b.config, cfe)
         self.assertEqual("DEFAULT", self.b.name)
@@ -44,11 +43,12 @@ class TestB2YBank(TestCase):
         ]:
 
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
+            config["path"] = join(get_project_dir(), config["path"])
+            b = B2YBank(config)
             files = b.get_files()
             self.assertEqual(len(files), num_files)
             # hack config to make sure we can deal with absolute paths too
-            b.config["path"] = abspath("test-data")
+            b.config["path"] = abspath(self.test_data)
             files = b.get_files()
             self.assertEqual(len(files), num_files)
 
@@ -61,8 +61,8 @@ class TestB2YBank(TestCase):
             ("test_delimiter_tab", 74, "test_delimiter_tab.csv"),
         ]:
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
-            records = b.read_data(join("test-data", fpath))
+            b = B2YBank(config)
+            records = b.read_data(join(self.test_data, fpath))
             self.assertEqual(len(records), num_records)
 
     def test_write_data(self):
@@ -79,13 +79,14 @@ class TestB2YBank(TestCase):
             ("test_record_headers", 74, "fixed_test_headers.csv"),
         ]:
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
+            b = B2YBank(config)
             for f in b.get_files():
                 output_data = b.read_data(f)
                 self.assertEqual(len(output_data), num_records)
                 result_file = b.write_data(f, output_data)
                 # check the file is where we expect it to be
-                expected_file = abspath(join("test-data", fpath))
+
+                expected_file = abspath(join(self.test_data, fpath))
                 self.assertTrue(exists(expected_file))
                 self.assertEqual(expected_file, result_file)
                 # todo: check actual contents are what we expect
@@ -111,7 +112,7 @@ class TestB2YBank(TestCase):
             "test_row_format_invalid",
         ]:
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config, self.py2)
+            b = B2YBank(config)
             for f in b.get_files():
                 output_data = b.read_data(f)
                 # test the same two rows in each scenario
@@ -119,7 +120,7 @@ class TestB2YBank(TestCase):
                     (
                         23,
                         [
-                            "28.09.2017",
+                            "2017-09-28",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
                             "",
                             "HOFER DANKT  0527  K2   28.09. 17:17",
@@ -130,7 +131,7 @@ class TestB2YBank(TestCase):
                     (
                         24,
                         [
-                            "28.09.2017",
+                            "2017-09-28",
                             "SOFTWARE Wien",
                             "",
                             "SOFTWARE Wien",
@@ -141,28 +142,46 @@ class TestB2YBank(TestCase):
                 ]:
                     result_row = output_data[row]
 
-                    if self.py2:
-                        self.assertItemsEqual(expected_row, result_row)
-                    else:
-                        self.assertCountEqual(expected_row, result_row)
+                    self.assertCountEqual(expected_row, result_row)
 
     def test_valid_row(self):
         """ Test making sure row has an outflow or an inflow """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
 
         for row, row_validity in [
-            (["28.09.2017", "Payee", "", "", "300", ""], True),
-            (["28.09.2017", "Payee", "", "", "", "400"], True),
+            (["Pending", "Payee", "", "", "300", ""], False),
+            (["28.09.2017", "Payee", "", "", "", "400"], False),
             (["28.09.2017", "Payee", "", "", "", ""], False),
+            (["2017-09-28", "Payee", "", "", "300", ""], True),
+            (["2017-09-28", "Payee", "", "", "", "400"], True),
+            (["2017-09-28", "Payee", "", "", "", ""], False),
         ]:
             is_valid = b._valid_row(row)
             self.assertEqual(is_valid, row_validity)
 
+    def test_clean_monetary_values(self):
+        """ Test cleaning of outflow and inflow of unneeded characters """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config)
+
+        for row, expected_row in [
+            (
+                ["28.09.2017", "Payee", "", "", "+ £300.01", ""],
+                ["28.09.2017", "Payee", "", "", "300.01", ""],
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "- $300"],
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
+        ]:
+            result_row = b._clean_monetary_values(row)
+            self.assertCountEqual(expected_row, result_row)
+
     def test_auto_memo(self):
         """ Test auto-filling empty memo field with payee data """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
         memo_index = b.config["output_columns"].index("Memo")
 
         for row, test_memo, fill_memo in [
@@ -177,7 +196,7 @@ class TestB2YBank(TestCase):
     def test_fix_outflow(self):
         """ Test conversion of negative Inflow into Outflow """
         config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config, self.py2)
+        b = B2YBank(config)
 
         for row, expected_row in [
             (
@@ -194,10 +213,30 @@ class TestB2YBank(TestCase):
             ),
         ]:
             result_row = b._fix_outflow(row)
-            if self.py2:
-                self.assertItemsEqual(expected_row, result_row)
-            else:
-                self.assertCountEqual(expected_row, result_row)
+
+            self.assertCountEqual(expected_row, result_row)
+
+    def test_fix_inflow(self):
+        """ Test conversion of positive Outflow into Inflow """
+        config = fix_conf_params(self.cp, "test_row_format_default")
+        b = B2YBank(config)
+
+        for row, expected_row in [
+            (
+                ["28.09.2017", "Payee", "", "", "300", ""],
+                ["28.09.2017", "Payee", "", "", "300", ""],
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "+300", ""],
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
+            (
+                ["28.09.2017", "Payee", "", "", "", "300"],
+                ["28.09.2017", "Payee", "", "", "", "300"],
+            ),
+        ]:
+            result_row = b._fix_inflow(row)
+            self.assertCountEqual(expected_row, result_row)
 
     """
     def test_fix_date(self):

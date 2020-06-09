@@ -2,17 +2,15 @@ from unittest import TestCase
 
 from os.path import join
 
-from bank2ynab import fix_conf_params
-from plugins.JLP_Card_UK import JLP_Card_UKPlugin
-from test.utils import get_test_confparser
+from bank2ynab.bank_process import B2YBank
+from bank2ynab.b2y_utilities import fix_conf_params
 
-_PY2 = False
+from test.utils import get_test_confparser, get_project_dir
 
 
-class TestJLP_Card_UKPlugin(TestCase):
+class TestJLP_Card_UK(TestCase):
     def setUp(self):
-        global _PY2
-        self.cp, self.py2, = get_test_confparser()
+        self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.b = None
 
@@ -20,8 +18,8 @@ class TestJLP_Card_UKPlugin(TestCase):
         pass
 
     def test_read_data(self):
-        """ Test that the right number of rows are read from the test files """
-        # if you need more tests, add sections to test.conf & specify them here
+
+        """ Test that the right number of rows are read and values. """
         (section_name, num_records, fpath) = (
             "test_jlp_card",
             11,
@@ -29,8 +27,8 @@ class TestJLP_Card_UKPlugin(TestCase):
         )
 
         config = fix_conf_params(self.cp, section_name)
-        b = JLP_Card_UKPlugin(config, self.py2)
-        records = b.read_data(join("test-data", fpath))
+        b = B2YBank(config)
+        records = b.read_data(join(get_project_dir(), "test-data", fpath))
         self.assertEqual(len(records), num_records)
         self.assertEqual(records[10][5], "1100.00")
         self.assertEqual(records[4][4], "80.99")

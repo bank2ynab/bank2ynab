@@ -2,25 +2,23 @@
 # The procedure is as follows:
 # 1 - Subclass B2YBank overriding the methods you need - typically just
 #       read_data(path_to_file). See docstrings below for explanations.
-# 2 - provide build_bank(config_dict, is_py2_bool) which should return an
+# 2 - provide build_bank(config_dict_bool) which should return an
 #       instance of your B2YBank subclass.
 # 3 - save the file under the "plugins" directory, e.g. plugins/mymodule.py
 # At that point, you can reference the plugin in conf files like this:
 #   Plugin = mymodule
 
-from bank2ynab import B2YBank
+from bank_process import B2YBank
 
 
 class NullBank(B2YBank):
     """ Example subclass used for testing the plugin system."""
 
-    def __init__(self, config_object, is_py2):
+    def __init__(self, config_object):
         """
         :param config_object: a dictionary of conf parameters
-        :param is_py2: boolean indicating if we're running under
-                        Python 2.x
         """
-        super(NullBank, self).__init__(config_object, is_py2)
+        super(NullBank, self).__init__(config_object)
         self.name = "NullBank"
 
     def read_data(self, file_path):
@@ -52,13 +50,12 @@ class NullBank(B2YBank):
         return None
 
 
-def build_bank(config, is_py2):
+def build_bank(config):
     """ This factory function is called from the main program,
     and expected to return a B2YBank subclass.
     Without this, the module will fail to load properly.
 
     :param config: dict containing all available configuration parameters
-    :param is_py2: boolean indicating whether we are running under Python 2.x
     :return: a B2YBank subclass instance
     """
-    return NullBank(config, is_py2)
+    return NullBank(config)

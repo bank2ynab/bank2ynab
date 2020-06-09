@@ -4,18 +4,16 @@
         With thanks to @joacand's script from here:
         github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py
 """
-from bank2ynab import B2YBank
+from bank_process import B2YBank
 import re
 
 
 class Handelsbanken(B2YBank):
-    def __init__(self, config_object, is_py2):
+    def __init__(self, config_object):
         """
         :param config_object: a dictionary of conf parameters
-        :param is_py2: boolean indicating if we're running under
-                        Python 2.x
         """
-        super(Handelsbanken, self).__init__(config_object, is_py2)
+        super(Handelsbanken, self).__init__(config_object)
         self.name = "Handelsbanken"
 
     def _preprocess_file(self, file_path):
@@ -47,13 +45,12 @@ class Handelsbanken(B2YBank):
         return
 
 
-def build_bank(config, is_py2):
+def build_bank(config):
     """ This factory function is called from the main program,
     and expected to return a B2YBank subclass.
     Without this, the module will fail to load properly.
 
     :param config: dict containing all available configuration parameters
-    :param is_py2: boolean indicating whether we are running under Python 2.x
     :return: a B2YBank subclass instance
     """
-    return Handelsbanken(config, is_py2)
+    return Handelsbanken(config)

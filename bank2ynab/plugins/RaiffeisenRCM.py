@@ -1,11 +1,12 @@
 # Plugin for handling [AT Raiffeisen RCM] format
 
-from bank2ynab import B2YBank, CrossversionCsvReader
+from bank_process import B2YBank
+from b2y_utilities import EncodingCsvReader
 
 
 class RaiffeisenRCMPlugin(B2YBank):
-    def __init__(self, config_object, is_py2):
-        super(RaiffeisenRCMPlugin, self).__init__(config_object, is_py2)
+    def __init__(self, config_object):
+        super(RaiffeisenRCMPlugin, self).__init__(config_object)
         self.name = "RaiffeisenRCM"
 
     def read_data(self, file_path):
@@ -15,7 +16,7 @@ class RaiffeisenRCMPlugin(B2YBank):
         header_rows = self.config["header_rows"]
         output_data = []
 
-        with CrossversionCsvReader(file_path, self._is_py2, delimiter=delim) as reader:
+        with EncodingCsvReader(file_path, delimiter=delim) as reader:
             for index, row in enumerate(reader):
                 tmp = {}
 
@@ -66,5 +67,5 @@ class RaiffeisenRCMPlugin(B2YBank):
         return output_data
 
 
-def build_bank(config, is_py2):
-    return RaiffeisenRCMPlugin(config, is_py2)
+def build_bank(config):
+    return RaiffeisenRCMPlugin(config)

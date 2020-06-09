@@ -3,7 +3,7 @@
 -->
 # bank2ynab
 
-A common project to consolidate all conversion efforts from various banks' export formats into YNAB's import format.
+This project consolidates other conversion efforts into one universal tool that easily converts and imports your bank's statements into YNAB.
 
 Development:
 [![GitHub issues by-label](https://img.shields.io/github/issues-raw/bank2ynab/bank2ynab/bug.svg)](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
@@ -101,76 +101,92 @@ For details, please see our [issue list labeled "Bug"](https://github.com/bank2y
 ## <a name="formats"></a>List of Supported Banks
 
 Here is a list of the banks and their formats that we already support. Note that we have many [more formats in the pipeline](https://github.com/bank2ynab/bank2ynab/issues?q=is%3Aopen+is%3Aissue+label%3A%22bank+format%22) so the list continues to grow, and we are happy to receive [requests](https://goo.gl/forms/b7SNwTxmQFfnXlMf2). In alphabetical order (country and bank):
-
+<!--AUTO BANK UPDATE START-->
 1. AT easybank credit card
-1. AT Raiffeisen Bank 2018 checking
+1. AT Raiffeisen Bank 2018
+1. AT Raiffeisen Bank RCM
 1. AT Raiffeisen Bank 2019 checking
-1. AT Raiffeisen Bank VISA card
+1. AT Raiffeisen VISA
+1. AU ANZ
+1. AU ING
+1. AU National Australia Bank
 1. BE KBC checking
-1. BE BE Keytrade Bank
-1. BR Banco do Brasil checking
-1. BR Inter checking
+1. BE KBC credit
+1. BE Keytrade Bank
+1. BR Banco do Brasil, checking
+1. BR Inter, checking
 1. CA TD Canada Trust, checking+Visa
-1. CH Zürcher Kantonalbank, Kontoauszug
-1. , Finanzassistent
+1. CH ZKB Erweiterte Suche
+1. CH ZKB Finanzassistent-Chronik
 1. CZ AirBank checking and savings
 1. CZ Ceska Sporitelna
 1. CZ Raiffeisen bank
 1. DE Commerzbank checking
 1. DE Consorsbank checking
 1. DE Deutsche Bank
+1. DE Deutsche Bank Credit Card
 1. DE Deutsche Kreditbank checking
 1. DE Deutsche Kreditbank credit card
+1. DE Fiducia (Volksbank, Sparda-Bank, BBBank, PSD Bank, Raiffeisen, ...)
 1. DE ING-DiBa
 1. DE Kreissparkasse
 1. DE N26
 1. DE Ostseesparkasse Rostock checking
 1. DE Ostseesparkasse Rostock credit card
 1. DE Sparkasse Rhein-Neckar-Nord
+1. DE Sparkasse Südholstein
 1. DK Bankernes EDB Central
 1. DK Jyske Bank VISA
 1. DK Nordea
 1. DK Sparkassen Thy
 1. HU Erste Bank checking
+1. HU OTP
 1. IE AIB Ireland
 1. IE Bank of Ireland
 1. IE N26
 1. IE Ulster Bank, savings
+1. IT RomagnaBanca Inbank
+1. Mint
 1. MV Bank of Maldives, checking
+1. NETELLER
 1. NL Bunq checking
 1. NL bunqDesktop software
-1. NL ING Bank
-1. NL Rabobank (2017 format)
-1. NL Rabobank (2018 format)
+1. NL bunqDesktop software 2
+1. NL ING
+1. NL ING Checking 2020
+1. NL Rabobank
+1. NL Rabobank-2018
 1. NO DNB
 1. NO Sparebank 1 VISA
-1. PL mBank, checking
+1. Personal Capital
+1. PL mBank
 1. SE Handelsbanken
 1. SE Länsförsäkringar checking
-1. SE Nordea
-1. SE SEB, Skandinaviska Enskilda Banken
+1. SE Nordea - internetbanken.privat.nordea.se
+1. SE Nordea - netbank.nordea.se
+1. SE SEB Skandinaviska Enskilda Banken
 1. SE Sparbanken Tanum
 1. SE Swedbank
-1. SE Swedbank (2019 format)
-1. SE OCBC Bank
+1. SE Swedbank 2019
+1. SG OCBC Bank
 1. SG POSB savings
 1. SK Tatra Banka
 1. SK VUB
+1. UK Co-operative Bank
+1. UK Monzo checking
 1. UK Barclaycard credit card
 1. UK Barclaycard Business Credit Card
-1. UK Co-operative Bank
 1. UK first direct checking
-1. UK Monzo checking
+1. UK John Lewis Partnership Card
 1. US Bank of America
 1. US Bank of America Credit Card
 1. US BB&T
-1. US Chase Credit Card
+1. US Chase Credit Card 2017
+1. US Chase Credit Card 2019
 1. US Schwab
 1. US TB Bank
-1. (software) Mint
-1. (software) Neteller
-1. (software) Personal Capital
-
+1. US USAA
+<!--AUTO BANK UPDATE END-->
 ----
 
 [![XKCD on standards: Fortunately, the charging one has been solved now that we've all standardized on mini-USB. Or is it micro-USB? Shit.](https://imgs.xkcd.com/comics/standards.png)](https://xkcd.com/927/)

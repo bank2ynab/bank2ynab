@@ -1,3 +1,7 @@
 # bank2ynab specific stuff
 user_configuration.conf
 test-data/temp-test.conf
+bank2ynab/main
+bank2ynab/plugins/plugins
+test/tests
+*.pyc

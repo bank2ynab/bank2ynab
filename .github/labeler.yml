@@ -1,5 +1,32 @@
-# Add 'bank format' label to any change in bank2ynab.conf
-bank format:
+formats:
   - ./bank2ynab.conf
-project automation:
+  - plugins/**/*
+automation:
   - .github/workflows/**/*
+  - .github/labeler.yml
+  - utils/**/*
+meta:
+  - .github/**/*
+docs:
+  - docs/**/*
+  - github-pages/**/*
+  - ./README.md
+tests:
+  - test/**/*
+  - test-data/**/*
+  - ./codecov.yml
+  - ./.coveragerc
+script:
+  - bank2ynab/**
+packaging:
+  - ./MANIFEST.in
+  - ./pyproject.toml
+  - ./setup.py
+INCLUSION_ERROR:
+  - ./user_configuration.conf
+api:
+  - bank2ynab/ynab_api.py
+bank_process:  
+  - bank2ynab/bank_process.py
+utilities:
+  - bank2ynab/b2y_utilities.py  

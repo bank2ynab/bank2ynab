@@ -1,0 +1,4 @@
+kredietkaart;kaarthouder;uitgavenstaat;datum verrichting;Datum verrekening;bedrag;credit;debet;munt;koers;bedrag in EUR;Kosten op verrichting;Handelaar;locatie;land;toelichting
+1234567890123456;SMITH JOHN;;01/02/2020;03/02/2020;-16,52;;-16,52;EUR;1;-16,52;0;More info;;;
+;;;24/01/2020;24/01/2020;35,77;35,77;;EUR;1;35,77;0;Payment from Checking account;;;
+1234567890123456;SMITH JOHN;januari 2020;01/01/2020;02/01/2020;-16,52;;-16,52;EUR;1;-16,52;0;More info;;;

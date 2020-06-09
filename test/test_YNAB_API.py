@@ -1,21 +1,31 @@
-from test.utils import get_test_confparser
 from unittest import TestCase
 from unittest.mock import patch
 from os.path import join
 import os
 from shutil import copyfile
-from bank2ynab import YNAB_API
 import configparser
 
-_PY2 = False
+
+from test.utils import get_test_confparser, get_project_dir
+
+from bank2ynab.b2y_utilities import (
+    get_configs,
+    string_num_diff,
+    get_config_line,
+    option_selection,
+)
+
+from bank2ynab.ynab_api import YNAB_API
+
 
 
 class Test_YNAB_API(TestCase):
     def setUp(self):
-        global _PY2
-        self.TESTCONFPATH = join("test-data", "test.conf")
-        self.TEMPCONFPATH = join("test-data", "temp-test.conf")
-        self.cp, self.py2, = get_test_confparser()
+        self.TESTCONFPATH = join(get_project_dir(), "test-data", "test.conf")
+        self.TEMPCONFPATH = join(
+            get_project_dir(), "test-data", "temp-test.conf"
+        )
+        self.cp = get_test_confparser()
         self.defaults = dict(self.cp.defaults())
         self.test_class = None
         # copy config file to temp location
@@ -46,8 +56,7 @@ class Test_YNAB_API(TestCase):
 
     def test_run(self):  # todo
         """
-        def run(self, transaction_data):
-        if(self.api_token is not None):
+        if self.api_token is not None:
             logging.info("Connecting to YNAB API...")
 
             # check for API token auth (and other errors)
@@ -55,15 +64,16 @@ class Test_YNAB_API(TestCase):
             if error_code[0] == "ERROR":
                 return error_code
             else:
-                # if no default budget, build budget list and select default
-                if self.budget_id is None:
-                    msg = "No default budget set! \nPick a budget"
-                    budget_ids = self.list_budgets()
-                    self.budget_id = option_selection(budget_ids, msg)
+                # generate our list of budgets
+                budget_ids = self.list_budgets()
+                # if there's only one budget, silently set a default budget
+                if len(budget_ids) == 1:
+                    self.budget_id = budget_ids[0]
 
-                transactions = self.process_transactions(transaction_data)
-                if transactions["transactions"] != []:
-                    self.post_transactions(transactions)
+                budget_t_data = self.process_transactions(transaction_data)
+                for budget in budget_ids:
+                    if budget_t_data[budget]["transactions"] != []:
+                        self.post_transactions(budget_t_data[budget])
         else:
             logging.info("No API-token provided.")
         """
@@ -200,7 +210,10 @@ class Test_YNAB_API(TestCase):
             transactions.append(test_transaction)
 
             for key in test_transaction:
-                self.assertEqual(target_transaction[key], test_transaction[key])
+
+                self.assertEqual(
+                    target_transaction[key], test_transaction[key]
+                )
 
     def test_create_import_id(self):
         test_class = YNAB_API(self.cp)
@@ -279,12 +292,12 @@ class Test_YNAB_API(TestCase):
 
     def test_post_transactions(self):  # todo
         """
-        def post_transactions(self, data):
+        def post_transactions(self, budget_id, data):
             # send our data to API
             logging.info("Uploading transactions to YNAB...")
             url = ("https://api.youneedabudget.com/v1/budgets/" +
                    "{}/transactions?access_token={}".format(
-                       self.budget_id,
+                       budget_id,
                        self.api_token))
 
             post_response = requests.post(url, json=data)
@@ -388,33 +401,35 @@ class Test_YNAB_API(TestCase):
             return ["ERROR", id, detail]
         """
 
-    @patch("bank2ynab.option_selection")
+    @patch("b2y_utilities.option_selection")
     @patch.object(YNAB_API, "list_accounts")
     def test_select_account(self, mock_list_acs, mock_option_sel):
         """
         Test account selection logic
         """
         test_class = YNAB_API(self.cp)
-        test_class.budget_id = "Test Budget ID"
         test_banks = [
-            ("test_api_existing_bank", "Test Account ID"),
-            ("New Bank", "ID #2"),
+
+            ("test_api_existing_bank", "Test Budget ID 1", "Test Account ID"),
+            ("New Bank", "Test Budget ID 2", "ID #2"),
         ]
         test_class.config_path = self.TEMPCONFPATH
         test_class.config = configparser.RawConfigParser()
         test_class.config.read(test_class.config_path)
 
         mock_ids = [
-            ("Account 1", "ID #1"),
-            ("Account 2", "ID #2"),
-            ("Account 3", "ID #3"),
+
+            ("Account 1", "Test Budget ID 1", "ID #1"),
+            ("Account 2", "Test Budget ID 2", "ID #2"),
+            ("Account 3", "Test Budget ID 1", "ID #3"),
         ]
         mock_list_acs.return_value = mock_ids
-        mock_option_sel.return_value = "ID #2"
+        mock_option_sel.side_effect = ["Test Budget ID 2", "ID #2"]
 
-        for bank, target_id in test_banks:
-            id = test_class.select_account(bank)
-            self.assertEqual(id, target_id)
+        for bank, budget_id, ac_id in test_banks:
+            b_id, a_id = test_class.select_account(bank)
+            self.assertEqual(b_id, budget_id)
+            self.assertEqual(a_id, ac_id)
 
     def test_save_account_selection(self):
         """
@@ -422,7 +437,7 @@ class Test_YNAB_API(TestCase):
         in the correct file.
         """
         test_class = YNAB_API(self.cp)
-        test_class.budget_id = "Test Budget ID"
+        test_budget_id = "Test Budget ID"
         test_account_id = "Test Account ID"
         test_banks = ["New Bank", "Existing Bank"]
         test_class.config_path = self.TEMPCONFPATH
@@ -431,12 +446,15 @@ class Test_YNAB_API(TestCase):
 
         # save test bank details to test config
         for test_bank in test_banks:
-            test_class.save_account_selection(test_bank, test_account_id)
+            test_class.save_account_selection(
+                test_bank, test_budget_id, test_account_id
+            )
         # check test config for test bank details & make sure ID matches
         config = configparser.RawConfigParser()
         config.read(test_class.user_config_path)
         for test_bank in test_banks:
             test_id = config.get(test_bank, "YNAB Account ID")
             self.assertEqual(
-                test_id, "{}||{}".format(test_class.budget_id, test_account_id)
+
+                test_id, "{}||{}".format(test_budget_id, test_account_id)
             )

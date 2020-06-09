@@ -31,4 +31,3 @@ bank_process:
   - bank2ynab/bank_process.py
 utilities:
   - bank2ynab/b2y_utilities.py  
->>>>>>> develop

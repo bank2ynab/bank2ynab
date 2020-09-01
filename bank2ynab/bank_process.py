@@ -77,7 +77,7 @@ class B2YBank(object):
                 files = [
                     join(path, f)
                     for f in directory_list
-                    if f.endswith(ext)
+                    if f.endswith(ext) or f.endswith(ext.lower()) or f.endswith(ext.upper())
                     if f.startswith(file_pattern)
                     if prefix not in f
                 ]

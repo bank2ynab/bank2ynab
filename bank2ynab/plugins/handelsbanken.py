@@ -46,7 +46,7 @@ class Handelsbanken(B2YBank):
 
 
 def build_bank(config):
-    """ This factory function is called from the main program,
+    """This factory function is called from the main program,
     and expected to return a B2YBank subclass.
     Without this, the module will fail to load properly.
 

@@ -146,6 +146,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. IE N26
 1. IE Ulster Bank, savings
 1. IT RomagnaBanca Inbank
+1. LV Swedbank
 1. Mint
 1. MV Bank of Maldives, checking
 1. NETELLER
@@ -154,8 +155,10 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL bunqDesktop software 2
 1. NL ING
 1. NL ING Checking 2020
+1. NL KNAB
 1. NL Rabobank
 1. NL Rabobank-2018
+1. NL Rabobank Credit Card
 1. NO DNB
 1. NO Sparebank 1 VISA
 1. Personal Capital

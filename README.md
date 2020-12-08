@@ -84,9 +84,9 @@ Using `bank2ynab` is easy:
 1. Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
 1. Install the required dependencies by navigating to the `bank2ynab` directory in your command line and entering the following - `pip install -r requirements.txt` or `pip3 install -r requirements.txt`.
 1. Run the `bank2ynab.py` conversion script to generate the YNAB-ready CSV output file. How to do this depends on your operating system:
-   - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab.py`.
+   - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab`.
      - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.bat` file, choose *Send to* and then choose *Desktop (create shortcut)*. Now you can just double-click that shortcut!
-   - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab.py`.
+   - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab`.
      - *Important:* Be sure to use `python3` specifically, and not `python` or `python2` which is probably the system default.
  1. Depending on your configuration, the conversion script will now import your files into YNAB automatically, or you can add the files manually:
     - **Automatic import** (when you have provided [your YNAB API access token](https://github.com/bank2ynab/bank2ynab/wiki/Create-your-YNAB-API-access-token): 

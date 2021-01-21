@@ -171,6 +171,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Sparbanken Tanum
 1. SE Swedbank
 1. SE Swedbank 2019
+1. SE Swedbank 2020
 1. SG OCBC Bank
 1. SG POSB savings
 1. SK Tatra Banka

@@ -31,7 +31,7 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 # Classes doing the actual work
 class B2YBank(object):
-    """ Object parsing and outputting data for a specific bank.
+    """Object parsing and outputting data for a specific bank.
     This can be subclassed to handle formats requiring special handling,
     overriding any of get_files(), read_data() or write_data()."""
 
@@ -43,7 +43,7 @@ class B2YBank(object):
         self.config = config_object
 
     def get_files(self):
-        """ find the transaction file
+        """find the transaction file
         :return: list of matching files found
         """
         ext = self.config["ext"]
@@ -90,7 +90,7 @@ class B2YBank(object):
         return files
 
     def read_data(self, file_path):
-        """ extract data from given transaction file
+        """extract data from given transaction file
         :param file_path: path to file
         :return: list of cleaned data rows
         """
@@ -243,7 +243,7 @@ class B2YBank(object):
         return row
 
     def _valid_row(self, row):
-        """ if our row doesn't have an inflow, outflow or a valid date,
+        """if our row doesn't have an inflow, outflow or a valid date,
         mark as invalid
         :param row: list of values
         """
@@ -258,7 +258,7 @@ class B2YBank(object):
         return True
 
     def _auto_memo(self, row, fill_memo):
-        """ auto fill empty memo field with payee info
+        """auto fill empty memo field with payee info
         :param row: list of values
         :param fill_memo: boolean
         """
@@ -270,7 +270,7 @@ class B2YBank(object):
         return row
 
     def _fix_date(self, row, date_format):
-        """ fix date format when required
+        """fix date format when required
         convert date to YYYY-MM-DD
         :param row: list of values
         :param date_format: date format string
@@ -292,7 +292,7 @@ class B2YBank(object):
         return row
 
     def _cd_flag_process(self, row, cd_flags):
-        """ fix rows where inflow or outflow is indicated by
+        """fix rows where inflow or outflow is indicated by
         a flag in a separate column
         :param row: list of values
         :param cd_flags: list of parameters for applying indicators
@@ -307,7 +307,7 @@ class B2YBank(object):
         return row
 
     def write_data(self, filename, data):
-        """ write out the new CSV file
+        """write out the new CSV file
         :param filename: path to output file
         :param data: cleaned data ready to output
         """
@@ -349,7 +349,7 @@ def build_bank(bank_config):
 
 
 class Bank2Ynab(object):
-    """ Main program instance, responsible for gathering configuration,
+    """Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
 
     def __init__(self, config_object):

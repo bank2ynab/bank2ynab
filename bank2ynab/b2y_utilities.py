@@ -31,7 +31,7 @@ def get_configs():
 
 
 def fix_conf_params(conf_obj, section_name):
-    """ from a ConfigParser object, return a dictionary of all parameters
+    """from a ConfigParser object, return a dictionary of all parameters
     for a given section in the expected format.
     Because ConfigParser defaults to values under [DEFAULT] if present, these
     values should always appear unless the file is really bad.
@@ -87,8 +87,7 @@ def get_config_line(conf_obj, section_name, args):
 
 
 def find_directory(filepath):
-    """ finds the downloads folder for the active user if filepath is not set
-    """
+    """finds the downloads folder for the active user if filepath is not set"""
     if filepath == "":
         if os.name == "nt":
             # Windows
@@ -346,7 +345,7 @@ class EncodingCsvReader(EncodingFileContext):
 
 
 class EncodingCsvWriter(EncodingFileContext):
-    """ context manager returning a csv.Writer-compatible object
+    """context manager returning a csv.Writer-compatible object
     regardless of Python version"""
 
     def __enter__(self):

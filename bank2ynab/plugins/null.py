@@ -22,7 +22,7 @@ class NullBank(B2YBank):
         self.name = "NullBank"
 
     def read_data(self, file_path):
-        """ This is probably the only method you really want to override.
+        """This is probably the only method you really want to override.
         Implement any custom parsing logic in here.
         :param file_path: absolute path to source file
         :return: list of lists representing rows in output format
@@ -33,14 +33,14 @@ class NullBank(B2YBank):
         ]
 
     def get_files(self):
-        """ Only override this if you need custom logic to find source
+        """Only override this if you need custom logic to find source
         data, e.g. downloading from somewhere.
         :return: list of absolute pathnames to source files
         """
         return []
 
     def write_data(self, source_file_path, data):
-        """ Only override this if you know read_data is not returning
+        """Only override this if you know read_data is not returning
         records in standard format (which you really shouldn't do anyway).
         :param source_file_path: absolute path to SOURCE file. The method will
                 determine output file on its own.
@@ -51,7 +51,7 @@ class NullBank(B2YBank):
 
 
 def build_bank(config):
-    """ This factory function is called from the main program,
+    """This factory function is called from the main program,
     and expected to return a B2YBank subclass.
     Without this, the module will fail to load properly.
 

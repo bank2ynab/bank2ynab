@@ -84,9 +84,9 @@ Using `bank2ynab` is easy:
 1. Check that the configuration in `bank2ynab.conf` contains a `[SECTION]` for your banking format. *You only need to do this once per bank you use.* If you can't find your bank in the config, [tell us your bank's format](https://goo.gl/forms/b7SNwTxmQFfnXlMf2) and we can add it to the project.
 1. Install the required dependencies by navigating to the `bank2ynab` directory in your command line and entering the following - `pip install -r requirements.txt` or `pip3 install -r requirements.txt`.
 1. Run the `bank2ynab.py` conversion script to generate the YNAB-ready CSV output file. How to do this depends on your operating system:
-   - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab.py`.
+   - Windows: Open a command prompt, navigate to the script directory, and run the command `python bank2ynab`.
      - Pro tip: Create a program shortcut! Right-click on the `bank2ynab.bat` file, choose *Send to* and then choose *Desktop (create shortcut)*. Now you can just double-click that shortcut!
-   - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab.py`.
+   - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab`.
      - *Important:* Be sure to use `python3` specifically, and not `python` or `python2` which is probably the system default.
  1. Depending on your configuration, the conversion script will now import your files into YNAB automatically, or you can add the files manually:
     - **Automatic import** (when you have provided [your YNAB API access token](https://github.com/bank2ynab/bank2ynab/wiki/Create-your-YNAB-API-access-token): 
@@ -146,6 +146,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. IE N26
 1. IE Ulster Bank, savings
 1. IT RomagnaBanca Inbank
+1. LV Swedbank
 1. Mint
 1. MV Bank of Maldives, checking
 1. NETELLER
@@ -154,8 +155,10 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL bunqDesktop software 2
 1. NL ING
 1. NL ING Checking 2020
+1. NL KNAB
 1. NL Rabobank
 1. NL Rabobank-2018
+1. NL Rabobank Credit Card
 1. NO DNB
 1. NO Sparebank 1 VISA
 1. Personal Capital
@@ -168,7 +171,9 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Sparbanken Tanum
 1. SE Swedbank
 1. SE Swedbank 2019
+1. SE Swedbank 2020
 1. SG OCBC Bank
+1. SG OCBC Bank Credit Card
 1. SG POSB savings
 1. SK Tatra Banka
 1. SK VUB
@@ -183,7 +188,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. US BB&T
 1. US Chase Credit Card 2017
 1. US Chase Credit Card 2019
-1. US Schwab
+1. US Schwab Checking
+1. US Schwab Savings
 1. US TB Bank
 1. US USAA
 <!--AUTO BANK UPDATE END-->

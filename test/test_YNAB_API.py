@@ -78,30 +78,30 @@ class Test_YNAB_API(TestCase):
 
     def test_api_read(self):  # todo
         """
-        def api_read(self, budget, kwd):
+         def api_read(self, budget, kwd):
 
-       General function for reading data from YNAB API
-       :param  budget: boolean indicating if there's a default budget
-       :param  kwd: keyword for data type, e.g. transactions
-       :return error_codes: if it fails we return our error
+        General function for reading data from YNAB API
+        :param  budget: boolean indicating if there's a default budget
+        :param  kwd: keyword for data type, e.g. transactions
+        :return error_codes: if it fails we return our error
 
-        id = self.budget_id
-        api_t = self.api_token
-        base_url = "https://api.youneedabudget.com/v1/budgets/"
+         id = self.budget_id
+         api_t = self.api_token
+         base_url = "https://api.youneedabudget.com/v1/budgets/"
 
-        if budget is False:
-            # only happens when we're looking for the list of budgets
-            url = base_url + "?access_token={}".format(api_t)
-        else:
-            url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
+         if budget is False:
+             # only happens when we're looking for the list of budgets
+             url = base_url + "?access_token={}".format(api_t)
+         else:
+             url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
 
-        response = requests.get(url)
-        try:
-            read_data = response.json()["data"][kwd]
-        except KeyError:
-            # the API has returned an error so let's handle it
-            return self.process_api_response(response.json()["error"])
-        return read_data
+         response = requests.get(url)
+         try:
+             read_data = response.json()["data"][kwd]
+         except KeyError:
+             # the API has returned an error so let's handle it
+             return self.process_api_response(response.json()["error"])
+         return read_data
         """
 
     def test_process_transactions(self):  # todo

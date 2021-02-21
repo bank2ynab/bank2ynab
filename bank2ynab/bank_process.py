@@ -101,6 +101,7 @@ class B2YBank(object):
         cd_flags = self.config["cd_flags"]
         date_format = self.config["date_format"]
         fill_memo = self.config["payee_to_memo"]
+        encoding = self.config["encoding"]
         output_data = []
 
         # give plugins a chance to pre-process the file
@@ -108,7 +109,7 @@ class B2YBank(object):
 
         # get total number of rows in transaction file using a generator
         with b2y_utilities.EncodingCsvReader(
-            file_path, delimiter=delim
+                file_path, delimiter=delim, encoding=encoding
         ) as row_count_reader:
             row_count = sum(1 for row in row_count_reader)
 

@@ -315,10 +315,11 @@ def detect_encoding(filepath):
 class EncodingFileContext(object):
     """ ContextManager class for common operations on files"""
 
-    def __init__(self, file_path, **kwds):
+    def __init__(self, file_path, encoding=None, **kwds):
         self.file_path = os.path.abspath(file_path)
         self.stream = None
         self.csv_object = None
+        self.encoding = encoding
         self.params = kwds
 
     def __enter__(self):
@@ -338,8 +339,9 @@ class EncodingCsvReader(EncodingFileContext):
     """ context manager returning a csv.Reader-compatible object"""
 
     def __enter__(self):
-        encoding = detect_encoding(self.file_path)
-        self.stream = open(self.file_path, encoding=encoding)
+        if not self.encoding :
+            self.encoding = detect_encoding(self.file_path)
+        self.stream = open(self.file_path, encoding=self.encoding)
         self.csv_object = csv.reader(self.stream, **self.params)
         return self.csv_object
 

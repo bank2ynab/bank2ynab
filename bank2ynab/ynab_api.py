@@ -2,11 +2,15 @@ import requests
 import json
 import configparser
 import logging
+from collections import namedtuple
 
 import b2y_utilities
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+
+Account = namedtuple("Account", ("id", "name"))
+Budget = namedtuple("Budget", ("id", "name", "accounts"))
 
 
 class YNAB_API(object):  # in progress (2)
@@ -58,7 +62,7 @@ class YNAB_API(object):  # in progress (2)
         """
         api_t = self.api_token
         base_url = "https://api.youneedabudget.com/v1/budgets/"
-        url =  f"{base_url}/{budget_id}/{kwd}" if budget_id else base_url
+        url = f"{base_url}/{budget_id}/{kwd}" if budget_id else base_url
         url += f"?access_token={api_t}"
         response = requests.get(url)
         try:
@@ -137,7 +141,7 @@ class YNAB_API(object):  # in progress (2)
         for transaction in existing_transactions:
             try:
                 if transaction["import_id"].startswith(
-                    "YNAB:{}:{}:".format(amount, date)
+                        "YNAB:{}:{}:".format(amount, date)
                 ):
                     count += 1
             except KeyError:
@@ -145,18 +149,26 @@ class YNAB_API(object):  # in progress (2)
                 pass
         return "YNAB:{}:{}:{}".format(amount, date, count)
 
-    def post_transactions(self, budget_id, data):
+    def post_transactions(self, data, budget_id, account_id):
+        budget_transactions = []
+        for t in data[1:]:
+            trans_dict = self.create_transaction(
+                account_id, t, budget_transactions
+            )
+            budget_transactions.append(trans_dict)
+
         # send our data to API
         logging.info("Uploading transactions to YNAB...")
-        url = (
-            "https://api.youneedabudget.com/v1/budgets/"
-            + "{}/transactions?access_token={}".format(
-                budget_id, self.api_token
-            )
-        )
+        url = "https://api.youneedabudget.com/v1/budgets/{}/transactions?access_token={}".format(budget_id,
+                                                                                                 self.api_token)
 
-        post_response = requests.post(url, json=data)
-        self.process_api_response(json.loads(post_response.text)["error"])
+        post_data = {"transactions": budget_transactions}
+        import pprint as pp
+        logging.info("Post data: {}".format(pp.pformat(post_data)))
+        post_response = requests.post(url, json=post_data)
+        logging.info("Got response={}".format(pp.pformat(post_response)))
+        if not post_response.ok:
+            self.process_api_response(json.loads(post_response.text)["error"])
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")
@@ -172,11 +184,16 @@ class YNAB_API(object):  # in progress (2)
 
     def list_accounts(self, budget_id):
         accounts = self.api_read(budget_id, "accounts")
-        return [(a["name"], a["id"]) for a in accounts]
+        return [Account(name=a["name"], id=a["id"]) for a in accounts]
 
     def list_budgets(self):
-        budgets = self.api_read(None, "budgets")
-        return [ (b["name"], b["id"]) for b in budgets]
+        res = []
+        for b in self.api_read(None, "budgets"):
+            budget_id = b["id"]
+            name = b["name"]
+            accounts = self.list_accounts(budget_id)
+            res.append(Budget(name=name, id=budget_id, accounts=accounts))
+        return res
 
     def process_api_response(self, details):
         """

@@ -6,13 +6,18 @@ import codecs
 import csv
 
 
+def get_project_dir():
+    path = os.path.realpath(__file__)
+    parent_dir = os.path.dirname(path)
+    return os.path.dirname(parent_dir)
+
+
 # Generic utilities
 def get_configs():
     """ Retrieve all configuration parameters."""
-    # TODO - fix path for these
-    path = os.path.realpath(__file__)
-    parent_dir = os.path.dirname(path)
-    project_dir = os.path.dirname(parent_dir)
+    # TODO - fix path for these,  To what and why?
+
+    project_dir = get_project_dir()
     conf_files = [
         os.path.join(project_dir, "bank2ynab.conf"),
         os.path.join(project_dir, "user_configuration.conf"),
@@ -334,7 +339,7 @@ class EncodingCsvReader(EncodingFileContext):
     """ context manager returning a csv.Reader-compatible object"""
 
     def __enter__(self):
-        if not self.encoding :
+        if not self.encoding:
             self.encoding = detect_encoding(self.file_path)
         self.stream = open(self.file_path, encoding=self.encoding)
         self.csv_object = csv.reader(self.stream, **self.params)
@@ -349,6 +354,5 @@ class EncodingCsvWriter(EncodingFileContext):
         self.stream = open(self.file_path, "w", encoding="utf-8", newline="")
         self.csv_object = csv.writer(self.stream, **self.params)
         return self.csv_object
-
 
 # -- end of utilities

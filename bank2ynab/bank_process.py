@@ -396,7 +396,14 @@ class Bank2Ynab(object):
         logging.info("Process files from bank. Bank={}, files={}".format(bank.name, files))
         for src_file in files:
             # TODO this is a bug from before only the latest is set
-            data = process_file(bank, src_file)
+            data = bank.process_file(src_file)
             if data:
                 self.transaction_data[bank.name] = data
         return len(files)
+
+    def get_bank_by_name(self, name):
+        for b in self.banks:
+            if b.name == name:
+                return b
+        names = [b.name for b in self.banks]
+        raise KeyError('Could not find "{}" among the know banks {}'.format(name, names))

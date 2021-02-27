@@ -331,7 +331,13 @@ class B2YBank(object):
         return target_filename
 
     def process_file(self, src_file):
-        logging.info("Parsing input file:  {} (format: {})".format(
+        """
+        read data from src_file and write it out and return the transaction data
+
+        :param src_file:
+        :return: transaction data
+        """
+        logging.info("Parsing input file: {} (format: {})".format(
             src_file, self.name))
         # create cleaned csv for each file
         output = self.read_data(src_file)
@@ -340,12 +346,8 @@ class B2YBank(object):
             return None
 
         self.write_data(src_file, output)
-        # save transaction data for each self   to object
-        # delete original csv file
         if self.config["delete_original"]:
-            logging.info(
-                "Removing input file: {}".format(src_file)
-            )
+            logging.info("Removing input file: {}".format(src_file))
             os.remove(src_file)
         return output
 

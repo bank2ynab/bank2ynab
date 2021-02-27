@@ -101,7 +101,7 @@ class B2YBank(object):
         cd_flags = self.config["cd_flags"]
         date_format = self.config["date_format"]
         fill_memo = self.config["payee_to_memo"]
-        encoding = self.config["encoding"]
+        encoding = self.config["encoding"] if "encoding" in self.config else None
         output_data = []
 
         # give plugins a chance to pre-process the file
@@ -114,7 +114,7 @@ class B2YBank(object):
             row_count = sum(1 for row in row_count_reader)
 
         with b2y_utilities.EncodingCsvReader(
-            file_path, delimiter=delim
+                file_path, delimiter=delim
         ) as transaction_reader:
             # make each row of our new transaction file
             for line, row in enumerate(transaction_reader):
@@ -330,6 +330,25 @@ class B2YBank(object):
                 writer.writerow(row)
         return target_filename
 
+    def process_file(self, src_file):
+        logging.info("Parsing input file:  {} (format: {})".format(
+            src_file, self.name))
+        # create cleaned csv for each file
+        output = self.read_data(src_file)
+        if not output:
+            logging.info("No output data from this file for this bank.")
+            return None
+
+        self.write_data(src_file, output)
+        # save transaction data for each self   to object
+        # delete original csv file
+        if self.config["delete_original"]:
+            logging.info(
+                "Removing input file: {}".format(src_file)
+            )
+            os.remove(src_file)
+        return output
+
 
 def build_bank(bank_config):
     """ Factory method loading the correct class for a given configuration. """
@@ -338,16 +357,15 @@ def build_bank(bank_config):
         p_mod = importlib.import_module("plugins.{}".format(plugin_module))
         if not hasattr(p_mod, "build_bank"):
             s = (
-                "The specified plugin {}.py".format(plugin_module)
-                + "does not contain the required "
-                "build_bank(config) method."
+                    "The specified plugin {}.py".format(plugin_module)
+                    + "does not contain the required "
+                      "build_bank(config) method."
             )
             raise ImportError(s)
         bank = p_mod.build_bank(bank_config)
         return bank
     else:
         return B2YBank(bank_config)
-
 
 class Bank2Ynab(object):
     """Main program instance, responsible for gathering configuration,
@@ -364,36 +382,18 @@ class Bank2Ynab(object):
 
     def run(self):
         """ Main program flow """
-        # initialize variables for summary:
+        # find all jobs, a tuple og bank and files to process
+        batch_list = [(b, b.get_files()) for b in self.banks if b.get_files()]
         files_processed = 0
-        # process account for each config file
-        for bank in self.banks:
-            # find all applicable files
-            files = bank.get_files()
-            bank_name = bank.name
-            for src_file in files:
-                logging.info(
-                    "\nParsing input file:  {} (format: {})".format(
-                        src_file, bank_name
-                    )
-                )
-                # increment for the summary:
-                files_processed += 1
-                # create cleaned csv for each file
-                output = bank.read_data(src_file)
-                if output != []:
-                    bank.write_data(src_file, output)
-                    # save transaction data for each bank to object
-                    self.transaction_data[bank_name] = output
-                    # delete original csv file
-                    if bank.config["delete_original"] is True:
-                        logging.info(
-                            "Removing input file: {}".format(src_file)
-                        )
-                        os.remove(src_file)
-                else:
-                    logging.info(
-                        "No output data from this file for this bank."
-                    )
+        for job in batch_list:
+            files_processed += self.process_files_from_bank(*job)
+        logging.info("Done! {} files processed.".format(files_processed))
 
-        logging.info("\nDone! {} files processed.\n".format(files_processed))
+    def process_files_from_bank(self, bank, files):
+        logging.info("Process files from bank. Bank={}, files={}".format(bank.name, files))
+        for src_file in files:
+            # TODO this is a bug from before only the latest is set
+            data = process_file(bank, src_file)
+            if data:
+                self.transaction_data[bank.name] = data
+        return len(files)

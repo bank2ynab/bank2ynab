@@ -20,68 +20,54 @@ class YNAB_API(object):  # in progress (2)
         self.budget_id = None
         self.config = b2y_utilities.get_configs()
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
+        if not self.api_token:
+            raise RuntimeError("No API-token provided.")
+
         # TODO make user_config section play nice with
         # b2y_utilities.get_configs()
         self.user_config_path = "user_configuration.conf"
         self.user_config = configparser.RawConfigParser()
 
-        # TODO: Fix debug structure, so it will be used in logging instead
-        self.debug = False
-
     def run(self, transaction_data):
-        if self.api_token is not None:
-            logging.info("Connecting to YNAB API...")
+        logging.info("Connecting to YNAB API...")
+        # generate our list of budgets
+        budget_ids = self.list_budgets()
+        # if there's only one budget, silently set a default budget
+        if len(budget_ids) == 1:
+            self.budget_id = budget_ids[0][1]
 
-            # check for API token auth (and other errors)
-            error_code = self.list_budgets()
-            if error_code[0] == "ERROR":
-                return error_code
-            else:
-                # generate our list of budgets
-                budget_ids = self.list_budgets()
-                # if there's only one budget, silently set a default budget
-                if len(budget_ids) == 1:
-                    self.budget_id = budget_ids[0]
-
-                budget_t_data = self.process_transactions(transaction_data)
-                for budget in budget_ids:
-                    id = budget[1]
-                    try:
-                        self.post_transactions(id, budget_t_data[id])
-                    except KeyError:
-                        logging.info(
-                            "No transactions to upload for {}.".format(
-                                budget[0]
-                            )
-                        )
-        else:
-            logging.info("No API-token provided.")
+        budget_t_data = self.process_transactions(transaction_data)
+        logging.info(f"budget_t_data={budget_t_data}")
+        # for budget in budget_ids:
+        #     id = budget[1]
+        #     try:
+        #         self.post_transactions(id, budget_t_data[id])
+        #     except KeyError:
+        #         logging.info(
+        #             "No transactions to upload for {}.".format(
+        #                 budget[0]
+        #             )
+        #         )
 
     def api_read(self, budget_id, kwd):
         """
         General function for reading data from YNAB API
-        :param  budget: boolean indicating if there's a default budget
+        :param  budget_id: 
         :param  kwd: keyword for data type, e.g. transactions
         :return error_codes: if it fails we return our error
         """
         api_t = self.api_token
         base_url = "https://api.youneedabudget.com/v1/budgets/"
-
-        if budget_id is None:
-            # only happens when we're looking for the list of budgets
-            url = base_url + "?access_token={}".format(api_t)
-        else:
-            url = base_url + "{}/{}?access_token={}".format(
-                budget_id, kwd, api_t
-            )
-
+        url =  f"{base_url}/{budget_id}/{kwd}" if budget_id else base_url
+        url += f"?access_token={api_t}"
         response = requests.get(url)
         try:
             read_data = response.json()["data"][kwd]
-        except KeyError:
-            # the API has returned an error so let's handle it
-            return self.process_api_response(response.json()["error"])
-        return read_data
+            logging.info(f"Read data for url={url} =  {read_data}")
+            return read_data
+        except KeyError as err:
+            logging.info(f"Error for URL={url} {err}")
+            raise err
 
     def process_transactions(self, transaction_data):
         """
@@ -170,12 +156,7 @@ class YNAB_API(object):  # in progress (2)
         )
 
         post_response = requests.post(url, json=data)
-
-        # response handling - TODO: make this more thorough!
-        try:
-            self.process_api_response(json.loads(post_response.text)["error"])
-        except KeyError:
-            logging.info("Success!")
+        self.process_api_response(json.loads(post_response.text)["error"])
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")
@@ -191,45 +172,11 @@ class YNAB_API(object):  # in progress (2)
 
     def list_accounts(self, budget_id):
         accounts = self.api_read(budget_id, "accounts")
-        if accounts[0] == "ERROR":
-            return accounts
-
-        account_ids = list()
-        if len(accounts) > 0:
-            for account in accounts:
-                account_ids.append([account["name"], account["id"]])
-                # debug messages
-                logging.debug("id: {}".format(account["id"]))
-                logging.debug("on_budget: {}".format(account["on_budget"]))
-                logging.debug("closed: {}".format(account["closed"]))
-        else:
-            logging.info("no accounts found")
-
-        return account_ids
+        return [(a["name"], a["id"]) for a in accounts]
 
     def list_budgets(self):
         budgets = self.api_read(None, "budgets")
-        if budgets[0] == "ERROR":
-            return budgets
-
-        budget_ids = list()
-        for budget in budgets:
-            budget_ids.append([budget["name"], budget["id"]])
-
-            # commented out because this is a bit messy and confusing
-            # TODO: make this legible!
-            """
-            # debug messages:
-            for key, value in budget.items():
-                if(type(value) is dict):
-                    logging.debug("%s: " % str(key))
-                    for subkey, subvalue in value.items():
-                        logging.debug("  %s: %s" %
-                                      (str(subkey), str(subvalue)))
-                else:
-                    logging.debug("%s: %s" % (str(key), str(value)))
-            """
-        return budget_ids
+        return [ (b["name"], b["id"]) for b in budgets]
 
     def process_api_response(self, details):
         """

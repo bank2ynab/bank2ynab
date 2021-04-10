@@ -140,7 +140,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DK Danske Bank
 1. DK Jyske Bank VISA
 1. DK Nordea
-1. DK Sparkassen Thy
+1. DK Portalbank
 1. HU Erste Bank checking
 1. HU OTP
 1. IE AIB Ireland
@@ -165,6 +165,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NO Sparebank 1 VISA
 1. Personal Capital
 1. PL mBank
+1. Revolut
 1. SE Handelsbanken
 1. SE Länsförsäkringar checking
 1. SE Nordea - internetbanken.privat.nordea.se

@@ -81,7 +81,7 @@ class B2YBank(object):
                     if f.startswith(file_pattern)
                     if prefix not in f
                 ]
-            if files != [] and missing_dir is True:
+            if not files and missing_dir:
                 s = (
                     "\nFormat: {}\n\nError: Can't find download path: {}"
                     "\nTrying default path instead:\t {}"

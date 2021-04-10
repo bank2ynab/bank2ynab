@@ -9,6 +9,7 @@ import csv
 # Generic utilities
 def get_configs():
     """ Retrieve all configuration parameters."""
+    # TODO - fix path for these
     path = os.path.realpath(__file__)
     parent_dir = os.path.dirname(path)
     project_dir = os.path.dirname(parent_dir)
@@ -16,13 +17,17 @@ def get_configs():
         os.path.join(project_dir, "bank2ynab.conf"),
         os.path.join(project_dir, "user_configuration.conf"),
     ]
-    for f in conf_files:
-        if not os.path.exists(f):
-            raise FileNotFoundError(
-                "Could not find configuration file {}".format((f)))
-    config = configparser.RawConfigParser()
-    config.read(conf_files, encoding="utf-8")
-    return config
+    try:
+        if not os.path.exists(conf_files[0]):
+            raise FileNotFoundError
+    except FileNotFoundError:
+        s = "Configuration file not found: {}".format(conf_files[0])
+        logging.error(s)
+        raise FileNotFoundError(s)
+    else:
+        config = configparser.RawConfigParser()
+        config.read(conf_files, encoding="utf-8")
+        return config
 
 
 def fix_conf_params(conf_obj, section_name):

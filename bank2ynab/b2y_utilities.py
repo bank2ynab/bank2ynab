@@ -8,7 +8,7 @@ import csv
 
 # Generic utilities
 def get_configs():
-    """ Retrieve all configuration parameters."""
+    """Retrieve all configuration parameters."""
     # TODO - fix path for these
     path = os.path.realpath(__file__)
     parent_dir = os.path.dirname(path)
@@ -313,7 +313,7 @@ def detect_encoding(filepath):
 
 # classes dealing with input and output charsets
 class EncodingFileContext(object):
-    """ ContextManager class for common operations on files"""
+    """ContextManager class for common operations on files"""
 
     def __init__(self, file_path, **kwds):
         self.file_path = os.path.abspath(file_path)
@@ -335,7 +335,7 @@ class EncodingFileContext(object):
 
 
 class EncodingCsvReader(EncodingFileContext):
-    """ context manager returning a csv.Reader-compatible object"""
+    """context manager returning a csv.Reader-compatible object"""
 
     def __enter__(self):
         encoding = detect_encoding(self.file_path)

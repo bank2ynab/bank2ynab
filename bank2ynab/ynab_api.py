@@ -296,7 +296,11 @@ class YNAB_API(object):  # in progress (2)
             if save_ac_toggle is True:
                 self.save_account_selection(bank, budget_id, account_id)
             else:
-                logging.info("Saving default YNAB account is disabled for {} - account match not saved.".format(bank))
+                logging.info(
+                    "Saving default YNAB account is disabled for {} - account match not saved.".format(
+                        bank
+                    )
+                )
         return budget_id, account_id
 
     def save_account_selection(self, bank, budget_id, account_id):

@@ -18,7 +18,7 @@ class TestJLP_Card_UK(TestCase):
         pass
 
     def test_read_data(self):
-        """ Test that the right number of rows are read and values. """
+        """Test that the right number of rows are read and values."""
         (section_name, num_records, fpath) = (
             "test_jlp_card",
             11,

@@ -41,7 +41,7 @@ class YNAB_API(object):  # in progress (2)
                 budget_ids = self.list_budgets()
                 # if there's only one budget, silently set a default budget
                 if len(budget_ids) == 1:
-                    self.budget_id = budget_ids[0]
+                    self.budget_id = budget_ids[0][1]
 
                 budget_t_data = self.process_transactions(transaction_data)
                 for budget in budget_ids:
@@ -218,17 +218,7 @@ class YNAB_API(object):  # in progress (2)
 
             # commented out because this is a bit messy and confusing
             # TODO: make this legible!
-            """
-            # debug messages:
-            for key, value in budget.items():
-                if(type(value) is dict):
-                    logging.debug("%s: " % str(key))
-                    for subkey, subvalue in value.items():
-                        logging.debug("  %s: %s" %
-                                      (str(subkey), str(subvalue)))
-                else:
-                    logging.debug("%s: %s" % (str(key), str(value)))
-            """
+
         return budget_ids
 
     def process_api_response(self, details):

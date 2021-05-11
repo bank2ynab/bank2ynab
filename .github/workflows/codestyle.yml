@@ -18,7 +18,7 @@ jobs:
         run: pip install black flake8
 
       - name: Run linters
-        uses: wearerequired/lint-action
+        uses: wearerequired/lint-action@v1.9.0
         with:
           github_token: ${{ secrets.github_token }}
           auto_fix: ${{ github.event_name == 'pull_request' }}

@@ -293,7 +293,7 @@ class YNAB_API(object):  # in progress (2)
             save_ac_toggle = b2y_utilities.get_config_line(
                 self.config, bank, ["Save YNAB Account", True, ""]
             )
-            if save_ac_toggle:
+            if save_ac_toggle is True:
                 self.save_account_selection(bank, budget_id, account_id)
             else:
                 logging.info("Saving default YNAB account is disabled for {} - account match not saved.".format(bank))

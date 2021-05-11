@@ -407,7 +407,7 @@ class Test_YNAB_API(TestCase):
         test_class = YNAB_API(self.cp)
         test_banks = [
             ("test_api_existing_bank", "Test Budget ID 1", "Test Account ID"),
-            ("New Bank", "Test Budget ID 2", "ID #2"),
+            ("test_api_existing_bank_2", "Test Budget ID 2", "ID #2"),
         ]
         test_class.config_path = self.TEMPCONFPATH
         test_class.config = configparser.RawConfigParser()

@@ -290,7 +290,13 @@ class YNAB_API(object):  # in progress (2)
             msg = instruction.format("account", bank, "an account")
             account_id = b2y_utilities.option_selection(account_ids, msg)
             # save account selection for bank
-            self.save_account_selection(bank, budget_id, account_id)
+            save_ac_toggle = b2y_utilities.get_config_line(
+                self.config, bank, ["Save YNAB Account", True, ""]
+            )
+            if save_ac_toggle:
+                self.save_account_selection(bank, budget_id, account_id)
+            else:
+                logging.info("Saving default YNAB account is disabled for {} - account match not saved.".format(bank))
         return budget_id, account_id
 
     def save_account_selection(self, bank, budget_id, account_id):

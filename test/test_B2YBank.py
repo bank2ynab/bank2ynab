@@ -25,14 +25,14 @@ class TestB2YBank(TestCase):
         pass
 
     def test_init_and_name(self):
-        """ Check parameters are correctly stored in the object."""
+        """Check parameters are correctly stored in the object."""
         self.b = B2YBank(self.defaults)
         cfe = copy(self.defaults)
         self.assertEqual(self.b.config, cfe)
         self.assertEqual("DEFAULT", self.b.name)
 
     def test_get_files(self):
-        """ Test it's finding the right amount of files"""
+        """Test it's finding the right amount of files"""
         # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_files in [
             ("test_num_files", 2),
@@ -53,7 +53,7 @@ class TestB2YBank(TestCase):
             self.assertEqual(len(files), num_files)
 
     def test_read_data(self):
-        """ Test that the right number of rows are read from the test files """
+        """Test that the right number of rows are read from the test files"""
         # if you need more tests, add sections to test.conf & specify them here
         for section_name, num_records, fpath in [
             ("test_record_i18n", 74, "test_raiffeisen_01.csv"),
@@ -101,7 +101,7 @@ class TestB2YBank(TestCase):
         self.assertRaises(ImportError, build_bank, missingconf)
 
     def test_fix_row(self):
-        """ Check output row is the same across different formats """
+        """Check output row is the same across different formats"""
         # todo: something where the row format is invalid
         # if you need more tests, add sections to test.conf & specify them here
         for section_name in [
@@ -144,7 +144,7 @@ class TestB2YBank(TestCase):
                     self.assertCountEqual(expected_row, result_row)
 
     def test_valid_row(self):
-        """ Test making sure row has an outflow or an inflow """
+        """Test making sure row has an outflow or an inflow"""
         config = fix_conf_params(self.cp, "test_row_format_default")
         b = B2YBank(config)
 
@@ -160,7 +160,7 @@ class TestB2YBank(TestCase):
             self.assertEqual(is_valid, row_validity)
 
     def test_clean_monetary_values(self):
-        """ Test cleaning of outflow and inflow of unneeded characters """
+        """Test cleaning of outflow and inflow of unneeded characters"""
         config = fix_conf_params(self.cp, "test_row_format_default")
         b = B2YBank(config)
 
@@ -178,7 +178,7 @@ class TestB2YBank(TestCase):
             self.assertCountEqual(expected_row, result_row)
 
     def test_auto_memo(self):
-        """ Test auto-filling empty memo field with payee data """
+        """Test auto-filling empty memo field with payee data"""
         config = fix_conf_params(self.cp, "test_row_format_default")
         b = B2YBank(config)
         memo_index = b.config["output_columns"].index("Memo")
@@ -193,7 +193,7 @@ class TestB2YBank(TestCase):
             self.assertEqual(test_memo, new_memo)
 
     def test_fix_outflow(self):
-        """ Test conversion of negative Inflow into Outflow """
+        """Test conversion of negative Inflow into Outflow"""
         config = fix_conf_params(self.cp, "test_row_format_default")
         b = B2YBank(config)
 
@@ -215,7 +215,7 @@ class TestB2YBank(TestCase):
             self.assertCountEqual(expected_row, result_row)
 
     def test_fix_inflow(self):
-        """ Test conversion of positive Outflow into Inflow """
+        """Test conversion of positive Outflow into Inflow"""
         config = fix_conf_params(self.cp, "test_row_format_default")
         b = B2YBank(config)
 

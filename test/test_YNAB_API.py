@@ -35,7 +35,7 @@ class Test_YNAB_API(TestCase):
             os.remove(self.TEMPCONFPATH)
 
     def test_init_and_name(self):  # todo
-        """ Check parameters are correctly stored in the API object."""
+        """Check parameters are correctly stored in the API object."""
         """
         self.test_class = YNAB_API(self.defaults)
         cfe = copy(self.defaults)

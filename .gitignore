@@ -5,3 +5,4 @@ bank2ynab/main
 bank2ynab/plugins/plugins
 test/tests
 *.pyc
+bank2ynab/workspace.code-workspace

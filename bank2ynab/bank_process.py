@@ -22,6 +22,7 @@ import importlib
 import re
 from datetime import datetime
 import logging
+import pandas as pd
 
 import b2y_utilities
 
@@ -95,6 +96,7 @@ class B2YBank(object):
         :return: list of cleaned data rows
         """
         delim = self.config["input_delimiter"]
+        input_columns = self.config["input_columns"]
         output_columns = self.config["output_columns"]
         header_rows = int(self.config["header_rows"])
         footer_rows = int(self.config["footer_rows"])
@@ -106,47 +108,66 @@ class B2YBank(object):
         # give plugins a chance to pre-process the file
         self._preprocess_file(file_path)
 
-        # get total number of rows in transaction file using a generator
-        with b2y_utilities.EncodingCsvReader(
-            file_path, delimiter=delim
-        ) as row_count_reader:
-            row_count = sum(1 for row in row_count_reader)
+        # create a list of column indices to use
+        included_cols = []
+        for column, index in enumerate(input_columns):
+            if column in output_columns:
+                included_cols.append(index)
 
-        with b2y_utilities.EncodingCsvReader(
-            file_path, delimiter=delim
-        ) as transaction_reader:
-            # make each row of our new transaction file
-            for line, row in enumerate(transaction_reader):
-                # skip header & footer rows
-                if header_rows <= line <= (row_count - footer_rows):
-                    # skip blank rows
-                    if len(row) == 0:
-                        continue
-                    # process Inflow or Outflow flags
-                    row = self._cd_flag_process(row, cd_flags)
-                    # fix the date format
-                    row = self._fix_date(row, date_format)
-                    # create our output_row
-                    fixed_row = self._fix_row(row)
-                    # convert negative inflows to standard outflows
-                    fixed_row = self._fix_outflow(fixed_row)
-                    # convert positive outflows to standard inflows
-                    fixed_row = self._fix_inflow(fixed_row)
-                    # fill in blank memo fields
-                    fixed_row = self._auto_memo(fixed_row, fill_memo)
-                    # convert decimal point
-                    fixed_row = self._fix_decimal_point(fixed_row)
-                    # remove extra characters in the inflow and outflow
-                    fixed_row = self._clean_monetary_values(fixed_row)
-                    # check our row isn't a null transaction
-                    if self._valid_row(fixed_row) is True:
-                        output_data.append(fixed_row)
+        # create a transaction dataframe TODO: look into read_csv arguments to see which are useful
+        df = pd.read_csv(
+            filepath_or_buffer=file_path,
+            delimiter=delim,
+            header="None",
+            usecols=included_cols, # strip out every input column that isn't named in the output columns
+            skipinitialspace=True,  # skip space after delimiter
+            skiprows=header_rows,  # skip header rows
+            skipfooter=footer_rows,  # skip footer rows
+            skip_blank_lines=True,  # skip blank lines
+            # parse_dates=False, # need to work the date parsing functionality out - could work nicely!
+            # infer_datetime_format=False,
+            # keep_date_col=False,
+            # date_parser=None,
+            # dayfirst=False, # we probably don't want this because we're converting to ISO
+            # decimal='.', # we probably need this for continental Europe?
+            # encoding=None, # hopefully we don't have to worry about this
+            # encoding_errors='strict', # hopefully we don't have to worry about this
+            # dialect=None,
+            # on_bad_lines="skip",  # skip lines that cause csv errors # TODO: fix errors coming from this line before enabling
+            memory_map=True,  # map the file object directly onto memory & access data directly - no I/O overhead
+        )
+
+        # convert each transaction to match ideal output data
+
+        # TODO actually implement row-modification
+
+        print(df.head()) # DEBUG to see what our dataframe looks like
+
+        # # process Inflow or Outflow flags
+        # row = self._cd_flag_process(row, cd_flags)
+        # # fix the date format
+        # row = self._fix_date(row, date_format)
+        # # create our output_row
+        # fixed_row = self._fix_row(row)
+        # # convert negative inflows to standard outflows
+        # fixed_row = self._fix_outflow(fixed_row)
+        # # convert positive outflows to standard inflows
+        # fixed_row = self._fix_inflow(fixed_row)
+        # # fill in blank memo fields
+        # fixed_row = self._auto_memo(fixed_row, fill_memo)
+        # # convert decimal point
+        # fixed_row = self._fix_decimal_point(fixed_row)
+        # # remove extra characters in the inflow and outflow
+        # fixed_row = self._clean_monetary_values(fixed_row)
+        # # check our row isn't a null transaction
+        # if self._valid_row(fixed_row) is True:
+        # output_data.append(fixed_row)
+
         # add in column headers
-        line_count = len(output_data)
+        df.columns = output_columns
+        line_count = df.shape[0]
         logging.info("Parsed {} lines".format(line_count))
-        if line_count > 0:
-            output_data.insert(0, output_columns)
-        return output_data
+        return df
 
     def _preprocess_file(self, file_path):
         """
@@ -157,7 +178,7 @@ class B2YBank(object):
         # intentionally empty - the plugins can use this function
         return
 
-    def _fix_row(self, row):
+    def _rearrange_columns(self, df):
         """
         rearrange a row of our file to match expected output format,
         optionally combining multiple input columns into a single output column
@@ -306,7 +327,7 @@ class B2YBank(object):
                 row[inflow_col] = "-" + row[inflow_col]
         return row
 
-    def write_data(self, filename, data):
+    def write_data(self, filename, df):
         """write out the new CSV file
         :param filename: path to output file
         :param data: cleaned data ready to output
@@ -324,9 +345,8 @@ class B2YBank(object):
             counter += 1
         target_filename = join(target_dir, new_filename)
         logging.info("Writing output file: {}".format(target_filename))
-        with b2y_utilities.EncodingCsvWriter(target_filename) as writer:
-            for row in data:
-                writer.writerow(row)
+        # write dataframe to csv
+        df.to_csv(target_filename, index = False)
         return target_filename
 
 

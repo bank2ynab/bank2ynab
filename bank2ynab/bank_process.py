@@ -129,7 +129,7 @@ class B2YBank(object):
             # keep_date_col=False,
             # date_parser=None,
             # dayfirst=False, # we probably don't want this because we're converting to ISO
-            # decimal='.', # we probably need this for continental Europe?
+            # decimal='.', # potential for replacing the fix_decimal function, but will require an extra config param
             # encoding=None, # hopefully we don't have to worry about this
             # encoding_errors='strict', # hopefully we don't have to worry about this
             # dialect=None,

@@ -1,9 +1,6 @@
 import os
 import configparser
-import chardet
 import logging
-import codecs
-import csv
 
 
 # Generic utilities
@@ -92,6 +89,7 @@ def find_directory(filepath):
         if os.name == "nt":
             # Windows
             import winreg
+
             shell_path = (
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
                 "\\Explorer\\Shell Folders"

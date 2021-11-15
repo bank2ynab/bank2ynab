@@ -91,10 +91,7 @@ def find_directory(filepath):
     if filepath == "":
         if os.name == "nt":
             # Windows
-            try:
-                import winreg
-            except ImportError:
-                import _winreg as winreg
+            import winreg
             shell_path = (
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
                 "\\Explorer\\Shell Folders"
@@ -176,7 +173,7 @@ def string_num_diff(str1, str2):
     return difference
 
 
-def detect_encoding(filepath):
+def detect_encoding(filepath): # TODO: check if this actually needed with pandas
     """
     Utility to detect file encoding. This is imperfect, but
     should work for the most common cases.

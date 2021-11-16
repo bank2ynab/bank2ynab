@@ -113,6 +113,21 @@ def find_directory(filepath):
         input_dir = filepath
     return input_dir
 
+def load_payee_transformation_map():
+    """Retrieve payee transformation map."""
+    # TODO - fix path for these
+    path = os.path.realpath(__file__)
+    parent_dir = os.path.dirname(path)
+    project_dir = os.path.dirname(parent_dir)
+    conf_file = os.path.join(project_dir, "user_transformation_map.conf")
+    if not os.path.exists(conf_file):
+        return dict()
+    config = configparser.ConfigParser()
+    config.optionxform = lambda option: option
+    config.read(conf_file, encoding="utf-8")
+    if not config.has_section("Payee"):
+        return dict()
+    return config._sections["Payee"]
 
 def option_selection(options, msg):
     """

@@ -1,5 +1,6 @@
 # bank2ynab specific stuff
 user_configuration.conf
+user_transformation_map.conf
 test-data/temp-test.conf
 bank2ynab/main
 bank2ynab/plugins/plugins

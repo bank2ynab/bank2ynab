@@ -1,0 +1,7 @@
+# User Transformation Map File
+
+# Use this file to override information received from your bank.
+# Currently only payee is supported.
+
+[Payee]
+PAYPAL (EUROPE) S.A.R.L ET CIE,S.C.A. = PayPal

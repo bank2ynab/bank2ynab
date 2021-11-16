@@ -41,6 +41,7 @@ class B2YBank(object):
         """
         self.name = config_object.get("bank_name", "DEFAULT")
         self.config = config_object
+        self.payee_transformation_map = b2y_utilities.load_payee_transformation_map()
 
     def get_files(self):
         """find the transaction file
@@ -138,6 +139,8 @@ class B2YBank(object):
                     fixed_row = self._fix_decimal_point(fixed_row)
                     # remove extra characters in the inflow and outflow
                     fixed_row = self._clean_monetary_values(fixed_row)
+                    # transform payees as given by the user
+                    fixed_row = self._transform_payees(fixed_row)
                     # check our row isn't a null transaction
                     if self._valid_row(fixed_row) is True:
                         output_data.append(fixed_row)
@@ -239,6 +242,17 @@ class B2YBank(object):
         outflow_index = self.config["output_columns"].index("Outflow")
         row[inflow_index] = re.sub(r"[^\d\.]", "", row[inflow_index])
         row[outflow_index] = re.sub(r"[^\d\.]", "", row[outflow_index])
+
+        return row
+
+    def _transform_payees(self, row):
+        """
+        translate payees as given through user config
+        :param row: list of values
+        """
+        payee_index = self.config["output_columns"].index("Payee")
+        for a, b in self.payee_transformation_map.items():
+            row[payee_index] = row[payee_index].replace(a, b)
 
         return row
 

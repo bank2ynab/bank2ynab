@@ -142,60 +142,61 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DK Jyske Bank VISA
 1. DK Nordea
 1. DK Portalbank
-1. HU Erste Bank checking
-1. HU OTP
-1. IE AIB Ireland
-1. IE Bank of Ireland
-1. IE N26
-1. IE Ulster Bank, savings
-1. IT RomagnaBanca Inbank
-1. LV Swedbank
-1. Mint
-1. MV Bank of Maldives, checking
-1. NETELLER
-1. NL Bunq checking
-1. NL bunqDesktop software
-1. NL bunqDesktop software 2
-1. NL ING
-1. NL ING Checking 2020
-1. NL KNAB
-1. NL Rabobank
-1. NL Rabobank-2018
-1. NL Rabobank Credit Card
-1. NO DNB
-1. NO Sparebank 1 VISA
-1. Personal Capital
-1. PL mBank
-1. Revolut
-1. SE Handelsbanken
-1. SE Länsförsäkringar checking
-1. SE Nordea - internetbanken.privat.nordea.se
-1. SE Nordea - netbank.nordea.se
-1. SE SEB Skandinaviska Enskilda Banken
-1. SE Sparbanken Tanum
-1. SE Swedbank
-1. SE Swedbank 2019
-1. SE Swedbank 2020
-1. SG OCBC Bank
-1. SG OCBC Bank Credit Card
-1. SG POSB savings
-1. SK Tatra Banka
-1. SK VUB
-1. UK Co-operative Bank
-1. UK Monzo checking
-1. UK Barclaycard credit card
-1. UK Barclaycard Business Credit Card
-1. UK first direct checking
-1. UK John Lewis Partnership Card
-1. US Bank of America
-1. US Bank of America Credit Card
-1. US BB&T
-1. US Chase Credit Card 2017
-1. US Chase Credit Card 2019
-1. US Schwab Checking
-1. US Schwab Savings
-1. US TB Bank
-1. US USAA
+1. Hibiscus
+3. HU Erste Bank checking
+4. HU OTP
+5. IE AIB Ireland
+6. IE Bank of Ireland
+7. IE N26
+8. IE Ulster Bank, savings
+9. IT RomagnaBanca Inbank
+10. LV Swedbank
+11. Mint
+12. MV Bank of Maldives, checking
+13. NETELLER
+14. NL Bunq checking
+15. NL bunqDesktop software
+16. NL bunqDesktop software 2
+17. NL ING
+18. NL ING Checking 2020
+19. NL KNAB
+20. NL Rabobank
+21. NL Rabobank-2018
+22. NL Rabobank Credit Card
+23. NO DNB
+24. NO Sparebank 1 VISA
+25. Personal Capital
+26. PL mBank
+27. Revolut
+28. SE Handelsbanken
+29. SE Länsförsäkringar checking
+30. SE Nordea - internetbanken.privat.nordea.se
+31. SE Nordea - netbank.nordea.se
+32. SE SEB Skandinaviska Enskilda Banken
+33. SE Sparbanken Tanum
+34. SE Swedbank
+35. SE Swedbank 2019
+36. SE Swedbank 2020
+37. SG OCBC Bank
+38. SG OCBC Bank Credit Card
+39. SG POSB savings
+40. SK Tatra Banka
+41. SK VUB
+42. UK Co-operative Bank
+43. UK Monzo checking
+44. UK Barclaycard credit card
+45. UK Barclaycard Business Credit Card
+46. UK first direct checking
+47. UK John Lewis Partnership Card
+48. US Bank of America
+49. US Bank of America Credit Card
+50. US BB&T
+51. US Chase Credit Card 2017
+52. US Chase Credit Card 2019
+53. US Schwab Checking
+54. US Schwab Savings
+55. US TB Bank
+56. US USAA
 <!--AUTO BANK UPDATE END-->
 ----
 

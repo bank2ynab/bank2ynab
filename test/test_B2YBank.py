@@ -5,9 +5,9 @@ from os.path import join, abspath, exists
 
 import os
 
-from bank_process import B2YBank, build_bank
-from b2y_utilities import fix_conf_params
-from plugins.null import NullBank
+from bank2ynab.bank_process import B2YBank, build_bank
+from bank2ynab.b2y_utilities import fix_conf_params
+from bank2ynab.plugins.null import NullBank
 from test.utils import get_test_confparser, get_project_dir
 
 
@@ -100,7 +100,7 @@ class TestB2YBank(TestCase):
         missingconf = fix_conf_params(self.cp, "test_plugin_missing")
         self.assertRaises(ImportError, build_bank, missingconf)
 
-    def test_fix_row(self):
+    def test_rearrange_columns(self):
         """Check output row is the same across different formats"""
         # todo: something where the row format is invalid
         # if you need more tests, add sections to test.conf & specify them here

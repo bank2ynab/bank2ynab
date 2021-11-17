@@ -23,6 +23,7 @@ import re
 from datetime import datetime
 import logging
 import pandas as pd
+from pandas.core.frame import DataFrame
 
 import b2y_utilities
 
@@ -110,7 +111,7 @@ class B2YBank(object):
 
         # create a list of column indices to use
         included_cols = []
-        for column, index in enumerate(input_columns):
+        for index, column in enumerate(input_columns):
             if column in output_columns:
                 included_cols.append(index)
 
@@ -118,8 +119,7 @@ class B2YBank(object):
         df = pd.read_csv(
             filepath_or_buffer=file_path,
             delimiter=delim,
-            header="None",
-            usecols=included_cols, # strip out every input column that isn't named in the output columns
+            # usecols=included_cols, # strip out every input column that isn't named in the output columns MAYBE DO NOT USE SO WE CAN PERFORM OPERATIONS
             skipinitialspace=True,  # skip space after delimiter
             skiprows=header_rows,  # skip header rows
             skipfooter=footer_rows,  # skip footer rows
@@ -135,20 +135,24 @@ class B2YBank(object):
             # dialect=None,
             # on_bad_lines="skip",  # skip lines that cause csv errors # TODO: fix errors coming from this line before enabling
             memory_map=True,  # map the file object directly onto memory & access data directly - no I/O overhead
+            engine="python",
         )
 
         # convert each transaction to match ideal output data
 
-        # TODO actually implement row-modification
+        # set column names based on input column list
+        df.columns = input_columns
+        # merge duplicate input columns
+        df = self._merge_duplicate_columns(df, input_columns)  # TODO
+        # add missing columns
+        df = self._add_missing_columns(df, input_columns, output_columns)
 
-        print(df.head()) # DEBUG to see what our dataframe looks like
 
+        """ TODO: FUNCTIONS NOT YET TACKLED
         # # process Inflow or Outflow flags
         # row = self._cd_flag_process(row, cd_flags)
         # # fix the date format
         # row = self._fix_date(row, date_format)
-        # # create our output_row
-        # fixed_row = self._fix_row(row)
         # # convert negative inflows to standard outflows
         # fixed_row = self._fix_outflow(fixed_row)
         # # convert positive outflows to standard inflows
@@ -158,15 +162,14 @@ class B2YBank(object):
         # # convert decimal point
         # fixed_row = self._fix_decimal_point(fixed_row)
         # # remove extra characters in the inflow and outflow
-        # fixed_row = self._clean_monetary_values(fixed_row)
-        # # check our row isn't a null transaction
-        # if self._valid_row(fixed_row) is True:
-        # output_data.append(fixed_row)
+        # fixed_row = self._clean_monetary_values(fixed_row) """
 
-        # add in column headers
-        df.columns = output_columns
+        # set final column order
+        df = df[output_columns]
+        # display parsed line count
         line_count = df.shape[0]
         logging.info("Parsed {} lines".format(line_count))
+        print(df.head())  # DEBUG - let's see what our Dataframe looks like
         return df
 
     def _preprocess_file(self, file_path):
@@ -178,32 +181,42 @@ class B2YBank(object):
         # intentionally empty - the plugins can use this function
         return
 
-    def _rearrange_columns(self, df):
+    def _merge_duplicate_columns(
+        self, df: DataFrame, input_columns: list
+    ) -> DataFrame:  # TODO: merge duplicates specified in input_columns
         """
-        rearrange a row of our file to match expected output format,
-        optionally combining multiple input columns into a single output column
-        :param row: list of values
-        :return: list of values in correct output format
+        Merges columns specified more than once in the input_columns list.
+
+        :param df: the dataframe to work on
+        :type df: DataFrame
+        :param input_columns: the list of columns in the input file
+        :type input_columns: list
+        :return: modified dataframe
+        :rtype: DataFrame
         """
-        output = []
-        for header in self.config["output_columns"]:
-            # find all input columns with data for this output column
-            indices = filter(
-                lambda i: self.config["input_columns"][i] == header,
-                range(len(self.config["input_columns"])),
-            )
-            # fetch data from those input columns if they are not empty,
-            # and merge them
-            cell_parts = []
-            for i in indices:
-                try:
-                    if row[i].lstrip():
-                        cell_parts.append(row[i].lstrip())
-                except IndexError:
-                    pass
-            cell = " ".join(cell_parts)
-            output.append(cell)
-        return output
+        return df
+
+    def _add_missing_columns(
+        self, df: DataFrame, input_cols: list, output_cols: list
+    ) -> DataFrame:
+        """
+        Adds any missing required columns to the Dataframe.
+
+        :param df: the dataframe to work on
+        :type df: DataFrame
+        :param input_columns: the list of columns in the input file
+        :type input_columns: list
+        :param output_columns: the desired list of columns as output
+        :type output_columns: list
+        :return: modified dataframe
+        :rtype: DataFrame
+        """
+        # compare input & output column lists to find missing columns
+        missing_cols = list(set(output_cols).difference(input_cols))
+        # add missing output columns
+        for col in missing_cols:
+            df.insert(loc=0, column=col, value="NaN")
+        return df
 
     def _fix_outflow(self, row):
         """
@@ -346,14 +359,14 @@ class B2YBank(object):
         target_filename = join(target_dir, new_filename)
         logging.info("Writing output file: {}".format(target_filename))
         # write dataframe to csv
-        df.to_csv(target_filename, index = False)
+        df.to_csv(target_filename, index=False)
         return target_filename
 
 
 def build_bank(bank_config):
     """Factory method loading the correct class for a given configuration."""
     plugin_module = bank_config.get("plugin", None)
-    if plugin_module:
+    """ if plugin_module:
         p_mod = importlib.import_module("plugins.{}".format(plugin_module))
         if not hasattr(p_mod, "build_bank"):
             s = (
@@ -364,8 +377,8 @@ def build_bank(bank_config):
             raise ImportError(s)
         bank = p_mod.build_bank(bank_config)
         return bank
-    else:
-        return B2YBank(bank_config)
+    else: """  # DEBUG - plugins broken
+    return B2YBank(bank_config)
 
 
 class Bank2Ynab(object):
@@ -400,6 +413,7 @@ class Bank2Ynab(object):
                 files_processed += 1
                 # create cleaned csv for each file
                 output = bank.read_data(src_file)
+                """# DEBUG: disabled file output while testing
                 if output != []:
                     bank.write_data(src_file, output)
                     # save transaction data for each bank to object
@@ -409,10 +423,10 @@ class Bank2Ynab(object):
                         logging.info(
                             "Removing input file: {}".format(src_file)
                         )
-                        os.remove(src_file)
+                        # os.remove(src_file) DEBUG - disabled deletion while testing
                 else:
                     logging.info(
                         "No output data from this file for this bank."
-                    )
+                    ) """
 
         logging.info("\nDone! {} files processed.\n".format(files_processed))

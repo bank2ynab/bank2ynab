@@ -17,6 +17,6 @@ if __name__ == "__main__":
     else:
         b2y = Bank2Ynab(config)
         b2y.run()
-        api = YNAB_API(config)
-        if b2y.transaction_data:
-            api.run(b2y.transaction_data)
+        # api = YNAB_API(config) # DEBUG: disabled
+        """ if b2y.transaction_data: # DEBUG - disabled while testing
+            api.run(b2y.transaction_data) """

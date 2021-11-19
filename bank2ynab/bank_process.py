@@ -138,15 +138,17 @@ class B2YBank(object):
             engine="python",
         )
 
+        print("\nInitial DF\n{}".format(df.head())) # debug to see what our df is like before transformation
+
         # convert each transaction to match ideal output data
 
         # set column names based on input column list
         df.columns = input_columns
         # merge duplicate input columns
-        df = self._merge_duplicate_columns(df, input_columns)  # TODO
+        df = self._merge_duplicate_columns(df, input_columns)
+        print("\nAfter duplicate merge\n{}".format(df.head())) # debug
         # add missing columns
         df = self._add_missing_columns(df, input_columns, output_columns)
-
 
         """ TODO: FUNCTIONS NOT YET TACKLED
         # # process Inflow or Outflow flags
@@ -169,7 +171,7 @@ class B2YBank(object):
         # display parsed line count
         line_count = df.shape[0]
         logging.info("Parsed {} lines".format(line_count))
-        print(df.head())  # DEBUG - let's see what our Dataframe looks like
+        print("\nFinal DF\n{}".format(df.head()))  # DEBUG - let's see what our Dataframe looks like
         return df
 
     def _preprocess_file(self, file_path):
@@ -183,9 +185,10 @@ class B2YBank(object):
 
     def _merge_duplicate_columns(
         self, df: DataFrame, input_columns: list
-    ) -> DataFrame:  # TODO: merge duplicates specified in input_columns
+    ) -> DataFrame:
         """
         Merges columns specified more than once in the input_columns list.
+        Note: converts values into strings before merging.
 
         :param df: the dataframe to work on
         :type df: DataFrame
@@ -194,6 +197,26 @@ class B2YBank(object):
         :return: modified dataframe
         :rtype: DataFrame
         """
+
+        # create dictionary mapping column names to indices of duplicates
+        cols_to_merge = dict()
+        for index, col in enumerate(input_columns):
+            if col not in cols_to_merge:
+                cols_to_merge[col] = []
+            cols_to_merge[col] += [index]
+
+        # go through each key
+        for key in cols_to_merge:
+            key_cols = cols_to_merge[key]
+            if len(key_cols) > 1:
+                # change first column to string
+                df.iloc[:,key_cols[0]] = "{} ".format(df.iloc[:,key_cols[0]])
+                # merge every duplicate column into the 1st instance of the column name
+                for dupe_count, key_col in enumerate(key_cols[1:]):
+                    # add string version of each column onto the first column
+                    df.iloc[:,key_cols[0]] += "{} ".format(df.iloc[:,key_col])
+                    # rename duplicate column
+                    df.columns.values[key_col] = "{} {}".format(key, dupe_count)
         return df
 
     def _add_missing_columns(

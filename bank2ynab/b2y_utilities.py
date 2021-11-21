@@ -169,3 +169,138 @@ def string_num_diff(str1, str2):
 
     difference = int(1000 * (num2 - num1))
     return difference
+
+
+def detect_encoding(filepath):
+    """
+    Utility to detect file encoding. This is imperfect, but
+    should work for the most common cases.
+    :param filepath: string path to a given file
+    :return: encoding alias that can be used with open()
+    """
+    # First try to guess the encoding with chardet. Take it if the
+    # confidence is >50% (randomly chosen)
+    with open(filepath, "rb") as f:
+        file_content = f.read()
+        rslt = chardet.detect(file_content)
+        confidence, encoding = rslt["confidence"], rslt["encoding"]
+        if confidence > 0.5:
+            logging.info(
+                "Using encoding {} with confidence {}".format(
+                    encoding, confidence
+                )
+            )
+            return encoding
+
+    # because some encodings will happily encode anything even if wrong,
+    # keeping the most common near the top should make it more likely that
+    # we're doing the right thing.
+    encodings = [
+        "ascii",
+        "utf-8",
+        "utf-16",
+        "cp1251",
+        "utf_32",
+        "utf_32_be",
+        "utf_32_le",
+        "utf_16",
+        "utf_16_be",
+        "utf_16_le",
+        "utf_7",
+        "utf_8_sig",
+        "cp850",
+        "cp852",
+        "latin_1",
+        "big5",
+        "big5hkscs",
+        "cp037",
+        "cp424",
+        "cp437",
+        "cp500",
+        "cp720",
+        "cp737",
+        "cp775",
+        "cp855",
+        "cp856",
+        "cp857",
+        "cp858",
+        "cp860",
+        "cp861",
+        "cp862",
+        "cp863",
+        "cp864",
+        "cp865",
+        "cp866",
+        "cp869",
+        "cp874",
+        "cp875",
+        "cp932",
+        "cp949",
+        "cp950",
+        "cp1006",
+        "cp1026",
+        "cp1140",
+        "cp1250",
+        "cp1252",
+        "cp1253",
+        "cp1254",
+        "cp1255",
+        "cp1256",
+        "cp1257",
+        "cp1258",
+        "euc_jp",
+        "euc_jis_2004",
+        "euc_jisx0213",
+        "euc_kr",
+        "gb2312",
+        "gbk",
+        "gb18030",
+        "hz",
+        "iso2022_jp",
+        "iso2022_jp_1",
+        "iso2022_jp_2",
+        "iso2022_jp_2004",
+        "iso2022_jp_3",
+        "iso2022_jp_ext",
+        "iso2022_kr",
+        "latin_1",
+        "iso8859_2",
+        "iso8859_3",
+        "iso8859_4",
+        "iso8859_5",
+        "iso8859_6",
+        "iso8859_7",
+        "iso8859_8",
+        "iso8859_9",
+        "iso8859_10",
+        "iso8859_11",
+        "iso8859_13",
+        "iso8859_14",
+        "iso8859_15",
+        "iso8859_16",
+        "johab",
+        "koi8_r",
+        "koi8_u",
+        "mac_cyrillic",
+        "mac_greek",
+        "mac_iceland",
+        "mac_latin2",
+        "mac_roman",
+        "mac_turkish",
+        "ptcp154",
+        "shift_jis",
+        "shift_jis_2004",
+        "shift_jisx0213",
+    ]
+    result = None
+    error = (ValueError, UnicodeError, UnicodeDecodeError, UnicodeEncodeError)
+    for enc in encodings:
+        try:
+            with codecs.open(filepath, "r", encoding=enc) as f:
+                for line in f:
+                    line.encode("utf-8")
+                return enc
+        except error:
+            continue
+
+    return result

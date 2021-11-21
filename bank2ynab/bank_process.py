@@ -120,7 +120,7 @@ class B2YBank(object):
             filepath_or_buffer=file_path,
             delimiter=delim,
             skipinitialspace=True,  # skip space after delimiter
-            header = None, # don't set column headers initially
+            header=None,  # don't set column headers initially
             skiprows=header_rows,  # skip header rows
             skipfooter=footer_rows,  # skip footer rows
             skip_blank_lines=True,  # skip blank lines
@@ -138,7 +138,9 @@ class B2YBank(object):
             engine="python",
         )
 
-        print("\nInitial DF\n{}".format(df.head())) # debug to see what our df is like before transformation
+        print(
+            "\nInitial DF\n{}".format(df.head())
+        )  # debug to see what our df is like before transformation
 
         # convert each transaction to match ideal output data
 
@@ -146,7 +148,7 @@ class B2YBank(object):
         df.columns = input_columns
         # merge duplicate input columns
         df = self._merge_duplicate_columns(df, input_columns)
-        print("\nAfter duplicate merge\n{}".format(df.head())) # debug
+        print("\nAfter duplicate merge\n{}".format(df.head()))  # debug
         # add missing columns
         df = self._add_missing_columns(df, input_columns, output_columns)
         # process Inflow/Outflow flags # TODO not yet implemented
@@ -175,7 +177,9 @@ class B2YBank(object):
         # display parsed line count
         line_count = df.shape[0]
         logging.info("Parsed {} lines".format(line_count))
-        print("\nFinal DF\n{}".format(df.head()))  # DEBUG - let's see what our Dataframe looks like
+        print(
+            "\nFinal DF\n{}".format(df.head())
+        )  # DEBUG - let's see what our Dataframe looks like
         return df
 
     def _preprocess_file(self, file_path):

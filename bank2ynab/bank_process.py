@@ -151,8 +151,9 @@ class B2YBank(object):
         # display parsed line count
         logging.info("Parsed {} lines".format(df.shape[0]))
 
-        logging.info("\nFinal DF\n{}".format(
-            df.head(10)))  # view final dataframe # TODO - switch to debug once finished here
+        logging.info(
+            "\nFinal DF\n{}".format(df.head(10))
+        )  # view final dataframe # TODO - switch to debug once finished here
 
         return df
 
@@ -233,9 +234,7 @@ class B2YBank(object):
             df.insert(loc=0, column=col, value="NaN")
         return df
 
-    def _cd_flag_process(
-        self, cd_flags: list, df: DataFrame
-    ) -> DataFrame:
+    def _cd_flag_process(self, cd_flags: list, df: DataFrame) -> DataFrame:
         """
         fix columns where inflow/outflow is indicated by a flag in a separate column
         the cd_flag list is in the form "indicator column, outflow flag, inflow flag"
@@ -251,8 +250,9 @@ class B2YBank(object):
         if len(cd_flags) == 3:
             outflow_flag = cd_flags[2]
             # if this row is indicated to be outflow, make inflow negative
-            df.loc[df["CDFlag"] is outflow_flag, [
-                "Inflow"]] = "-{}".format(df["Inflow"])
+            df.loc[df["CDFlag"] is outflow_flag, ["Inflow"]] = "-{}".format(
+                df["Inflow"]
+            )
 
         return df
 
@@ -297,7 +297,13 @@ class B2YBank(object):
         # remove all except last decimal point
         num_series.replace({"\.(?=.*?\.)": ""}, regex=True, inplace=True)
         # remove all non-digit characters
-        num_series.replace({"[^\d\.-]": "", }, regex=True, inplace=True)
+        num_series.replace(
+            {
+                "[^\d\.-]": "",
+            },
+            regex=True,
+            inplace=True,
+        )
         # fill in null values with 0
         num_series.fillna(value=0, inplace=True)
         return num_series.astype(float)

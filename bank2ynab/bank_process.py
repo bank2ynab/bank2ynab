@@ -149,6 +149,8 @@ class B2YBank(object):
         print("\nAfter duplicate merge\n{}".format(df.head())) # debug
         # add missing columns
         df = self._add_missing_columns(df, input_columns, output_columns)
+        # process Inflow/Outflow flags # TODO not yet implemented
+        df = self._cd_flag_process(cd_flags, df)
 
         """ TODO: FUNCTIONS NOT YET TACKLED
         # # process Inflow or Outflow flags
@@ -241,6 +243,27 @@ class B2YBank(object):
         # add missing output columns
         for col in missing_cols:
             df.insert(loc=0, column=col, value="NaN")
+        return df
+
+    def _cd_flag_process(self, cd_flags: list, df: DataFrame) -> DataFrame:
+        """
+        fix columns where inflow/outflow is indicated by a flag in a separate column
+
+        :param cd_flags: list of parameters for applying indicators
+        :type cd_flags: list
+        :param df: dataframe to be modified
+        :type df: DataFrame
+        :return: modified dataframe
+        :rtype: DataFrame
+        """
+        if len(cd_flags) == 3:
+            indicator_col = int(cd_flags[0])
+            outflow_flag = cd_flags[2]
+            # if this row is indicated to be outflow, make inflow negative
+            # if row[indicator_col] == outflow_flag:
+            #    row[inflow_col] = "-" + row[inflow_col]
+            print(df["CDFlag"])
+
         return df
 
     def _fix_outflow(self, row):
@@ -358,25 +381,16 @@ class B2YBank(object):
             pass
         return row
 
-    def _cd_flag_process(self, row, cd_flags):
-        """fix rows where inflow or outflow is indicated by
-        a flag in a separate column
-        :param row: list of values
-        :param cd_flags: list of parameters for applying indicators
+    def write_data(self, filename: str, df: DataFrame) -> str:
         """
-        if len(cd_flags) == 3:
-            indicator_col = int(cd_flags[0])
-            outflow_flag = cd_flags[2]
-            inflow_col = self.config["input_columns"].index("Inflow")
-            # if this row is indicated to be outflow, make inflow negative
-            if row[indicator_col] == outflow_flag:
-                row[inflow_col] = "-" + row[inflow_col]
-        return row
+        write out the new CSV file
 
-    def write_data(self, filename, df):
-        """write out the new CSV file
         :param filename: path to output file
-        :param data: cleaned data ready to output
+        :type filename: str
+        :param df: cleaned data ready to output
+        :type df: DataFrame
+        :return: target filename
+        :rtype: str
         """
         target_dir = dirname(filename)
         target_fname = basename(filename)[:-4]
@@ -396,7 +410,9 @@ class B2YBank(object):
         return target_filename
 
 
-def build_bank(bank_config):
+def build_bank(
+    bank_config,
+):  # mostly commented out for now as plugins need to be fixed
     """Factory method loading the correct class for a given configuration."""
     plugin_module = bank_config.get("plugin", None)
     """ if plugin_module:

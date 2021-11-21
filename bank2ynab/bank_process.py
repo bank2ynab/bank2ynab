@@ -166,6 +166,8 @@ class B2YBank(object):
         # # remove extra characters in the inflow and outflow
         # fixed_row = self._clean_monetary_values(fixed_row) """
 
+        # remove invalid rows # TODO date checking
+        df = self._remove_invalid_rows(df)
         # set final column order
         df = df[output_columns]
         # display parsed line count
@@ -299,20 +301,28 @@ class B2YBank(object):
 
         return row
 
-    def _valid_row(self, row):
-        """if our row doesn't have an inflow, outflow or a valid date,
-        mark as invalid
-        :param row: list of values
+    def _remove_invalid_rows(
+        self, df: DataFrame
+    ) -> DataFrame:  # not yet implemented
         """
-        inflow_index = self.config["output_columns"].index("Inflow")
-        outflow_index = self.config["output_columns"].index("Outflow")
-        if row[inflow_index] == "" and row[outflow_index] == "":
-            return False
-        # check that date matches YYYY-MM-DD format
+        Removes invalid rows from dataframe.
+        An invalid row is one which does not have a date or one without an Inflow or Outflow value.
+
+        :param df: dataframe to be modified
+        :type df: DataFrame
+        :return: modified dataframe
+        :rtype: DataFrame
+        """
+
+        # filter out rows where Inflow and Outflow are both blank
+        df.query("Inflow.notna() & Outflow.notna()", inplace=True)
+        # TODO # filter rows with an invalid date
+        """ # check that date matches YYYY-MM-DD format
         date_index = self.config["output_columns"].index("Date")
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row[date_index]):
-            return False
-        return True
+            return False """
+
+        return df
 
     def _auto_memo(self, row, fill_memo):
         """auto fill empty memo field with payee info

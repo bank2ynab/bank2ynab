@@ -156,7 +156,7 @@ class TestB2YBank(TestCase):
             (["2017-09-28", "Payee", "", "", "", "400"], True),
             (["2017-09-28", "Payee", "", "", "", ""], False),
         ]:
-            is_valid = b._valid_row(row)
+            is_valid = b._remove_invalid_rows(row)
             self.assertEqual(is_valid, row_validity)
 
     def test_clean_monetary_values(self):

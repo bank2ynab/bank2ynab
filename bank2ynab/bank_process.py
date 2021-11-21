@@ -164,7 +164,7 @@ class B2YBank(object):
         # # remove extra characters in the inflow and outflow
         # fixed_row = self._clean_monetary_values(fixed_row) """
 
-        # remove invalid rows # TODO date checking
+        # remove invalid rows
         df = self._remove_invalid_rows(df)
         # set final column order
         df = df[output_columns]
@@ -350,17 +350,20 @@ class B2YBank(object):
 
         return df
 
-    def _auto_memo(self, row, fill_memo):
-        """auto fill empty memo field with payee info
-        :param row: list of values
-        :param fill_memo: boolean
+    def _auto_memo(self, df:DataFrame, fill_memo:bool) -> DataFrame:
+        """
+        if memo is blank, fill with contents of payee column
+
+        :param df: dataframe to be modified
+        :type df: DataFrame
+        :param fill_memo: boolean to check
+        :type fill_memo: bool
+        :return: modified dataframe
+        :rtype: DataFrame
         """
         if fill_memo:
-            payee_index = self.config["output_columns"].index("Payee")
-            memo_index = self.config["output_columns"].index("Memo")
-            if row[memo_index] == "":
-                row[memo_index] = row[payee_index]
-        return row
+            df["Memo"].fillna(df["Payee"])
+        return df
 
     def _fix_date(self, df: DataFrame, date_format: str) -> DataFrame:
         """
@@ -460,21 +463,20 @@ class Bank2Ynab(object):
                     )
                 )
                 try:  # TODO: is this Try/Except the best way to handle format mismatches?
-
                     # create cleaned csv for each file
-                    output = bank.read_data(src_file)
+                    output_df = bank.read_data(src_file)
                     # increment for the summary:
                     files_processed += 1
 
-                except ValueError:
+                except ValueError as e:
                     logging.info(
-                        "No output data from this file for this bank."
+                        "No output data from this file for this bank. ({})".format(e)
                     )
             """# DEBUG: disabled file output while testing
             if output != []:
-                bank.write_data(src_file, output)
+                bank.write_data(src_file, output_df)
                 # save transaction data for each bank to object
-                self.transaction_data[bank_name] = output
+                self.transaction_data[bank_name] = output_df
                 # delete original csv file
                 if bank.config["delete_original"] is True:
                     logging.info(

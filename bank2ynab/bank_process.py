@@ -104,7 +104,6 @@ class B2YBank(object):
         cd_flags = self.config["cd_flags"]
         date_format = self.config["date_format"]
         fill_memo = self.config["payee_to_memo"]
-        output_data = []
 
         # give plugins a chance to pre-process the file
         self._preprocess_file(file_path)
@@ -124,11 +123,6 @@ class B2YBank(object):
             skiprows=header_rows,  # skip header rows
             skipfooter=footer_rows,  # skip footer rows
             skip_blank_lines=True,  # skip blank lines
-            # parse_dates=False, # need to work the date parsing functionality out - could work nicely!
-            # infer_datetime_format=False,
-            # keep_date_col=False,
-            # date_parser=None,
-            # dayfirst=False, # we probably don't want this because we're converting to ISO
             # decimal='.', # potential for replacing the fix_decimal function, but will require an extra config param
             # encoding=None, # hopefully we don't have to worry about this
             # encoding_errors='strict', # hopefully we don't have to worry about this
@@ -151,14 +145,14 @@ class B2YBank(object):
         print("\nAfter duplicate merge\n{}".format(df.head()))  # debug
         # add missing columns
         df = self._add_missing_columns(df, input_columns, output_columns)
+        # fix date format
+        df = self._fix_date(df, date_format)
         # process Inflow/Outflow flags # TODO not yet implemented
         df = self._cd_flag_process(cd_flags, df)
 
         """ TODO: FUNCTIONS NOT YET TACKLED
         # # process Inflow or Outflow flags
         # row = self._cd_flag_process(row, cd_flags)
-        # # fix the date format
-        # row = self._fix_date(row, date_format)
         # # convert negative inflows to standard outflows
         # fixed_row = self._fix_outflow(fixed_row)
         # # convert positive outflows to standard inflows
@@ -258,7 +252,9 @@ class B2YBank(object):
             df.insert(loc=0, column=col, value="NaN")
         return df
 
-    def _cd_flag_process(self, cd_flags: list, df: DataFrame) -> DataFrame:
+    def _cd_flag_process(
+        self, cd_flags: list, df: DataFrame
+    ) -> DataFrame:  # TODO
         """
         fix columns where inflow/outflow is indicated by a flag in a separate column
 
@@ -337,9 +333,7 @@ class B2YBank(object):
 
         return row
 
-    def _remove_invalid_rows(
-        self, df: DataFrame
-    ) -> DataFrame:  # not yet implemented
+    def _remove_invalid_rows(self, df: DataFrame) -> DataFrame:
         """
         Removes invalid rows from dataframe.
         An invalid row is one which does not have a date or one without an Inflow or Outflow value.
@@ -349,14 +343,10 @@ class B2YBank(object):
         :return: modified dataframe
         :rtype: DataFrame
         """
-
         # filter out rows where Inflow and Outflow are both blank
         df.query("Inflow.notna() & Outflow.notna()", inplace=True)
-        # TODO # filter rows with an invalid date
-        """ # check that date matches YYYY-MM-DD format
-        date_index = self.config["output_columns"].index("Date")
-        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", row[date_index]):
-            return False """
+        # filter rows with an invalid date
+        df.query("Date.notna()", inplace=True)
 
         return df
 
@@ -372,27 +362,25 @@ class B2YBank(object):
                 row[memo_index] = row[payee_index]
         return row
 
-    def _fix_date(self, row, date_format):
-        """fix date format when required
-        convert date to YYYY-MM-DD
-        :param row: list of values
-        :param date_format: date format string
+    def _fix_date(self, df: DataFrame, date_format: str) -> DataFrame:
         """
-        if not (date_format):
-            return row
+        If provided with an input date format, process the date column to the ISO format.
+        Any non-parseable dates are returned as a NaT null value
 
-        date_col = self.config["input_columns"].index("Date")
-        try:
-            if row[date_col] == "":
-                return row
-            # parse our date according to provided formatting string
-            input_date = datetime.strptime(row[date_col].strip(), date_format)
-            # do our actual date processing
-            output_date = datetime.strftime(input_date, "%Y-%m-%d")
-            row[date_col] = output_date
-        except (ValueError, IndexError):
-            pass
-        return row
+        :param df: dataframe to modify
+        :type df: DataFrame
+        :param date_format: date format codes according to 1989 C standard (https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior)
+        :type date_format: str
+        :return: modified dataframe
+        :rtype: DataFrame
+        """
+        df["Date"] = pd.to_datetime(
+            df["Date"],
+            format=date_format,
+            infer_datetime_format=True,
+            errors="coerce",
+        )
+        return df
 
     def write_data(self, filename: str, df: DataFrame) -> str:
         """
@@ -473,8 +461,8 @@ class Bank2Ynab(object):
                 )
                 try:  # TODO: is this Try/Except the best way to handle format mismatches?
 
-                # create cleaned csv for each file
-                output = bank.read_data(src_file)
+                    # create cleaned csv for each file
+                    output = bank.read_data(src_file)
                     # increment for the summary:
                     files_processed += 1
 
@@ -482,20 +470,20 @@ class Bank2Ynab(object):
                     logging.info(
                         "No output data from this file for this bank."
                     )
-                """# DEBUG: disabled file output while testing
-                if output != []:
-                    bank.write_data(src_file, output)
-                    # save transaction data for each bank to object
-                    self.transaction_data[bank_name] = output
-                    # delete original csv file
-                    if bank.config["delete_original"] is True:
-                        logging.info(
-                            "Removing input file: {}".format(src_file)
-                        )
-                        # os.remove(src_file) DEBUG - disabled deletion while testing
-                else:
+            """# DEBUG: disabled file output while testing
+            if output != []:
+                bank.write_data(src_file, output)
+                # save transaction data for each bank to object
+                self.transaction_data[bank_name] = output
+                # delete original csv file
+                if bank.config["delete_original"] is True:
                     logging.info(
-                        "No output data from this file for this bank."
-                    ) """
+                        "Removing input file: {}".format(src_file)
+                    )
+                    # os.remove(src_file) DEBUG - disabled deletion while testing
+            else:
+                logging.info(
+                    "No output data from this file for this bank."
+                ) """
 
         logging.info("\nDone! {} files processed.\n".format(files_processed))

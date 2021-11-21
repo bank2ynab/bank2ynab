@@ -471,10 +471,17 @@ class Bank2Ynab(object):
                         src_file, bank_name
                     )
                 )
-                # increment for the summary:
-                files_processed += 1
+                try:  # TODO: is this Try/Except the best way to handle format mismatches?
+
                 # create cleaned csv for each file
                 output = bank.read_data(src_file)
+                    # increment for the summary:
+                    files_processed += 1
+
+                except ValueError:
+                    logging.info(
+                        "No output data from this file for this bank."
+                    )
                 """# DEBUG: disabled file output while testing
                 if output != []:
                     bank.write_data(src_file, output)

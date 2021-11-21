@@ -1,7 +1,8 @@
 import os
 import configparser
 import logging
-
+import codecs
+import chardet
 
 # Generic utilities
 def get_configs():
@@ -179,14 +180,14 @@ def detect_encoding(filepath):
     :return: encoding alias that can be used with open()
     """
     # First try to guess the encoding with chardet. Take it if the
-    # confidence is >50% (randomly chosen)
+    # confidence is >60% (randomly chosen)
     with open(filepath, "rb") as f:
         file_content = f.read()
         rslt = chardet.detect(file_content)
         confidence, encoding = rslt["confidence"], rslt["encoding"]
-        if confidence > 0.5:
+        if confidence > 0.6:
             logging.info(
-                "Using encoding {} with confidence {}".format(
+                "\tOpening file using encoding {} with confidence {}".format(
                     encoding, confidence
                 )
             )
@@ -296,6 +297,9 @@ def detect_encoding(filepath):
     error = (ValueError, UnicodeError, UnicodeDecodeError, UnicodeEncodeError)
     for enc in encodings:
         try:
+            logging.info(
+                "\tAttempting to open file using {} encoding...".format(enc)
+            )
             with codecs.open(filepath, "r", encoding=enc) as f:
                 for line in f:
                     line.encode("utf-8")

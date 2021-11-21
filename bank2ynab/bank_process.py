@@ -108,13 +108,9 @@ class B2YBank(object):
         # give plugins a chance to pre-process the file
         self._preprocess_file(file_path)
 
-        # create a list of column indices to use
-        included_cols = []
-        for index, column in enumerate(input_columns):
-            if column in output_columns:
-                included_cols.append(index)
-
-        # create a transaction dataframe TODO: look into read_csv arguments to see which are useful
+        # detect file encoding
+        encod = b2y_utilities.detect_encoding(file_path)
+        # create a transaction dataframe
         df = pd.read_csv(
             filepath_or_buffer=file_path,
             delimiter=delim,
@@ -123,57 +119,41 @@ class B2YBank(object):
             skiprows=header_rows,  # skip header rows
             skipfooter=footer_rows,  # skip footer rows
             skip_blank_lines=True,  # skip blank lines
-            # decimal='.', # potential for replacing the fix_decimal function, but will require an extra config param
-            # encoding=None, # hopefully we don't have to worry about this
-            # encoding_errors='strict', # hopefully we don't have to worry about this
-            # dialect=None,
-            # on_bad_lines="skip",  # skip lines that cause csv errors # TODO: fix errors coming from this line before enabling
-            memory_map=True,  # map the file object directly onto memory & access data directly - no I/O overhead
+            encoding=encod,
+            memory_map=True,  # access file object directly - no I/O overhead
             engine="python",
         )
-
-        print(
-            "\nInitial DF\n{}".format(df.head())
-        )  # debug to see what our df is like before transformation
 
         # convert each transaction to match ideal output data
 
         # set column names based on input column list
         df.columns = input_columns
+
+        # debug to see what our df is like before transformation
+        logging.debug("\nInitial DF\n{}".format(df.head()))
+
         # merge duplicate input columns
         df = self._merge_duplicate_columns(df, input_columns)
-        print("\nAfter duplicate merge\n{}".format(df.head()))  # debug
         # add missing columns
         df = self._add_missing_columns(df, input_columns, output_columns)
         # fix date format
-        df = self._fix_date(df, date_format)
-        # process Inflow/Outflow flags # TODO not yet implemented
+        df["Date"] = self._fix_date(df["Date"], date_format)
+        # process Inflow/Outflow flags
         df = self._cd_flag_process(cd_flags, df)
-
-        """ TODO: FUNCTIONS NOT YET TACKLED
-        # # process Inflow or Outflow flags
-        # row = self._cd_flag_process(row, cd_flags)
-        # # convert negative inflows to standard outflows
-        # fixed_row = self._fix_outflow(fixed_row)
-        # # convert positive outflows to standard inflows
-        # fixed_row = self._fix_inflow(fixed_row)
-        # # fill in blank memo fields
-        # fixed_row = self._auto_memo(fixed_row, fill_memo)
-        # # convert decimal point
-        # fixed_row = self._fix_decimal_point(fixed_row)
-        # # remove extra characters in the inflow and outflow
-        # fixed_row = self._clean_monetary_values(fixed_row) """
-
+        # fix amounts (convert negative inflows and outflows etc)
+        df = self._fix_amount(df)
+        # auto fill memo if required
+        df = self._auto_memo(df, fill_memo)
         # remove invalid rows
         df = self._remove_invalid_rows(df)
-        # set final column order
+        # set final columns & order
         df = df[output_columns]
         # display parsed line count
-        line_count = df.shape[0]
-        logging.info("Parsed {} lines".format(line_count))
-        print(
-            "\nFinal DF\n{}".format(df.head())
-        )  # DEBUG - let's see what our Dataframe looks like
+        logging.info("Parsed {} lines".format(df.shape[0]))
+
+        logging.info("\nFinal DF\n{}".format(
+            df.head(10)))  # view final dataframe # TODO - switch to debug once finished here
+
         return df
 
     def _preprocess_file(self, file_path):
@@ -223,11 +203,12 @@ class B2YBank(object):
                     df.columns.values[key_col] = "{} {}".format(
                         key, dupe_count
                     )
-            # remove excess spaces
-            df[key] = (
-                df[key].str.replace("\s{2,}", " ", regex=True).str.strip()
-            )
+                # remove excess spaces
+                df[key] = (
+                    df[key].str.replace("\s{2,}", " ", regex=True).str.strip()
+                )
 
+        logging.debug("\nAfter duplicate merge\n{}".format(df.head()))
         return df
 
     def _add_missing_columns(
@@ -254,9 +235,11 @@ class B2YBank(object):
 
     def _cd_flag_process(
         self, cd_flags: list, df: DataFrame
-    ) -> DataFrame:  # TODO
+    ) -> DataFrame:
         """
         fix columns where inflow/outflow is indicated by a flag in a separate column
+        the cd_flag list is in the form "indicator column, outflow flag, inflow flag"
+        (the code does not use the indicator flag specified in the flag list, but instead the "CDFlag" column specified in Input Columns)
 
         :param cd_flags: list of parameters for applying indicators
         :type cd_flags: list
@@ -266,72 +249,58 @@ class B2YBank(object):
         :rtype: DataFrame
         """
         if len(cd_flags) == 3:
-            indicator_col = int(cd_flags[0])
             outflow_flag = cd_flags[2]
             # if this row is indicated to be outflow, make inflow negative
-            # if row[indicator_col] == outflow_flag:
-            #    row[inflow_col] = "-" + row[inflow_col]
-            print(df["CDFlag"])
+            df.loc[df["CDFlag"] is outflow_flag, [
+                "Inflow"]] = "-{}".format(df["Inflow"])
 
         return df
 
-    def _fix_outflow(self, row):
+    def _fix_amount(self, df: DataFrame) -> DataFrame:
         """
-        convert negative inflow into positive outflow
-        :param row: list of values
-        :return: list of values with corrected outflow column
-        """
-        inflow_index = self.config["output_columns"].index("Inflow")
-        outflow_index = self.config["output_columns"].index("Outflow")
-        inflow = row[inflow_index]
-        if inflow.startswith("-"):
-            row[inflow_index] = ""
-            row[outflow_index] = inflow[1:]
-        return row
+        fix currency string formatting
+        convert currency values to floats
+        convert negative inflows into outflows and vice versa
 
-    def _fix_inflow(self, row):
+        :param df: dataframe to modify
+        :type df: DataFrame
+        :return: modified dataframe
+        :rtype: DataFrame
         """
-        convert positive outflow into inflow
-        :param row: list of values
-        :return: list of values with corrected outflow column
-        """
-        inflow_index = self.config["output_columns"].index("Inflow")
-        outflow_index = self.config["output_columns"].index("Outflow")
-        outflow = row[outflow_index]
-        if outflow.startswith("+"):
-            row[outflow_index] = ""
-            row[inflow_index] = outflow[1:]
-        return row
+        # fix various formatting issues
+        df["Inflow"] = self._clean_monetary_values(df["Inflow"])
+        df["Outflow"] = self._clean_monetary_values(df["Outflow"])
 
-    def _fix_decimal_point(self, row):
-        """
-        convert , to . in inflow and outflow strings
-        then remove every instance of . except last one
-        :param row: list of values
-        """
-        inflow_index = self.config["output_columns"].index("Inflow")
-        outflow_index = self.config["output_columns"].index("Outflow")
-        inflow = row[inflow_index].replace(",", ".")
-        outflow = row[outflow_index].replace(",", ".")
-        dot_count = inflow.count(".") - 1
-        row[inflow_index] = inflow.replace(".", "", dot_count)
-        dot_count = outflow.count(".") - 1
-        row[outflow_index] = outflow.replace(".", "", dot_count)
+        # negative inflow = outflow
+        df.loc[df["Inflow"] < 0, ["Outflow"]] = df["Inflow"] * -1
+        df.loc[df["Inflow"] < 0, ["Inflow"]] = 0
+        # negative outflow = inflow
+        df.loc[df["Outflow"] < 0, ["Inflow"]] = df["Outflow"] * -1
+        df.loc[df["Outflow"] < 0, ["Outflow"]] = 0
 
-        return row
+        return df
 
-    def _clean_monetary_values(self, row):
+    def _clean_monetary_values(self, num_series: DataFrame) -> DataFrame:
         """
+        convert "," to "." then remove every instance of . except last one
         remove any characters from inflow or outflow strings except
-        digits and '.'
-        :param row: list of values
-        """
-        inflow_index = self.config["output_columns"].index("Inflow")
-        outflow_index = self.config["output_columns"].index("Outflow")
-        row[inflow_index] = re.sub(r"[^\d\.]", "", row[inflow_index])
-        row[outflow_index] = re.sub(r"[^\d\.]", "", row[outflow_index])
+        digits, "-", and "."
+        fill in null values with 0
 
-        return row
+        :param num_series: series of values to modify
+        :type num_series: DataFrame
+        :return: modified series
+        :rtype: DataFrame
+        """
+        # convert all commas to full stops
+        num_series.replace({"\,": "."}, regex=True, inplace=True)
+        # remove all except last decimal point
+        num_series.replace({"\.(?=.*?\.)": ""}, regex=True, inplace=True)
+        # remove all non-digit characters
+        num_series.replace({"[^\d\.-]": "", }, regex=True, inplace=True)
+        # fill in null values with 0
+        num_series.fillna(value=0, inplace=True)
+        return num_series.astype(float)
 
     def _remove_invalid_rows(self, df: DataFrame) -> DataFrame:
         """
@@ -348,7 +317,7 @@ class B2YBank(object):
         # filter rows with an invalid date
         df.query("Date.notna()", inplace=True)
 
-        return df
+        return df.reset_index()
 
     def _auto_memo(self, df: DataFrame, fill_memo: bool) -> DataFrame:
         """
@@ -365,7 +334,7 @@ class B2YBank(object):
             df["Memo"].fillna(df["Payee"])
         return df
 
-    def _fix_date(self, df: DataFrame, date_format: str) -> DataFrame:
+    def _fix_date(self, date_series: DataFrame, date_format: str) -> DataFrame:
         """
         If provided with an input date format, process the date column to the ISO format.
         Any non-parseable dates are returned as a NaT null value
@@ -377,13 +346,16 @@ class B2YBank(object):
         :return: modified dataframe
         :rtype: DataFrame
         """
-        df["Date"] = pd.to_datetime(
-            df["Date"],
+        date_series = pd.to_datetime(
+            date_series,
             format=date_format,
             infer_datetime_format=True,
             errors="coerce",
         )
-        return df
+
+        logging.debug("\nFixed dates:\n{}".format(date_series.head()))
+
+        return date_series
 
     def write_data(self, filename: str, df: DataFrame) -> str:
         """

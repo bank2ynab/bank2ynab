@@ -119,8 +119,8 @@ class B2YBank(object):
         df = pd.read_csv(
             filepath_or_buffer=file_path,
             delimiter=delim,
-            # usecols=included_cols, # strip out every input column that isn't named in the output columns MAYBE DO NOT USE SO WE CAN PERFORM OPERATIONS
             skipinitialspace=True,  # skip space after delimiter
+            header = None, # don't set column headers initially
             skiprows=header_rows,  # skip header rows
             skipfooter=footer_rows,  # skip footer rows
             skip_blank_lines=True,  # skip blank lines

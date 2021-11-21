@@ -350,7 +350,7 @@ class B2YBank(object):
 
         return df
 
-    def _auto_memo(self, df:DataFrame, fill_memo:bool) -> DataFrame:
+    def _auto_memo(self, df: DataFrame, fill_memo: bool) -> DataFrame:
         """
         if memo is blank, fill with contents of payee column
 
@@ -470,7 +470,9 @@ class Bank2Ynab(object):
 
                 except ValueError as e:
                     logging.info(
-                        "No output data from this file for this bank. ({})".format(e)
+                        "No output data from this file for this bank. ({})".format(
+                            e
+                        )
                     )
             """# DEBUG: disabled file output while testing
             if output != []:

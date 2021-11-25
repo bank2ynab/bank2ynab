@@ -175,9 +175,7 @@ class B2YBank:
         # intentionally empty - the plugins can use this function
         return
 
-    def _merge_duplicate_columns(
-        self, input_columns: list
-    ) -> None:
+    def _merge_duplicate_columns(self, input_columns: list) -> None:
         """
         Merges columns specified more than once in the input_columns list.
         Note: converts values into strings before merging.
@@ -200,7 +198,8 @@ class B2YBank:
             if len(key_cols) > 1:
                 # change first column to string
                 self.df.iloc[:, key_cols[0]] = "{} ".format(
-                    self.df.iloc[:, key_cols[0]])
+                    self.df.iloc[:, key_cols[0]]
+                )
                 # merge every duplicate column into the 1st instance of the column name
                 for dupe_count, key_col in enumerate(key_cols[1:]):
                     # add string version of each column onto the first column
@@ -213,8 +212,9 @@ class B2YBank:
                     )
                 # remove excess spaces
                 self.df[key] = (
-                    self.df[key].str.replace(
-                        "\s{2,}", " ", regex=True).str.strip()
+                    self.df[key]
+                    .str.replace("\s{2,}", " ", regex=True)
+                    .str.strip()
                 )
 
         logging.debug("\nAfter duplicate merge\n{}".format(self.df.head()))
@@ -251,9 +251,9 @@ class B2YBank:
         if len(cd_flags) == 3:
             outflow_flag = cd_flags[2]
             # if this row is indicated to be outflow, make inflow negative
-            self.df.loc[self.df["CDFlag"] is outflow_flag, ["Inflow"]] = "-{}".format(
-                self.df["Inflow"]
-            )
+            self.df.loc[
+                self.df["CDFlag"] is outflow_flag, ["Inflow"]
+            ] = "-{}".format(self.df["Inflow"])
 
     def _fix_amount(self) -> None:
         """
@@ -268,12 +268,14 @@ class B2YBank:
         self.df["Outflow"] = self._clean_monetary_values(self.df["Outflow"])
 
         # negative inflow = outflow
-        self.df.loc[self.df["Inflow"] < 0, [
-            "Outflow"]] = self.df["Inflow"] * -1
+        self.df.loc[self.df["Inflow"] < 0, ["Outflow"]] = (
+            self.df["Inflow"] * -1
+        )
         self.df.loc[self.df["Inflow"] < 0, ["Inflow"]] = 0
         # negative outflow = inflow
-        self.df.loc[self.df["Outflow"] < 0, [
-            "Inflow"]] = self.df["Outflow"] * -1
+        self.df.loc[self.df["Outflow"] < 0, ["Inflow"]] = (
+            self.df["Outflow"] * -1
+        )
         self.df.loc[self.df["Outflow"] < 0, ["Outflow"]] = 0
 
     def _clean_monetary_values(self, num_series: Series) -> Series:

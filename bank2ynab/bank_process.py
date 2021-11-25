@@ -24,6 +24,7 @@ from datetime import datetime
 import logging
 import pandas as pd
 from pandas.core.frame import DataFrame
+from pandas.core.series import Series
 
 import b2y_utilities
 
@@ -275,7 +276,7 @@ class B2YBank:
             "Inflow"]] = self.df["Outflow"] * -1
         self.df.loc[self.df["Outflow"] < 0, ["Outflow"]] = 0
 
-    def _clean_monetary_values(self, num_series: DataFrame) -> DataFrame:
+    def _clean_monetary_values(self, num_series: Series) -> Series:
         """
         convert "," to "." then remove every instance of . except last one
         remove any characters from inflow or outflow strings except
@@ -283,9 +284,9 @@ class B2YBank:
         fill in null values with 0
 
         :param num_series: series of values to modify
-        :type num_series: DataFrame
+        :type num_series: Series
         :return: modified series
-        :rtype: DataFrame
+        :rtype: Series
         """
         # convert all commas to full stops
         num_series.replace({"\,": "."}, regex=True, inplace=True)
@@ -335,17 +336,17 @@ class B2YBank:
         """
         self.df["Payee"].fillna(self.df["Memo"], inplace=True)
 
-    def _fix_date(self, date_series: DataFrame, date_format: str) -> DataFrame:
+    def _fix_date(self, date_series: Series, date_format: str) -> Series:
         """
         If provided with an input date format, process the date column to the ISO format.
         Any non-parseable dates are returned as a NaT null value
 
         :param df: dataframe to modify
-        :type df: DataFrame
+        :type df: Series
         :param date_format: date format codes according to 1989 C standard (https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior)
         :type date_format: str
         :return: modified dataframe
-        :rtype: DataFrame
+        :rtype: Series
         """
         date_series = pd.to_datetime(
             date_series,

@@ -413,7 +413,7 @@ def build_bank(
     return B2YBank(bank_config)
 
 
-class Bank2Ynab(object):
+class Bank2Ynab:
     """Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
 

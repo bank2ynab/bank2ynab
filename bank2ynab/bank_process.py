@@ -231,7 +231,8 @@ class B2YBank(object):
         missing_cols = list(set(output_cols).difference(input_cols))
         # add missing output columns
         for col in missing_cols:
-            df.insert(loc=0, column=col, value="NaN")
+            df.insert(loc=0, column=col, value="")
+            df[col] = pd.to_numeric(df[col], errors="coerce")
         return df
 
     def _cd_flag_process(self, cd_flags: list, df: DataFrame) -> DataFrame:

@@ -148,8 +148,10 @@ class B2YBank:
         df = self._cd_flag_process(cd_flags, df)
         # fix amounts (convert negative inflows and outflows etc)
         df = self._fix_amount(df)
-        # auto fill memo if required
+        # auto fill memo from payee if required
         df = self._auto_memo(df, fill_memo)
+        # auto fill payee from memo
+        df = self._auto_payee(df)
         # remove invalid rows
         df = self._remove_invalid_rows(df)
         # set final columns & order
@@ -344,7 +346,20 @@ class B2YBank:
         :rtype: DataFrame
         """
         if fill_memo:
-            df["Memo"].fillna(df["Payee"])
+            df["Memo"].fillna(df["Payee"], inplace=True)
+        return df
+
+    def _auto_payee(self, df: DataFrame) -> DataFrame:
+        """
+        if Payee is blank, fill with contents of Memo column
+
+        :param df: dataframe to be modified
+        :type df: DataFrame
+        :return: modified dataframe
+        :rtype: DataFrame
+        """
+        df["Payee"].fillna(df["Memo"], inplace=True)
+
         return df
 
     def _fix_date(self, date_series: DataFrame, date_format: str) -> DataFrame:

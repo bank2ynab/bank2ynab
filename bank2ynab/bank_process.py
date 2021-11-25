@@ -32,21 +32,27 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 # Classes doing the actual work
-class B2YBank(object):
+class B2YBank:
     """Object parsing and outputting data for a specific bank.
     This can be subclassed to handle formats requiring special handling,
     overriding any of get_files(), read_data() or write_data()."""
 
-    def __init__(self, config_object):
+    def __init__(self, config_object) -> None:
         """
-        :param config_object: dict containing config parameters
+        load bank-specific configuration parameters
+
+        :param config_object: bank's configuration 
+        :type config_object: [type]
         """
         self.name = config_object.get("bank_name", "DEFAULT")
         self.config = config_object
 
-    def get_files(self):
-        """find the transaction file
-        :return: list of matching files found
+    def get_files(self) -> list:
+        """
+        gets list of matching transaction files
+
+        :return: list of files to process
+        :rtype: list
         """
         ext = self.config["ext"]
         file_pattern = self.config["input_filename"]

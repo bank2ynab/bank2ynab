@@ -41,7 +41,7 @@ class B2YBank:
         """
         load bank-specific configuration parameters
 
-        :param config_object: bank's configuration 
+        :param config_object: bank's configuration
         :type config_object: [type]
         """
         self.name = config_object.get("bank_name", "DEFAULT")

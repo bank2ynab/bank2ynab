@@ -98,7 +98,9 @@ class BankHandler:
         transaction_files = bank_transactions.get_files()
         # initialise variables
         bank_files_processed = 0
-        output_df = []  # TODO temporary empty list until we work out df appending
+        output_df = (
+            []
+        )  # TODO temporary empty list until we work out df appending
 
         for src_file in transaction_files:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
@@ -108,20 +110,24 @@ class BankHandler:
                 bank_files_processed += 1
             except ValueError as e:
                 logging.info(
-                    f"No output data from this file for this bank. ({e})")
+                    f"No output data from this file for this bank. ({e})"
+                )
             else:
                 if 1 != 2:  # TODO need df alternative to check if df empty
                     self.write_data(src_file, cleaned_df)
 
                     # save transaction data for each bank to object
-                    self.transaction_data = output_df  # TODO actually append the data
+                    self.transaction_data = (
+                        output_df  # TODO actually append the data
+                    )
                     # delete original csv file
                     if self.config["delete_original"] is True:
                         logging.info(f"Removing input file: {src_file}")
                         # os.remove(src_filefile) DEBUG - disabled deletion while testing
                 else:
                     logging.info(
-                        "No output data from this file for this bank.")
+                        "No output data from this file for this bank."
+                    )
         return bank_files_processed, output_df
 
     def write_data(self, filename: str, df: DataFrame) -> str:
@@ -208,7 +214,8 @@ class TransactionFileReader:
                 ]
             if not files and missing_dir:
                 logging.error(
-                    f"\nFormat: {self.name}\n\nError: Can't find download path: {try_path}\nTrying default path instead:\t {path}")
+                    f"\nFormat: {self.name}\n\nError: Can't find download path: {try_path}\nTrying default path instead:\t {path}"
+                )
         return files
 
     def _preprocess_file(self, file_path):
@@ -344,7 +351,9 @@ class DataframeCleaner:
 
         logging.debug("\nAfter duplicate merge\n{}".format(self.df.head()))
 
-    def _add_missing_columns(self, input_cols: list, output_cols: list) -> None:
+    def _add_missing_columns(
+        self, input_cols: list, output_cols: list
+    ) -> None:
         """
         Adds any missing required columns to the Dataframe.
 

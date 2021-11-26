@@ -91,11 +91,8 @@ class B2YBank:
                     if prefix not in f
                 ]
             if not files and missing_dir:
-                s = (
-                    "\nFormat: {}\n\nError: Can't find download path: {}"
-                    "\nTrying default path instead:\t {}"
-                )
-                logging.error(s.format(self.name, try_path, path))
+                logging.error(
+                    f"\nFormat: {self.name}\n\nError: Can't find download path: {try_path}\nTrying default path instead:\t {path}")
         return files
 
     def read_data(self, file_path):
@@ -219,9 +216,7 @@ class B2YBank:
 
         logging.debug("\nAfter duplicate merge\n{}".format(self.df.head()))
 
-    def _add_missing_columns(
-        self, input_cols: list, output_cols: list
-    ) -> None:
+    def _add_missing_columns(self, input_cols: list, output_cols: list) -> None:
         """
         Adds any missing required columns to the Dataframe.
 

@@ -33,19 +33,135 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 # Classes doing the actual work
-class B2YBank:
-    """Object parsing and outputting data for a specific bank.
-    This can be subclassed to handle formats requiring special handling,
-    overriding any of get_files(), read_data() or write_data()."""
+class Bank2Ynab:
+    """Main program instance, responsible for gathering configuration,
+    creating the right object for each bank, and triggering elaboration."""
+
+    def __init__(self, config_object):
+        self.banks = []
+        self.transaction_data = {}
+
+        for section in config_object.sections():
+            bank_config = b2y_utilities.fix_conf_params(config_object, section)
+            bank_object = self.build_bank(bank_config)
+            self.banks.append(bank_object)
+
+    def build_bank(self, bank_config):
+        # mostly commented out for now as plugins need to be fixed
+        """Factory method loading the correct class for a given configuration."""
+        plugin_module = bank_config.get("plugin", None)
+        """ if plugin_module:
+            p_mod = importlib.import_module("plugins.{}".format(plugin_module))
+            if not hasattr(p_mod, "build_bank"):
+                s = (
+                    "The specified plugin {}.py".format(plugin_module)
+                    + "does not contain the required "
+                    "build_bank(config) method."
+                )
+                raise ImportError(s)
+            bank = p_mod.build_bank(bank_config)
+            return bank
+            else: """  # DEBUG - plugins broken
+        return BankHandler(bank_config)
+
+    def run(self):
+        """Main program flow"""
+        # initialize variables for summary:
+        files_processed = 0
+        # process account for each config file
+        for bank in self.banks:
+            bank_files_processed, bank_df = bank.run()
+            # do something with bank_df so we can pass to API class
+            # TODO something!
+            files_processed += bank_files_processed
+
+        logging.info("\nDone! {} files processed.\n".format(files_processed))
+
+
+class BankHandler:
+    """
+    handle the flow for data input, parsing, and data output for a given bank configuration
+    """
 
     def __init__(self, config_object) -> None:
         """
         load bank-specific configuration parameters
 
         :param config_object: bank's configuration
-        :type config_object: [type]
+        :type config_object: Configparser config object #TODO correctly typehint this
         """
         self.name = config_object.get("bank_name", "DEFAULT")
+        self.config = config_object
+
+    def run(self) -> None:
+        bank_transactions = TransactionFileReader(self.config)
+        transaction_files = bank_transactions.get_files()
+        # initialise variables
+        bank_files_processed = 0
+        output_df = []  # TODO temporary empty list until we work out df appending
+
+        for src_file in transaction_files:
+            logging.info(f"\nParsing input file: {src_file} ({self.name})")
+            try:
+                raw_df = bank_transactions.read_transactions(src_file)
+                cleaned_df = DataframeCleaner(raw_df, self.config).parse_data()
+                bank_files_processed += 1
+            except ValueError as e:
+                logging.info(
+                    f"No output data from this file for this bank. ({e})")
+            else:
+                if 1 != 2:  # TODO need df alternative to check if df empty
+                    self.write_data(src_file, cleaned_df)
+
+                    # save transaction data for each bank to object
+                    self.transaction_data = output_df  # TODO actually append the data
+                    # delete original csv file
+                    if self.config["delete_original"] is True:
+                        logging.info(f"Removing input file: {src_file}")
+                        # os.remove(src_filefile) DEBUG - disabled deletion while testing
+                else:
+                    logging.info(
+                        "No output data from this file for this bank.")
+        return bank_files_processed, output_df
+
+    def write_data(self, filename: str, df: DataFrame) -> str:
+        """
+        write out the new CSV file
+
+        :param filename: path to output file
+        :type filename: str
+        :param df: cleaned data ready to output
+        :type df: DataFrame
+        :return: target filename
+        :rtype: str
+        """
+        target_dir = dirname(filename)
+        target_fname = basename(filename)[:-4]
+        fixed_prefix = self.config["fixed_prefix"]
+        new_filename = f"{fixed_prefix}{target_fname}.csv"
+        while os.path.isfile(new_filename):
+            counter = 1
+            new_filename = f"{fixed_prefix}{target_fname}_{counter}.csv"
+            counter += 1
+        target_filename = join(target_dir, new_filename)
+        logging.info(f"Writing output file: {target_filename}")
+        # write dataframe to csv
+        # df.to_csv(target_filename, index=False) # TODO DEBUG file output disabled
+        return target_filename
+
+
+class TransactionFileReader:
+    """
+    find all relevant files for a specified config and provide a dataframe to work with
+    """
+
+    def __init__(self, config_object) -> None:
+        """
+        load bank-specific configuration parameters
+
+        :param config_object: bank's configuration
+        :type config_object: Configparser config object #TODO correctly typehint this
+        """
         self.config = config_object
 
     def get_files(self) -> list:
@@ -95,19 +211,24 @@ class B2YBank:
                     f"\nFormat: {self.name}\n\nError: Can't find download path: {try_path}\nTrying default path instead:\t {path}")
         return files
 
-    def read_data(self, file_path):
+    def _preprocess_file(self, file_path):
+        """
+        exists solely to be used by plugins for pre-processing a file
+        that otherwise can be read normally (e.g. weird format)
+        :param file_path: path to file
+        """
+        # intentionally empty - the plugins can use this function
+        return
+
+    # TODO separate out preprocess step
+    def read_transactions(self, file_path: str) -> DataFrame:
         """extract data from given transaction file
         :param file_path: path to file
         :return: list of cleaned data rows
         """
         delim = self.config["input_delimiter"]
-        input_columns = self.config["input_columns"]
-        output_columns = self.config["output_columns"]
         header_rows = int(self.config["header_rows"])
         footer_rows = int(self.config["footer_rows"])
-        cd_flags = self.config["cd_flags"]
-        date_format = self.config["date_format"]
-        fill_memo = self.config["payee_to_memo"]
 
         # give plugins a chance to pre-process the file
         self._preprocess_file(file_path)
@@ -115,7 +236,7 @@ class B2YBank:
         # detect file encoding
         encod = b2y_utilities.detect_encoding(file_path)
         # create a transaction dataframe
-        self.df = pd.read_csv(
+        return pd.read_csv(
             filepath_or_buffer=file_path,
             delimiter=delim,
             skipinitialspace=True,  # skip space after delimiter
@@ -128,7 +249,23 @@ class B2YBank:
             engine="python",
         )
 
+
+class DataframeCleaner:
+    """
+    use the details for a specified config to produce a cleaned dataframe matching a given specification
+    """
+
+    def __init__(self, df: DataFrame, config_object) -> None:
+        self.df = df
+        self.config = config_object
+
+    def parse_data(self):
         # convert each transaction to match ideal output data
+        input_columns = self.config["input_columns"]
+        output_columns = self.config["output_columns"]
+        cd_flags = self.config["cd_flags"]
+        date_format = self.config["date_format"]
+        fill_memo = self.config["payee_to_memo"]
 
         # set column names based on input column list
         self.df.columns = input_columns
@@ -162,15 +299,6 @@ class B2YBank:
         )  # view final dataframe # TODO - switch to debug once finished here
 
         return self.df
-
-    def _preprocess_file(self, file_path):
-        """
-        exists solely to be used by plugins for pre-processing a file
-        that otherwise can be read normally (e.g. weird format)
-        :param file_path: path to file
-        """
-        # intentionally empty - the plugins can use this function
-        return
 
     def _merge_duplicate_columns(self, input_columns: list) -> None:
         """
@@ -355,110 +483,3 @@ class B2YBank:
         logging.debug("\nFixed dates:\n{}".format(date_series.head()))
 
         return date_series
-
-    def write_data(self, filename: str, df: DataFrame) -> str:
-        """
-        write out the new CSV file
-
-        :param filename: path to output file
-        :type filename: str
-        :param df: cleaned data ready to output
-        :type df: DataFrame
-        :return: target filename
-        :rtype: str
-        """
-        target_dir = dirname(filename)
-        target_fname = basename(filename)[:-4]
-        new_filename = "{}{}.csv".format(
-            self.config["fixed_prefix"], target_fname
-        )
-        while os.path.isfile(new_filename):
-            counter = 1
-            new_filename = "{}{}_{}.csv".format(
-                self.config["fixed_prefix"], target_fname, counter
-            )
-            counter += 1
-        target_filename = join(target_dir, new_filename)
-        logging.info("Writing output file: {}".format(target_filename))
-        # write dataframe to csv
-        df.to_csv(target_filename, index=False)
-        return target_filename
-
-
-def build_bank(
-    bank_config,
-):  # mostly commented out for now as plugins need to be fixed
-    """Factory method loading the correct class for a given configuration."""
-    plugin_module = bank_config.get("plugin", None)
-    """ if plugin_module:
-        p_mod = importlib.import_module("plugins.{}".format(plugin_module))
-        if not hasattr(p_mod, "build_bank"):
-            s = (
-                "The specified plugin {}.py".format(plugin_module)
-                + "does not contain the required "
-                "build_bank(config) method."
-            )
-            raise ImportError(s)
-        bank = p_mod.build_bank(bank_config)
-        return bank
-    else: """  # DEBUG - plugins broken
-    return B2YBank(bank_config)
-
-
-class Bank2Ynab:
-    """Main program instance, responsible for gathering configuration,
-    creating the right object for each bank, and triggering elaboration."""
-
-    def __init__(self, config_object):
-        self.banks = []
-        self.transaction_data = {}
-
-        for section in config_object.sections():
-            bank_config = b2y_utilities.fix_conf_params(config_object, section)
-            bank_object = build_bank(bank_config)
-            self.banks.append(bank_object)
-
-    def run(self):
-        """Main program flow"""
-        # initialize variables for summary:
-        files_processed = 0
-        # process account for each config file
-        for bank in self.banks:
-            # find all applicable files
-            files = bank.get_files()
-            bank_name = bank.name
-            for src_file in files:
-                logging.info(
-                    "\nParsing input file:  {} (format: {})".format(
-                        src_file, bank_name
-                    )
-                )
-                try:  # TODO: is this Try/Except the best way to handle format mismatches?
-                    # create cleaned csv for each file
-                    output_df = bank.read_data(src_file)
-                    # increment for the summary:
-                    files_processed += 1
-
-                except ValueError as e:
-                    logging.info(
-                        "No output data from this file for this bank. ({})".format(
-                            e
-                        )
-                    )
-            """# DEBUG: disabled file output while testing
-            if output != []:
-                bank.write_data(src_file, output_df)
-                # save transaction data for each bank to object
-                self.transaction_data[bank_name] = output_df
-                # delete original csv file
-                if bank.config["delete_original"] is True:
-                    logging.info(
-                        "Removing input file: {}".format(src_file)
-                    )
-                    # os.remove(src_file) DEBUG - disabled deletion while testing
-            else:
-                logging.info(
-                    "No output data from this file for this bank."
-                ) """
-
-        logging.info("\nDone! {} files processed.\n".format(files_processed))

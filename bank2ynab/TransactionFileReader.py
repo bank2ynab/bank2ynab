@@ -77,7 +77,7 @@ class TransactionFileReader:
         that otherwise can be read normally (e.g. weird format)
         :param file_path: path to file
         """
-        # intentionally empty - the plugins can use this function
+        # intentionally empty - plugins can use this function
         return
 
     # TODO separate out preprocess step

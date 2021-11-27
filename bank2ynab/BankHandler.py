@@ -36,7 +36,14 @@ class BankHandler:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
             try:
                 raw_df = bank_transactions.read_transactions(src_file)
-                cleaned_df = DataframeCleaner(raw_df, self.config).parse_data()
+                cleaned_df = DataframeCleaner(
+                    df=raw_df,
+                    input_columns=self.config["input_columns"],
+                    output_columns=self.config["output_columns"],
+                    cd_flags=self.config["cd_flags"],
+                    date_format=self.config["date_format"],
+                    fill_memo=self.config["payee_to_memo"],).parse_data()
+
                 bank_files_processed += 1
             except ValueError as e:
                 logging.info(
@@ -56,8 +63,7 @@ class BankHandler:
                         # os.remove(src_filefile) DEBUG - disabled deletion while testing
                 else:
                     logging.info(
-                        "No output data from this file for this bank."
-                    )
+                        "No output data from this file for this bank.")
         return bank_files_processed, output_df
 
     def write_data(self, filename: str, df: DataFrame) -> str:

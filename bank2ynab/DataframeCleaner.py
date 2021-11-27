@@ -1,50 +1,54 @@
+import logging
+
 import pandas as pd
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 
-import logging
 
 class DataframeCleaner:
     """
     use the details for a specified config to produce a cleaned dataframe matching a given specification
     """
 
-    def __init__(self, df: DataFrame, config_object) -> None:
+    def __init__(self, *, df: DataFrame, input_columns: list, output_columns: list, cd_flags: list, date_format: str, fill_memo: bool) -> None:
         self.df = df
-        self.config = config_object
+        self.input_columns = input_columns
+        self.output_columns = output_columns
+        self.cd_flags = cd_flags
+        self.date_format = date_format
+        self.fill_memo = fill_memo
 
-    def parse_data(self):
-        # convert each transaction to match ideal output data
-        input_columns = self.config["input_columns"]
-        output_columns = self.config["output_columns"]
-        cd_flags = self.config["cd_flags"]
-        date_format = self.config["date_format"]
-        fill_memo = self.config["payee_to_memo"]
+    def parse_data(self)->DataFrame:
+        """
+        convert each column of the dataframe to match ideal output data
 
+        :return: modified dataframe matching provided configuration values
+        :rtype: DataFrame
+        """
         # set column names based on input column list
-        self.df.columns = input_columns
+        self.df.columns = self.input_columns
 
         # debug to see what our df is like before transformation
         logging.debug("\nInitial DF\n{}".format(self.df.head()))
 
         # merge duplicate input columns
-        self._merge_duplicate_columns(input_columns)
+        self._merge_duplicate_columns(self.input_columns)
         # add missing columns
-        self._add_missing_columns(input_columns, output_columns)
+        self._add_missing_columns(self.input_columns, self.output_columns)
         # fix date format
-        self.df["Date"] = self._fix_date(self.df["Date"], date_format)
+        self.df["Date"] = self._fix_date(self.df["Date"], self.date_format)
         # process Inflow/Outflow flags
-        self._cd_flag_process(cd_flags)
+        self._cd_flag_process(self.cd_flags)
         # fix amounts (convert negative inflows and outflows etc)
         self._fix_amount()
         # auto fill memo from payee if required
-        self._auto_memo(fill_memo)
+        self._auto_memo(self.fill_memo)
         # auto fill payee from memo
         self._auto_payee()
         # remove invalid rows
         self._remove_invalid_rows()
         # set final columns & order
-        self.df = self.df[output_columns]
+        self.df = self.df[self.output_columns]
         # display parsed line count
         logging.info("Parsed {} lines".format(self.df.shape[0]))
 

@@ -1,8 +1,10 @@
-import os
+import codecs
 import configparser
 import logging
-import codecs
+import os
+
 import chardet
+
 
 # Generic utilities
 def get_configs():
@@ -45,6 +47,7 @@ def fix_conf_params(conf_obj, section_name):
         "input_filename": ["Source Filename Pattern", False, ""],
         "path": ["Source Path", False, ""],
         "ext": ["Source Filename Extension", False, ""],
+        "encoding": ["Encoding", False, ""],
         "regex": ["Use Regex For Filename", True, ""],
         "fixed_prefix": ["Output Filename Prefix", False, ""],
         "input_delimiter": ["Source CSV Delimiter", False, ""],

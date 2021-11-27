@@ -10,7 +10,25 @@ class DataframeCleaner:
     use the details for a specified config to produce a cleaned dataframe matching a given specification
     """
 
-    def __init__(self, *, df: DataFrame, input_columns: list, output_columns: list, cd_flags: list, date_format: str, fill_memo: bool) -> None:
+    def __init__(
+            self, *, df: DataFrame, input_columns: list, output_columns: list,
+            cd_flags: list, date_format: str, fill_memo: bool) -> None:
+        """
+        initialise cleaner object using provided dataframe and parameters
+
+        :param df: dataframe to be modified
+        :type df: DataFrame
+        :param input_columns: columns present in input data
+        :type input_columns: list
+        :param output_columns: desired columns to be present in output data
+        :type output_columns: list
+        :param cd_flags: parameter to indicate inflow/outflow for a row
+        :type cd_flags: list
+        :param date_format: string format for date
+        :type date_format: str
+        :param fill_memo: boolean to indicate whether to fill blank memo with payee data
+        :type fill_memo: bool
+        """
         self.df = df
         self.input_columns = input_columns
         self.output_columns = output_columns
@@ -18,7 +36,7 @@ class DataframeCleaner:
         self.date_format = date_format
         self.fill_memo = fill_memo
 
-    def parse_data(self)->DataFrame:
+    def parse_data(self) -> DataFrame:
         """
         convert each column of the dataframe to match ideal output data
 

@@ -11,8 +11,15 @@ class DataframeCleaner:
     """
 
     def __init__(
-            self, *, df: DataFrame, input_columns: list, output_columns: list,
-            cd_flags: list, date_format: str, fill_memo: bool) -> None:
+        self,
+        *,
+        df: DataFrame,
+        input_columns: list,
+        output_columns: list,
+        cd_flags: list,
+        date_format: str,
+        fill_memo: bool
+    ) -> None:
         """
         initialise cleaner object using provided dataframe and parameters
 

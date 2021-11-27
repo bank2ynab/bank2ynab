@@ -15,14 +15,18 @@ class TransactionFileReader:
     """
 
     def __init__(
-            self, *, ext: str,
-            file_pattern: str,
-            prefix: str,
-            regex_active: bool,
-            encoding: str,
-            try_path: str, delim: str,
-            header_rows: int,
-            footer_rows: int,) -> None:
+        self,
+        *,
+        ext: str,
+        file_pattern: str,
+        prefix: str,
+        regex_active: bool,
+        encoding: str,
+        try_path: str,
+        delim: str,
+        header_rows: int,
+        footer_rows: int,
+    ) -> None:
         """
         generate bank specific file reader using supplied configuration flags
 

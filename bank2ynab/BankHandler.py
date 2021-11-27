@@ -24,7 +24,17 @@ class BankHandler:
         self.config = config_object
 
     def run(self) -> None:
-        bank_transactions = TransactionFileReader(self.config)
+        bank_transactions = TransactionFileReader(
+            ext=self.config["ext"],
+            file_pattern=self.config["input_filename"],
+            prefix=self.config["fixed_prefix"],
+            encoding=self.config["encoding"],
+            regex_active=self.config["regex"],
+            try_path=self.config["path"],
+            delim=self.config["input_delimiter"],
+            header_rows=int(self.config["header_rows"]),
+            footer_rows=int(self.config["footer_rows"]),
+        )
         transaction_files = bank_transactions.get_files()
         # initialise variables
         bank_files_processed = 0

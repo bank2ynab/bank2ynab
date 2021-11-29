@@ -105,8 +105,9 @@ class DataframeCleaner:
             key_cols = cols_to_merge[key]
             if len(key_cols) > 1:
                 # change first column to string
-                self.df.iloc[:, key_cols[0]] = self.df.iloc[:,
-                                                            key_cols[0]].astype(str) + " "
+                self.df.iloc[:, key_cols[0]] = (
+                    self.df.iloc[:, key_cols[0]].astype(str) + " "
+                )
                 # merge every duplicate column into the 1st instance of the column name
                 for dupe_count, key_col in enumerate(key_cols[1:]):
                     # add string version of each column onto the first column

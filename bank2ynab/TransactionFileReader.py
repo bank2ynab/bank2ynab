@@ -264,13 +264,18 @@ class TransactionFileReader:
             "shift_jisx0213",
         ]
         result = None
-        error = (ValueError, UnicodeError,
-                 UnicodeDecodeError, UnicodeEncodeError)
+        error = (
+            ValueError,
+            UnicodeError,
+            UnicodeDecodeError,
+            UnicodeEncodeError,
+        )
         for enc in encodings:
             try:
                 logging.info(
                     "\tAttempting to open file using {} encoding...".format(
-                        enc)
+                        enc
+                    )
                 )
                 with codecs.open(filepath, "r", encoding=enc) as f:
                     for line in f:
@@ -293,7 +298,9 @@ class TransactionFileReader:
                     "\\Explorer\\Shell Folders"
                 )
                 dl_key = "{374DE290-123F-4565-9164-39C4925E467B}"
-                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, shell_path) as key:
+                with winreg.OpenKey(
+                    winreg.HKEY_CURRENT_USER, shell_path
+                ) as key:
                     input_dir = winreg.QueryValueEx(key, dl_key)[0]
             else:
                 # Linux, OSX

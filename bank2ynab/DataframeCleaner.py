@@ -6,6 +6,9 @@ from pandas.core.series import Series
 
 
 class DataframeCleaner:
+    # TODO - integrate payee mapping in this class
+    # TODO - add currency conversion factor (removes need for Raiffeisen plugin?)
+    
     """
     use the details for a specified config to produce a cleaned dataframe matching a given specification
     """

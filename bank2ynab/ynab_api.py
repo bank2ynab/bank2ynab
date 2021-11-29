@@ -1,25 +1,32 @@
-import requests
-import json
 import configparser
+import json
 import logging
 
+import requests
+
 import b2y_utilities
+from ConfigHandler import ConfigHandler
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
-class YNAB_API(object):  # in progress (2)
+class YNAB_API:
+    # TODO - revise docstring
+    # TODO - rename class
+    # TODO - break up class - too many responsibilities
+    # TODO - create API Error class?
+    # TODO - handle transaction creation in DataframeCleaner?
     """
     uses Personal Access Token stored in user_configuration.conf
     (note for devs: be careful not to accidentally share API access token!)
     """
 
-    def __init__(self, config_object, transactions=None):
+    def __init__(self, config_object: ConfigHandler, transactions=None) -> None:
         self.transactions = []
         self.budget_id = None
-        self.config = b2y_utilities.get_configs()
-        self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
+        self.config_handler = config_object
+        self.api_token = self.config_handler.config.get("DEFAULT", "YNAB API Access Token")
         # TODO make user_config section play nice with
         # b2y_utilities.get_configs()
         self.user_config_path = "user_configuration.conf"
@@ -249,10 +256,11 @@ class YNAB_API(object):  # in progress (2)
 
     def select_account(self, bank):
         account_id = ""
+        budget_id = ""
         # check if bank has account associated with it already
         try:
-            config_line = b2y_utilities.get_config_line(
-                self.config, bank, ["YNAB Account ID", False, "||"]
+            config_line = self.config_handler.get_config_line(
+                bank, ["YNAB Account ID", False, "||"]
             )
             budget_id = config_line[0]
             account_id = config_line[1]
@@ -260,6 +268,7 @@ class YNAB_API(object):  # in progress (2)
         except IndexError:
             pass
         except configparser.NoSectionError:
+            # TODO - can we handle this within the config class?
             logging.info("No user configuration for {} found.".format(bank))
 
         if account_id == "":
@@ -280,8 +289,8 @@ class YNAB_API(object):  # in progress (2)
             msg = instruction.format("account", bank, "an account")
             account_id = b2y_utilities.option_selection(account_ids, msg)
             # save account selection for bank
-            save_ac_toggle = b2y_utilities.get_config_line(
-                self.config, bank, ["Save YNAB Account", True, ""]
+            save_ac_toggle = self.config_handler.get_config_line(
+                bank, ["Save YNAB Account", True, ""]
             )
             if save_ac_toggle is True:
                 self.save_account_selection(bank, budget_id, account_id)

@@ -410,8 +410,8 @@ class Test_YNAB_API(TestCase):
             ("test_api_existing_bank_2", "Test Budget ID 2", "ID #2"),
         ]
         test_class.config_path = self.TEMPCONFPATH
-        test_class.config = configparser.RawConfigParser()
-        test_class.config.read(test_class.config_path)
+        test_class.config_handler = configparser.RawConfigParser()
+        test_class.config_handler.read(test_class.config_path)
 
         mock_ids = [
             ("Account 1", "Test Budget ID 1", "ID #1"),
@@ -436,8 +436,8 @@ class Test_YNAB_API(TestCase):
         test_account_id = "Test Account ID"
         test_banks = ["New Bank", "Existing Bank"]
         test_class.config_path = self.TEMPCONFPATH
-        test_class.config = configparser.RawConfigParser()
-        test_class.config.read(test_class.config_path)
+        test_class.config_handler = configparser.RawConfigParser()
+        test_class.config_handler.read(test_class.config_path)
 
         # save test bank details to test config
         for test_bank in test_banks:

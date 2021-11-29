@@ -22,11 +22,15 @@ class YNAB_API:
     (note for devs: be careful not to accidentally share API access token!)
     """
 
-    def __init__(self, config_object: ConfigHandler, transactions=None) -> None:
+    def __init__(
+        self, config_object: ConfigHandler, transactions=None
+    ) -> None:
         self.transactions = []
         self.budget_id = None
         self.config_handler = config_object
-        self.api_token = self.config_handler.config.get("DEFAULT", "YNAB API Access Token")
+        self.api_token = self.config_handler.config.get(
+            "DEFAULT", "YNAB API Access Token"
+        )
         # TODO make user_config section play nice with
         # b2y_utilities.get_configs()
         self.user_config_path = "user_configuration.conf"

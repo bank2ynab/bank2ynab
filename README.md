@@ -142,6 +142,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DK Jyske Bank VISA
 1. DK Nordea
 1. DK Portalbank
+1. Hibiscus
 1. HU Erste Bank checking
 1. HU OTP
 1. IE AIB Ireland

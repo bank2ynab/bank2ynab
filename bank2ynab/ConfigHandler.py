@@ -66,7 +66,12 @@ class ConfigHandler:
         bank_config = dict()
         for parameter in config_mapping:
             bank_config.update(
-                {parameter: self.get_config_line(section_name, config_mapping[parameter])})
+                {
+                    parameter: self.get_config_line(
+                        section_name, config_mapping[parameter]
+                    )
+                }
+            )
 
         bank_config.update({"bank_name": section_name})
 

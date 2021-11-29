@@ -23,8 +23,9 @@ class BankHandler:
         self.name = config_object.get("bank_name", "DEFAULT")
         self.config = config_object
 
-    def run(self) -> None:
+    def run(self) -> list:
         bank_transactions = TransactionFileReader(
+            name=self.name,
             ext=self.config["ext"],
             file_pattern=self.config["input_filename"],
             prefix=self.config["fixed_prefix"],
@@ -76,7 +77,7 @@ class BankHandler:
                     logging.info(
                         "No output data from this file for this bank."
                     )
-        return bank_files_processed, output_df
+        return [bank_files_processed, output_df]
 
     def write_data(self, filename: str, df: DataFrame) -> str:
         """

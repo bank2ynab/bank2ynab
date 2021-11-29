@@ -105,9 +105,8 @@ class DataframeCleaner:
             key_cols = cols_to_merge[key]
             if len(key_cols) > 1:
                 # change first column to string
-                self.df.iloc[:, key_cols[0]] = "{} ".format(
-                    self.df.iloc[:, key_cols[0]]
-                )
+                self.df.iloc[:, key_cols[0]] = self.df.iloc[:,
+                                                            key_cols[0]].astype(str) + " "
                 # merge every duplicate column into the 1st instance of the column name
                 for dupe_count, key_col in enumerate(key_cols[1:]):
                     # add string version of each column onto the first column
@@ -121,7 +120,7 @@ class DataframeCleaner:
                 # remove excess spaces
                 self.df[key] = (
                     self.df[key]
-                    .str.replace("\s{2,}", " ", regex=True)
+                    .str.replace("\\s{2,}", " ", regex=True)
                     .str.strip()
                 )
 
@@ -199,13 +198,13 @@ class DataframeCleaner:
         :rtype: Series
         """
         # convert all commas to full stops
-        num_series.replace({"\,": "."}, regex=True, inplace=True)
+        num_series.replace({"\\,": "."}, regex=True, inplace=True)
         # remove all except last decimal point
-        num_series.replace({"\.(?=.*?\.)": ""}, regex=True, inplace=True)
+        num_series.replace({"\\.(?=.*?\\.)": ""}, regex=True, inplace=True)
         # remove all non-digit characters
         num_series.replace(
             {
-                "[^\d\.-]": "",
+                "[^\\d\\.-]": "",
             },
             regex=True,
             inplace=True,

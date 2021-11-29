@@ -46,9 +46,10 @@ class BankIterator:
         files_processed = 0
         # process account for each config file
         for bank in self.banks:
-            bank_files_processed, bank_df = bank.run()
+            bank_process = bank.run()
             # do something with bank_df so we can pass to API class
             # TODO something!
-            files_processed += bank_files_processed
+            bank_process[1]
+            files_processed += bank_process[0]
 
         logging.info("\nDone! {} files processed.\n".format(files_processed))

@@ -13,12 +13,12 @@ class BankIterator:
     """Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
 
-    def __init__(self, config_object):
+    def __init__(self, config_handler):
         self.banks = []
         self.transaction_data = {}
 
-        for section in config_object.sections():
-            bank_config = b2y_utilities.fix_conf_params(config_object, section)
+        for section in config_handler.config.sections():
+            bank_config = config_handler.fix_conf_params(section)
             bank_object = self.build_bank(bank_config)
             self.banks.append(bank_object)
 

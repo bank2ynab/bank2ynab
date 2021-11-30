@@ -1,7 +1,8 @@
 # Step 1: See https://github.com/bank2ynab/bank2ynab/wiki/WorkingWithPlugins
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
-
+# TODO commented out until plugin structure finalised
+'''
 from bank_process import B2YBank
 
 
@@ -56,3 +57,4 @@ class YourActualBankPlugin(B2YBank):
 
 def build_bank(config):
     return YourActualBankPlugin(config)
+'''

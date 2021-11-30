@@ -8,6 +8,8 @@
 # At that point, you can reference the plugin in conf files like this:
 #   Plugin = mymodule
 
+# TODO commented out until plugin structure finalised
+'''
 from bank_process import B2YBank
 
 
@@ -59,3 +61,5 @@ def build_bank(config):
     :return: a B2YBank subclass instance
     """
     return NullBank(config)
+"""
+'''

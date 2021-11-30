@@ -1,5 +1,6 @@
 # Plugin for handling OCBC Bank [SG] files
-
+# TODO commented out until plugin structure finalised
+'''
 from bank_process import B2YBank
 
 
@@ -60,3 +61,4 @@ def build_bank(config):
     :return: a B2YBank subclass instance
     """
     return OCBC_Bank_SG(config)
+'''

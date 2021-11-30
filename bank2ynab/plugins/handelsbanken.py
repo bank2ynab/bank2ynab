@@ -4,6 +4,8 @@
         With thanks to @joacand's script from here:
         github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py
 """
+# TODO commented out until we have a different structure to rely on
+'''
 from bank_process import B2YBank
 import re
 
@@ -27,7 +29,7 @@ class Handelsbanken(B2YBank):
                 cells = row.split(";")
                 new_row = []
                 for cell in cells:
-                    es = re.findall(r"\>.*?\<", cell)
+                    es = re.findall(r"\\>.*?\\<", cell)
                     while "><" in es:
                         es.remove("><")
                         for n, i in enumerate(es):
@@ -54,3 +56,5 @@ def build_bank(config):
     :return: a B2YBank subclass instance
     """
     return Handelsbanken(config)
+
+'''

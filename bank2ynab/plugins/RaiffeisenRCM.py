@@ -1,5 +1,6 @@
 # Plugin for handling [AT Raiffeisen RCM] format
-
+# TODO commented out until plugin structure finalised
+'''
 from bank_process import B2YBank
 from b2y_utilities import EncodingCsvReader
 
@@ -69,3 +70,4 @@ class RaiffeisenRCMPlugin(B2YBank):
 
 def build_bank(config):
     return RaiffeisenRCMPlugin(config)
+'''

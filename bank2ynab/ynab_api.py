@@ -4,7 +4,6 @@ import logging
 
 import requests
 
-import b2y_utilities
 from config_handler import ConfigHandler
 
 # configure our logger

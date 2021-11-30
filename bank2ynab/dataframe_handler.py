@@ -62,7 +62,7 @@ class DataframeHandler:
             engine="python",
         )
 
-    def parse_data(self) -> DataFrame:
+    def parse_data(self) -> None:
         """
         convert each column of the dataframe to match ideal output data
 
@@ -99,8 +99,8 @@ class DataframeHandler:
         logging.info(
             "\nFinal DF\n{}".format(self.df.head(10))
         )  # view final dataframe # TODO - switch to debug once finished here
-
-        return self.df
+        # check if dataframe is empty
+        self.empty = self.df.empty
 
     def _merge_duplicate_columns(self, input_columns: list) -> None:
         """
@@ -287,3 +287,12 @@ class DataframeHandler:
         logging.debug("\nFixed dates:\n{}".format(date_series.head()))
 
         return date_series
+
+    def output_csv(self, path: str) -> None:
+        """
+        Writes self.df to the specified filepath as a csv file
+
+        :param path: path to write exported file to
+        :type path: str
+        """
+        self.df.to_csv(path, index=False)

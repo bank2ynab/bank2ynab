@@ -1,8 +1,6 @@
 import logging
 from os.path import basename, dirname, isfile, join
 
-from pandas.core.frame import DataFrame
-
 from dataframe_handler import DataframeHandler
 from transactionfile_reader import TransactionFileReader
 
@@ -34,10 +32,7 @@ class BankHandler:
         )
         # initialise variables
         bank_files_processed = 0
-        output_df = (
-            []
-        )  # TODO temporary empty list until we work out df appending
-
+        output_data = list()
         for src_file in transaction_reader.files:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
             try:
@@ -59,7 +54,7 @@ class BankHandler:
                     date_format=self.config_dict["date_format"],
                     fill_memo=self.config_dict["payee_to_memo"],
                 )
-                cleaned_df = df_handler.parse_data()
+                df_handler.parse_data()
 
                 bank_files_processed += 1
             except ValueError as e:
@@ -67,36 +62,36 @@ class BankHandler:
                     f"No output data from this file for this bank. ({e})"
                 )
             else:
-                if 1 != 2:  # TODO need df alternative to check if df empty
-                    self.write_data(src_file, cleaned_df)
-
+                # make sure our data is not blank before writing
+                if not df_handler.df.empty:
+                    # write export file
+                    self.write_data(src_file, df_handler)
                     # save transaction data for each bank to object
-                    self.transaction_data = (
-                        output_df  # TODO actually append the data
-                    )
+                    output_data.append(df_handler)
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
-                        logging.info(f"Removing input file: {src_file}")
-                        # os.remove(src_filefile) DEBUG - disabled deletion while testing
+                        logging.info(
+                            f"Removing input file: {src_file} NOTE DELETING IS ACTUALLY DISABLED")
+                        # os.remove(src_filefile) # TODO DEBUG - disabled deletion while testing
                 else:
                     logging.info(
                         "No output data from this file for this bank."
                     )
-        return [bank_files_processed, output_df]
+        return [bank_files_processed, output_data]
 
-    def write_data(self, filename: str, df: DataFrame) -> str:
+    def write_data(self, path: str, df_handler: DataframeHandler) -> str:
         """
         write out the new CSV file
 
-        :param filename: path to output file
-        :type filename: str
+        :param path: path to output file
+        :type path: str
         :param df: cleaned data ready to output
         :type df: DataFrame
         :return: target filename
         :rtype: str
         """
-        target_dir = dirname(filename)
-        target_fname = basename(filename)[:-4]
+        target_dir = dirname(path)
+        target_fname = basename(path)[:-4]
         fixed_prefix = self.config_dict["fixed_prefix"]
         new_filename = f"{fixed_prefix}{target_fname}.csv"
         while isfile(new_filename):
@@ -106,7 +101,7 @@ class BankHandler:
         target_filename = join(target_dir, new_filename)
         logging.info(f"Writing output file: {target_filename}")
         # write dataframe to csv
-        # df.to_csv(target_filename, index=False) # TODO DEBUG file output disabled
+        df_handler.output_csv(target_filename)
         return target_filename
 
     def _preprocess_file(self, file_path: str):

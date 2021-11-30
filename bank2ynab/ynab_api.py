@@ -22,7 +22,9 @@ class YNAB_API:
     (note for devs: be careful not to accidentally share API access token!)
     """
 
-    def __init__(self, config_object: ConfigHandler, transactions=None) -> None:
+    def __init__(
+        self, config_object: ConfigHandler, transactions=None
+    ) -> None:
         self.transactions = []
         self.budget_id = None
         self.config_handler = config_object

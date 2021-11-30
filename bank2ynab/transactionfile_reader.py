@@ -9,7 +9,7 @@ import chardet
 
 class TransactionFileReader:
     """
-    find all relevant files for a specified config and provide a dataframe to work with
+    Find all relevant files for a specified configuration.
     """
 
     def __init__(
@@ -23,9 +23,20 @@ class TransactionFileReader:
         prefix: str,
     ) -> None:
         """
-        generate bank specific file reader using supplied configuration flags
+        Generate bank-specific file reader using supplied configuration flags.
 
-
+        :param name: Name of the bank.
+        :type name: str
+        :param file_pattern: Filename beginning or regex pattern to match
+        :type file_pattern: str
+        :param try_path: Directory to search for initially for files.
+        :type try_path: str
+        :param regex_active: Flag to indicate if regex is to be used when searching.
+        :type regex_active: bool
+        :param ext: File extension to search for.
+        :type ext: str
+        :param prefix: Prefix to flag already-processed files.
+        :type prefix: str
         """
         self.name = name
         self.file_pattern = file_pattern
@@ -38,7 +49,7 @@ class TransactionFileReader:
 
     def get_files(self) -> list:
         """
-        gets list of matching transaction files
+        Returns list of files matching the specified search parameters.
 
         :return: list of files to process
         :rtype: list
@@ -80,7 +91,8 @@ class TransactionFileReader:
                 )
         return files
 
-    def detect_encoding(self, filepath):
+    # TODO add check of config to see if we have encoding specified
+    def detect_encoding(self, filepath: str) -> str:
         """
         Utility to detect file encoding. This is imperfect, but
         should work for the most common cases.
@@ -201,7 +213,7 @@ class TransactionFileReader:
             "shift_jis_2004",
             "shift_jisx0213",
         ]
-        result = None
+        result = ""
         error = (
             ValueError,
             UnicodeError,
@@ -211,10 +223,7 @@ class TransactionFileReader:
         for enc in encodings:
             try:
                 logging.info(
-                    "\tAttempting to open file using {} encoding...".format(
-                        enc
-                    )
-                )
+                    f"\tAttempting to open file using {enc} encoding...")
                 with codecs.open(filepath, "r", encoding=enc) as f:
                     for line in f:
                         line.encode("utf-8")
@@ -224,8 +233,16 @@ class TransactionFileReader:
 
         return result
 
-    def find_directory(self, filepath):
-        """finds the downloads folder for the active user if filepath is not set"""
+    def find_directory(self, filepath: str) -> str:
+        """
+        Finds the downloads directory for the active user if filepath is not set.
+
+        :param filepath: Filepath specified by the configuration file.
+        :type filepath: str
+        :raises FileNotFoundError: Error raised if the specified filepath is invalid.
+        :return: The desired directory to use.
+        :rtype: str
+        """
         if filepath == "":
             if os.name == "nt":
                 # Windows

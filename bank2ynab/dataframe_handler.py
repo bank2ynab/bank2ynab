@@ -5,10 +5,10 @@ from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 
 
-class DataframeCleaner:
+class DataframeHandler:
     # TODO - integrate payee mapping in this class
     # TODO - add currency conversion factor (removes need for Raiffeisen plugin?)
-    
+
     """
     use the details for a specified config to produce a cleaned dataframe matching a given specification
     """
@@ -16,7 +16,11 @@ class DataframeCleaner:
     def __init__(
         self,
         *,
-        df: DataFrame,
+        file_path: str,
+        delim: str,
+        header_rows: int,
+        footer_rows: int,
+        encod: str,
         input_columns: list,
         output_columns: list,
         cd_flags: list,
@@ -39,12 +43,24 @@ class DataframeCleaner:
         :param fill_memo: boolean to indicate whether to fill blank memo with payee data
         :type fill_memo: bool
         """
-        self.df = df
         self.input_columns = input_columns
         self.output_columns = output_columns
         self.cd_flags = cd_flags
         self.date_format = date_format
         self.fill_memo = fill_memo
+
+        self.df = pd.read_csv(
+            file_path,
+            delimiter=delim,
+            skipinitialspace=True,  # skip space after delimiter
+            header=None,  # don't set column headers initially
+            skiprows=header_rows,  # skip header rows
+            skipfooter=footer_rows,  # skip footer rows
+            skip_blank_lines=True,  # skip blank lines
+            encoding=encod,
+            memory_map=True,  # access file object directly - no I/O overhead
+            engine="python",
+        )
 
     def parse_data(self) -> DataFrame:
         """

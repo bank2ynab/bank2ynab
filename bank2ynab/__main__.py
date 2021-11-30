@@ -16,8 +16,8 @@
 
 import logging
 
-from BankIterator import BankIterator
-from ConfigHandler import ConfigHandler
+from bank_iterator import BankIterator
+from config_handler import ConfigHandler
 from ynab_api import YNAB_API
 
 # configure our logger
@@ -31,8 +31,8 @@ if __name__ == "__main__":
         logging.error("No configuration file found, process aborted.")
         pass
     else:
-        b2y = BankIterator(config_handler)
-        b2y.run()
+        bank_iterator = BankIterator(config_handler)
+        bank_iterator.run()
         api = YNAB_API(config_handler)
-        """ if b2y.transaction_data: # DEBUG - disabled while testing
-            api.run(b2y.transaction_data) """
+        """ if bank_iterator.transaction_data: # DEBUG - disabled while testing
+            api.run(bank_iterator.transaction_data) """

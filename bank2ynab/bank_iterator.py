@@ -1,8 +1,7 @@
-import importlib
 import logging
 
-import b2y_utilities
-from BankHandler import BankHandler
+from bank_handler import BankHandler
+from config_handler import ConfigHandler
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -13,16 +12,16 @@ class BankIterator:
     """Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
 
-    def __init__(self, config_handler):
+    def __init__(self, config_handler: ConfigHandler):
         self.banks = []
         self.transaction_data = {}
 
         for section in config_handler.config.sections():
-            bank_config = config_handler.fix_conf_params(section)
-            bank_object = self.build_bank(bank_config)
+            config_dict = config_handler.fix_conf_params(section)
+            bank_object = self.build_bank(bank_config=config_dict)
             self.banks.append(bank_object)
 
-    def build_bank(self, bank_config):
+    def build_bank(self, bank_config:dict):
         # TODO mostly commented out for now as plugins need to be fixed
         """Factory method loading the correct class for a given configuration."""
         plugin_module = bank_config.get("plugin", None)
@@ -38,7 +37,7 @@ class BankIterator:
             bank = p_mod.build_bank(bank_config)
             return bank
             else: """  # DEBUG - plugins broken
-        return BankHandler(bank_config)
+        return BankHandler(config_dict=bank_config)
 
     def run(self):
         """Main program flow"""

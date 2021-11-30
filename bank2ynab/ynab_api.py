@@ -5,7 +5,7 @@ import logging
 import requests
 
 import b2y_utilities
-from ConfigHandler import ConfigHandler
+from config_handler import ConfigHandler
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -13,8 +13,8 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 class YNAB_API:
     # TODO - revise docstring
-    # TODO - rename class
     # TODO - break up class - too many responsibilities
+    #           - ??? what subsets to use
     # TODO - create API Error class?
     # TODO - handle transaction creation in DataframeCleaner?
     """
@@ -26,11 +26,11 @@ class YNAB_API:
         self.transactions = []
         self.budget_id = None
         self.config_handler = config_object
-        self.api_token = self.config_handler.config.get("DEFAULT", "YNAB API Access Token")
-        # TODO make user_config section play nice with
-        # b2y_utilities.get_configs()
-        self.user_config_path = "user_configuration.conf"
-        self.user_config = configparser.RawConfigParser()
+        self.api_token = self.config_handler.config.get(
+            "DEFAULT", "YNAB API Access Token")
+        self.user_config_handler = ConfigHandler(user_mode=True)
+        self.user_config = self.user_config_handler.config
+        self.user_config_path = self.user_config_handler.user_conf_path
 
         # TODO: Fix debug structure, so it will be used in logging instead
         self.debug = False

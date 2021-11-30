@@ -4,19 +4,29 @@ import os
 
 
 class ConfigHandler:
-    def __init__(self) -> None:
+
+    def __init__(self, *, user_mode: bool = False) -> None:
+        self.user_mode = user_mode
+
+        path = os.path.realpath(__file__)
+        parent_dir = os.path.dirname(path)
+        project_dir = os.path.dirname(parent_dir)
+
+        self.bank_conf_path = os.path.join(
+            project_dir, "bank2ynab.conf")
+        self.user_conf_path = os.path.join(
+            project_dir, "user_configuration.conf")
+
         self.config = self.get_configs()
 
     def get_configs(self) -> configparser.RawConfigParser:
         """Retrieve all configuration parameters."""
-        # TODO - fix path for these
-        path = os.path.realpath(__file__)
-        parent_dir = os.path.dirname(path)
-        project_dir = os.path.dirname(parent_dir)
-        conf_files = [
-            os.path.join(project_dir, "bank2ynab.conf"),
-            os.path.join(project_dir, "user_configuration.conf"),
-        ]
+
+        conf_files = []
+
+        if not self.user_mode:
+            conf_files.append(self.bank_conf_path)
+        conf_files.append(self.user_conf_path)
         try:
             if not os.path.exists(conf_files[0]):
                 raise FileNotFoundError
@@ -82,6 +92,7 @@ class ConfigHandler:
         return bank_config
 
     def get_config_line(self, section_name: str, args):
+        # TODO fix this so that we don't get a type error - consistent return type?
         """Get parameter for a given section in the expected format."""
         param = args[0]
         boolean = args[1]

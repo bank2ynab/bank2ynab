@@ -29,7 +29,8 @@ class YNAB_API:
         self.budget_id = None
         self.config_handler = config_object
         self.api_token = self.config_handler.config.get(
-            "DEFAULT", "YNAB API Access Token")
+            "DEFAULT", "YNAB API Access Token"
+        )
         self.user_config_handler = ConfigHandler(user_mode=True)
         self.user_config = self.user_config_handler.config
         self.user_config_path = self.user_config_handler.user_conf_path

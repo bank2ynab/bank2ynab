@@ -4,7 +4,6 @@ import os
 
 
 class ConfigHandler:
-
     def __init__(self, *, user_mode: bool = False) -> None:
         self.user_mode = user_mode
 
@@ -12,10 +11,10 @@ class ConfigHandler:
         parent_dir = os.path.dirname(path)
         project_dir = os.path.dirname(parent_dir)
 
-        self.bank_conf_path = os.path.join(
-            project_dir, "bank2ynab.conf")
+        self.bank_conf_path = os.path.join(project_dir, "bank2ynab.conf")
         self.user_conf_path = os.path.join(
-            project_dir, "user_configuration.conf")
+            project_dir, "user_configuration.conf"
+        )
 
         self.config = self.get_configs()
 

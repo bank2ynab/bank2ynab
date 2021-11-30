@@ -21,7 +21,7 @@ class BankIterator:
             bank_object = self.build_bank(bank_config=config_dict)
             self.banks.append(bank_object)
 
-    def build_bank(self, bank_config:dict):
+    def build_bank(self, bank_config: dict):
         # TODO mostly commented out for now as plugins need to be fixed
         """Factory method loading the correct class for a given configuration."""
         plugin_module = bank_config.get("plugin", None)

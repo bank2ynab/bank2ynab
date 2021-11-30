@@ -12,14 +12,16 @@ class TransactionFileReader:
     find all relevant files for a specified config and provide a dataframe to work with
     """
 
-    def __init__(self, *,
-                 name: str,
-                 file_pattern: str,
-                 try_path: str,
-                 regex_active: bool,
-                 ext: str,
-                 prefix: str,
-                 ) -> None:
+    def __init__(
+        self,
+        *,
+        name: str,
+        file_pattern: str,
+        try_path: str,
+        regex_active: bool,
+        ext: str,
+        prefix: str,
+    ) -> None:
         """
         generate bank specific file reader using supplied configuration flags
 

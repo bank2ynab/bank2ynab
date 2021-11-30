@@ -262,8 +262,8 @@ class YNAB_API:
         budget_id = ""
         # check if bank has account associated with it already
         try:
-            config_line = self.config_handler.get_config_line(
-                bank, ["YNAB Account ID", False, "||"]
+            config_line = self.config_handler.get_config_line_lst(
+                bank, "YNAB Account ID", "||"
             )
             budget_id = config_line[0]
             account_id = config_line[1]
@@ -292,8 +292,8 @@ class YNAB_API:
             msg = instruction.format("account", bank, "an account")
             account_id = b2y_utilities.option_selection(account_ids, msg)
             # save account selection for bank
-            save_ac_toggle = self.config_handler.get_config_line(
-                bank, ["Save YNAB Account", True, ""]
+            save_ac_toggle = self.config_handler.get_config_line_boo(
+                bank, "Save YNAB Account"
             )
             if save_ac_toggle is True:
                 self.save_account_selection(bank, budget_id, account_id)

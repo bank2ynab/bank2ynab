@@ -38,51 +38,39 @@ class ConfigHandler:
             config.read(conf_files, encoding="utf-8")
             return config
 
-    def fix_conf_params(self, section_name: str) -> dict:
-        # TODO revise docstring
-        # TODO revise argument passing? Make it clearer what the args do
+    def fix_conf_params(self, section: str) -> dict:
         """from a ConfigParser object, return a dictionary of all parameters
         for a given section in the expected format.
         Because ConfigParser defaults to values under [DEFAULT] if present, these
         values should always appear unless the file is really bad.
 
-        :param configparser_object: ConfigParser instance
-        :param section_name: string of section name in config file
-                            (e.g. "MyBank" matches "[MyBank]" in file)
-        :return: dict with all parameters
+        :param section: name of section in config file to access (i.e. bank name, e.g. "MyBank" matches "[MyBank]" in file)
+        :type section: str
+        :return: dictionary matching shorthand strings to specified values in config
+        :rtype: dict
         """
-        config_mapping = {
-            "input_columns": ["Input Columns", False, ","],
-            "output_columns": ["Output Columns", False, ","],
-            "input_filename": ["Source Filename Pattern", False, ""],
-            "path": ["Source Path", False, ""],
-            "ext": ["Source Filename Extension", False, ""],
-            "encoding": ["Encoding", False, ""],
-            "regex": ["Use Regex For Filename", True, ""],
-            "fixed_prefix": ["Output Filename Prefix", False, ""],
-            "input_delimiter": ["Source CSV Delimiter", False, ""],
-            "header_rows": ["Header Rows", False, ""],
-            "footer_rows": ["Footer Rows", False, ""],
-            "date_format": ["Date Format", False, ""],
-            "delete_original": ["Delete Source File", True, ""],
-            "cd_flags": ["Inflow or Outflow Indicator", False, ","],
-            "payee_to_memo": ["Use Payee for Memo", True, ""],
-            "plugin": ["Plugin", False, ""],
-            "api_token": ["YNAB API Access Token", False, ""],
-            "api_account": ["YNAB Account ID", False, "|"],
+
+        bank_config = {
+            "bank_name": section,
+            "input_columns": self.get_config_line_lst(section, "Input Columns", ","),
+            "output_columns": self.get_config_line_lst(section, "Output Columns", ","),
+            "input_filename": self.get_config_line_str(section, "Source Filename Pattern"),
+            "path": self.get_config_line_str(section, "Source Path"),
+            "ext": self.get_config_line_str(section, "Source Filename Extension"),
+            "encoding": self.get_config_line_str(section, "Encoding"),
+            "regex": self.get_config_line_boo(section, "Use Regex For Filename"),
+            "fixed_prefix": self.get_config_line_str(section, "Output Filename Prefix"),
+            "input_delimiter": self.get_config_line_str(section, "Source CSV Delimiter"),
+            "header_rows": self.get_config_line_int(section, "Header Rows"),
+            "footer_rows": self.get_config_line_int(section, "Footer Rows"),
+            "date_format": self.get_config_line_str(section, "Date Format"),
+            "delete_original": self.get_config_line_boo(section, "Delete Source File"),
+            "cd_flags": self.get_config_line_lst(section, "Inflow or Outflow Indicator", ","),
+            "payee_to_memo": self.get_config_line_boo(section, "Use Payee for Memo"),
+            "plugin": self.get_config_line_str(section, "Plugin"),
+            "api_token": self.get_config_line_str(section, "YNAB API Access Token"),
+            "api_account": self.get_config_line_lst(section, "YNAB Account ID", "|"),
         }
-
-        bank_config = dict()
-        for parameter in config_mapping:
-            bank_config.update(
-                {
-                    parameter: self.get_config_line(
-                        section_name, config_mapping[parameter]
-                    )
-                }
-            )
-
-        bank_config.update({"bank_name": section_name})
 
         # quick n' dirty fix for tabs as delimiters
         if bank_config["input_delimiter"] == "\\t":
@@ -90,16 +78,17 @@ class ConfigHandler:
 
         return bank_config
 
-    def get_config_line(self, section_name: str, args):
-        # TODO fix this so that we don't get a type error - consistent return type?
-        """Get parameter for a given section in the expected format."""
-        param = args[0]
-        boolean = args[1]
-        splitter = args[2]
-        if boolean is True:
-            line = self.config.getboolean(section_name, param)
-        else:
-            line = self.config.get(section_name, param)
-            if splitter != "":
-                line = line.split(splitter)
-        return line
+    def get_config_line_str(self, section_name: str, param: str) -> str:
+        return self.config.get(section_name, param)
+
+    def get_config_line_int(self, section_name: str, param: str) -> int:
+        return self.config.getint(section_name, param)
+
+    def get_config_line_flt(self, section_name: str, param: str) -> float:
+        return self.config.getfloat(section_name, param)
+
+    def get_config_line_boo(self, section_name: str, param: str) -> bool:
+        return self.config.getboolean(section_name, param)
+
+    def get_config_line_lst(self, section_name: str, param: str, splitter: str) -> list:
+        return self.config.get(section_name, param).split(splitter)

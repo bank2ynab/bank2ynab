@@ -53,7 +53,7 @@ class DataframeHandler:
             file_path,
             delimiter=delim,
             skipinitialspace=True,  # skip space after delimiter
-            header=None,  # don't set column headers initially
+            names=[],  # don't set column headers initially
             skiprows=header_rows,  # skip header rows
             skipfooter=footer_rows,  # skip footer rows
             skip_blank_lines=True,  # skip blank lines

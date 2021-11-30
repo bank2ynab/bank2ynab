@@ -223,7 +223,8 @@ class TransactionFileReader:
         for enc in encodings:
             try:
                 logging.info(
-                    f"\tAttempting to open file using {enc} encoding...")
+                    f"\tAttempting to open file using {enc} encoding..."
+                )
                 with codecs.open(filepath, "r", encoding=enc) as f:
                     for line in f:
                         line.encode("utf-8")

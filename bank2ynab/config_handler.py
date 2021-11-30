@@ -70,6 +70,8 @@ class ConfigHandler:
             "plugin": self.get_config_line_str(section, "Plugin"),
             "api_token": self.get_config_line_str(section, "YNAB API Access Token"),
             "api_account": self.get_config_line_lst(section, "YNAB Account ID", "|"),
+            # TODO - add currency conversion factor
+            # "currency_mult":self.get_config_line_flt(section,"Currency Conversion Factor")
         }
 
         # quick n' dirty fix for tabs as delimiters
@@ -79,16 +81,66 @@ class ConfigHandler:
         return bank_config
 
     def get_config_line_str(self, section_name: str, param: str) -> str:
+        """
+        Returns a string value from a given section in the config object.
+
+        :param section_name: section to search for parameter
+        :type section_name: str
+        :param param: parameter to obtain from section
+        :type param: str
+        :return: value matching parameter
+        :rtype: str
+        """
         return self.config.get(section_name, param)
 
     def get_config_line_int(self, section_name: str, param: str) -> int:
+        """
+        Returns an integer value from a given section in the config object.
+
+        :param section_name: section to search for parameter
+        :type section_name: str
+        :param param: parameter to obtain from section
+        :type param: str
+        :return: value matching parameter
+        :rtype: int
+        """
         return self.config.getint(section_name, param)
 
     def get_config_line_flt(self, section_name: str, param: str) -> float:
+        """
+        Returns a float value from a given section in the config object.
+
+        :param section_name: section to search for parameter
+        :type section_name: str
+        :param param: parameter to obtain from section
+        :type param: str
+        :return: value matching parameter
+        :rtype: float
+        """
         return self.config.getfloat(section_name, param)
 
     def get_config_line_boo(self, section_name: str, param: str) -> bool:
+        """
+        Returns a bool value from a given section in the config object.
+
+        :param section_name: section to search for parameter
+        :type section_name: str
+        :param param: parameter to obtain from section
+        :type param: str
+        :return: value matching parameter
+        :rtype: bool
+        """
         return self.config.getboolean(section_name, param)
 
     def get_config_line_lst(self, section_name: str, param: str, splitter: str) -> list:
+        """
+        Returns a list value from a given section in the config object.
+
+        :param section_name: section to search for parameter
+        :type section_name: str
+        :param param: parameter to obtain from section
+        :type param: str
+        :return: value matching parameter
+        :rtype: list
+        """
         return self.config.get(section_name, param).split(splitter)

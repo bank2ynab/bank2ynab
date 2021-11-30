@@ -52,24 +52,48 @@ class ConfigHandler:
 
         bank_config = {
             "bank_name": section,
-            "input_columns": self.get_config_line_lst(section, "Input Columns", ","),
-            "output_columns": self.get_config_line_lst(section, "Output Columns", ","),
-            "input_filename": self.get_config_line_str(section, "Source Filename Pattern"),
+            "input_columns": self.get_config_line_lst(
+                section, "Input Columns", ","
+            ),
+            "output_columns": self.get_config_line_lst(
+                section, "Output Columns", ","
+            ),
+            "input_filename": self.get_config_line_str(
+                section, "Source Filename Pattern"
+            ),
             "path": self.get_config_line_str(section, "Source Path"),
-            "ext": self.get_config_line_str(section, "Source Filename Extension"),
+            "ext": self.get_config_line_str(
+                section, "Source Filename Extension"
+            ),
             "encoding": self.get_config_line_str(section, "Encoding"),
-            "regex": self.get_config_line_boo(section, "Use Regex For Filename"),
-            "fixed_prefix": self.get_config_line_str(section, "Output Filename Prefix"),
-            "input_delimiter": self.get_config_line_str(section, "Source CSV Delimiter"),
+            "regex": self.get_config_line_boo(
+                section, "Use Regex For Filename"
+            ),
+            "fixed_prefix": self.get_config_line_str(
+                section, "Output Filename Prefix"
+            ),
+            "input_delimiter": self.get_config_line_str(
+                section, "Source CSV Delimiter"
+            ),
             "header_rows": self.get_config_line_int(section, "Header Rows"),
             "footer_rows": self.get_config_line_int(section, "Footer Rows"),
             "date_format": self.get_config_line_str(section, "Date Format"),
-            "delete_original": self.get_config_line_boo(section, "Delete Source File"),
-            "cd_flags": self.get_config_line_lst(section, "Inflow or Outflow Indicator", ","),
-            "payee_to_memo": self.get_config_line_boo(section, "Use Payee for Memo"),
+            "delete_original": self.get_config_line_boo(
+                section, "Delete Source File"
+            ),
+            "cd_flags": self.get_config_line_lst(
+                section, "Inflow or Outflow Indicator", ","
+            ),
+            "payee_to_memo": self.get_config_line_boo(
+                section, "Use Payee for Memo"
+            ),
             "plugin": self.get_config_line_str(section, "Plugin"),
-            "api_token": self.get_config_line_str(section, "YNAB API Access Token"),
-            "api_account": self.get_config_line_lst(section, "YNAB Account ID", "|"),
+            "api_token": self.get_config_line_str(
+                section, "YNAB API Access Token"
+            ),
+            "api_account": self.get_config_line_lst(
+                section, "YNAB Account ID", "|"
+            ),
             # TODO - add currency conversion factor
             # "currency_mult":self.get_config_line_flt(section,"Currency Conversion Factor")
         }
@@ -132,7 +156,9 @@ class ConfigHandler:
         """
         return self.config.getboolean(section_name, param)
 
-    def get_config_line_lst(self, section_name: str, param: str, splitter: str) -> list:
+    def get_config_line_lst(
+        self, section_name: str, param: str, splitter: str
+    ) -> list:
         """
         Returns a list value from a given section in the config object.
 

@@ -127,7 +127,7 @@ class YNAB_API:
         payee = this_trans[1]
         category = this_trans[2]
         memo = this_trans[3]
-        amount = b2y_utilities.string_num_diff(this_trans[4], this_trans[5])
+        amount = self.string_num_diff(this_trans[4], this_trans[5])
 
         # assign values to transaction dictionary
         transaction = {
@@ -282,7 +282,7 @@ class YNAB_API:
                 # "No YNAB budget for {} set! \nPick a budget".format(bank)
                 msg = instruction.format("budget", bank, "a budget")
                 budget_ids = self.list_budgets()
-                budget_id = b2y_utilities.option_selection(budget_ids, msg)
+                budget_id = self.option_selection(budget_ids, msg)
             else:
                 budget_id = self.budget_id
 
@@ -290,7 +290,7 @@ class YNAB_API:
             account_ids = self.list_accounts(budget_id)
             # msg = "Pick a YNAB account for transactions from {}".format(bank)
             msg = instruction.format("account", bank, "an account")
-            account_id = b2y_utilities.option_selection(account_ids, msg)
+            account_id = self.option_selection(account_ids, msg)
             # save account selection for bank
             save_ac_toggle = self.config_handler.get_config_line_boo(
                 bank, "Save YNAB Account"
@@ -321,3 +321,62 @@ class YNAB_API:
         logging.info("Saving default account for {}...".format(bank))
         with open(self.user_config_path, "w", encoding="utf-8") as config_file:
             self.user_config.write(config_file)
+
+    def option_selection(self, options, msg):
+        """
+        Used to select from a list of options
+        If only one item in list, selects that by default
+        Otherwise displays "msg" asking for input selection (integer only)
+        :param options: list of [name, option] pairs to select from
+        :param msg: the message to display on the input line
+        :return option_selected: the selected item from the list
+        """
+        selection = 1
+        count = len(options)
+        if count > 1:
+            index = 0
+            for option in options:
+                index += 1
+                print("| {} | {}".format(index, option[0]))
+            selection = self.int_input(1, count, msg)
+        option_selected = options[selection - 1][1]
+        return option_selected
+
+    def int_input(self, min, max, msg):
+        """
+        Makes a user select an integer between min & max stated values
+        :param  min: the minimum acceptable integer value
+        :param  max: the maximum acceptable integer value
+        :param  msg: the message to display on the input line
+        :return user_input: sanitised integer input in acceptable range
+        """
+        while True:
+            try:
+                user_input = int(
+                    input("{} (range {} - {}): ".format(msg, min, max))
+                )
+                if user_input not in range(min, max + 1):
+                    raise ValueError
+                break
+            except ValueError:
+                logging.info(
+                    "This integer is not in the acceptable range, try again!"
+                )
+        return user_input
+
+    def string_num_diff(self, str1, str2):
+        """
+        converts strings to floats and subtracts 1 from 2
+        also convert output to "milliunits"
+        """
+        try:
+            num1 = float(str1)
+        except ValueError:
+            num1 = 0.0
+        try:
+            num2 = float(str2)
+        except ValueError:
+            num2 = 0.0
+
+        difference = int(1000 * (num2 - num1))
+        return difference

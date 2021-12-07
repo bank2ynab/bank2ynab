@@ -5,3 +5,4 @@ test-data/temp-test.conf
 bank2ynab/workspace.code-workspace
 .vscode
 .venv
+env

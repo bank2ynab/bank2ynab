@@ -6,10 +6,12 @@ from pandas.core.series import Series
 
 class DataframeHandler:
     # TODO - integrate payee mapping in this class
-    # TODO - add currency conversion factor (removes need for Raiffeisen plugin?)
+    # TODO - add currency conversion factor
+    # (removes need for Raiffeisen plugin?)
 
     """
-    use the details for a specified config to produce a cleaned dataframe matching a given specification
+    use the details for a specified config to produce a cleaned dataframe
+    matching a given specification
     """
 
     def __init__(
@@ -39,7 +41,7 @@ class DataframeHandler:
         :type cd_flags: list
         :param date_format: string format for date
         :type date_format: str
-        :param fill_memo: boolean to indicate whether to fill blank memo with payee data
+        :param fill_memo: switch whether to fill blank memo with payee data
         :type fill_memo: bool
         """
         self.input_columns = input_columns
@@ -126,7 +128,8 @@ class DataframeHandler:
                 self.df.iloc[:, key_cols[0]] = (
                     self.df.iloc[:, key_cols[0]].astype(str) + " "
                 )
-                # merge every duplicate column into the 1st instance of the column name
+                # merge every duplicate column into the 1st instance
+                # of the column name
                 for dupe_count, key_col in enumerate(key_cols[1:]):
                     # add string version of each column onto the first column
                     self.df.iloc[:, key_cols[0]] += "{} ".format(
@@ -166,9 +169,12 @@ class DataframeHandler:
 
     def _cd_flag_process(self, cd_flags: list) -> None:
         """
-        fix columns where inflow/outflow is indicated by a flag in a separate column
-        the cd_flag list is in the form "indicator column, outflow flag, inflow flag"
-        (the code does not use the indicator flag specified in the flag list, but instead the "CDFlag" column specified in Input Columns)
+        fix columns where inflow/outflow is indicated by a flag
+        in a separate column
+        the cd_flag list is in the form
+        "indicator column, outflow flag, inflow flag"
+        (the code does not use the indicator flag specified in the flag list,
+        but instead the "CDFlag" column specified in Input Columns)
 
         :param cd_flags: list of parameters for applying indicators
         :type cd_flags: list
@@ -235,7 +241,8 @@ class DataframeHandler:
     def _remove_invalid_rows(self) -> None:
         """
         Removes invalid rows from dataframe.
-        An invalid row is one which does not have a date or one without an Inflow or Outflow value.
+        An invalid row is one which does not have a date
+        or one without an Inflow or Outflow value.
 
         :return: None
         """
@@ -266,12 +273,14 @@ class DataframeHandler:
 
     def _fix_date(self, date_series: Series, date_format: str) -> Series:
         """
-        If provided with an input date format, process the date column to the ISO format.
+        If provided with an input date format,
+        process the date column to the ISO format.
         Any non-parseable dates are returned as a NaT null value
 
         :param df: dataframe to modify
         :type df: Series
-        :param date_format: date format codes according to 1989 C standard (https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior)
+        :param date_format: date format codes according to 1989 C standard
+        (https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior)
         :type date_format: str
         :return: modified dataframe
         :rtype: Series

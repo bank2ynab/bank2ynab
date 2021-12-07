@@ -67,8 +67,10 @@ class TestBankHandler(TestCase):
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
                         logging.info(
-                            f"Removing input file: {src_file} NOTE DELETING IS ACTUALLY DISABLED")
-                        # os.remove(src_filefile) # TODO DEBUG - disabled deletion while testing
+                            f"Removing input file: {src_file}
+                            #NOTE DELETING IS ACTUALLY DISABLED")
+                        # os.remove(src_filefile)
+                        # # TODO DEBUG - disabled deletion while testing
                 else:
                     logging.info(
                         "No output data from this file for this bank."

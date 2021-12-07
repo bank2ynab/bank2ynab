@@ -1,5 +1,8 @@
 import sys
-from os.path import join, realpath, dirname
+from os.path import dirname, join, realpath
 
 project_dirname = dirname(dirname(realpath(__file__)))
-sys.path.append(join(project_dirname, "bank2ynab"))
+path = join(project_dirname, "bank2ynab")
+
+if path not in sys.path:
+    sys.path.append(path)

@@ -4,5 +4,4 @@ test-data/temp-test.conf
 *.pyc
 bank2ynab/workspace.code-workspace
 .vscode
-.venv
-env
+b2y_env

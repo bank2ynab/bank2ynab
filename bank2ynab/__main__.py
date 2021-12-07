@@ -21,7 +21,7 @@ from config_handler import ConfigHandler
 from ynab_api import YNAB_API
 
 # configure our logger
-logging.basicConfig(format=f"%(levelname): %(message)", level=logging.INFO)
+logging.basicConfig(format="%(levelname): %(message)", level=logging.INFO)
 
 # Let's run this thing!
 if __name__ == "__main__":

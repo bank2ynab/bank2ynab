@@ -1,7 +1,6 @@
 import logging
 
 import pandas as pd
-from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 
 

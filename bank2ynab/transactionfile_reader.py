@@ -31,7 +31,7 @@ class TransactionFileReader:
         :type file_pattern: str
         :param try_path: Directory to search for initially for files.
         :type try_path: str
-        :param regex_active: Flag to indicate if regex is to be used when searching.
+        :param regex_active: Flag to indicate if regex is to be used
         :type regex_active: bool
         :param ext: File extension to search for.
         :type ext: str
@@ -87,7 +87,9 @@ class TransactionFileReader:
                 ]
             if not files and missing_dir:
                 logging.error(
-                    f"\nFormat: {self.name}\n\nError: Can't find download path: {self.try_path}\nTrying default path instead:\t {path}"
+                    f"\nFormat: {self.name}\n\n"
+                    + "Error: Can't find download path:"
+                    + f"{self.try_path}\nTrying default path instead:\t {path}"
                 )
         return files
 
@@ -104,14 +106,12 @@ class TransactionFileReader:
         with open(filepath, "rb") as f:
             file_content = f.read()
             rslt = chardet.detect(file_content)
-            confidence, encoding = rslt["confidence"], rslt["encoding"]
-            if confidence > 0.6:
+            conf, enc = rslt["confidence"], rslt["encoding"]
+            if conf > 0.6:
                 logging.info(
-                    "\tOpening file using encoding {} with confidence {}".format(
-                        encoding, confidence
-                    )
+                    f"\tOpening file using encoding {enc} (confidence {conf})"
                 )
-                return encoding
+                return enc
 
         # because some encodings will happily encode anything even if wrong,
         # keeping the most common near the top should make it more likely that
@@ -236,11 +236,11 @@ class TransactionFileReader:
 
     def find_directory(self, filepath: str) -> str:
         """
-        Finds the downloads directory for the active user if filepath is not set.
+        Finds the downloads directory for active user if filepath is not set.
 
         :param filepath: Filepath specified by the configuration file.
         :type filepath: str
-        :raises FileNotFoundError: Error raised if the specified filepath is invalid.
+        :raises FileNotFoundError: Error raised if the filepath is invalid.
         :return: The desired directory to use.
         :rtype: str
         """

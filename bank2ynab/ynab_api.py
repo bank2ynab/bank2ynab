@@ -298,9 +298,8 @@ class YNAB_API:
                 self.save_account_selection(bank, budget_id, account_id)
             else:
                 logging.info(
-                    "Saving default YNAB account is disabled for {} - account match not saved.".format(
-                        bank
-                    )
+                    f"Saving default YNAB account is disabled for {bank}"
+                    + " - account match not saved."
                 )
         return budget_id, account_id
 

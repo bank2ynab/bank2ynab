@@ -1,7 +1,6 @@
 import logging
 
 import pandas as pd
-from pandas.core.series import Series
 
 
 class DataframeHandler:
@@ -210,7 +209,7 @@ class DataframeHandler:
         )
         self.df.loc[self.df["Outflow"] < 0, ["Outflow"]] = 0
 
-    def _clean_monetary_values(self, num_series: Series) -> Series:
+    def _clean_monetary_values(self, num_series: pd.Series) -> pd.Series:
         """
         convert "," to "." then remove every instance of . except last one
         remove any characters from inflow or outflow strings except
@@ -271,7 +270,7 @@ class DataframeHandler:
         """
         self.df["Payee"].fillna(self.df["Memo"], inplace=True)
 
-    def _fix_date(self, date_series: Series, date_format: str) -> Series:
+    def _fix_date(self, date_series: pd.Series, date_format: str) -> pd.Series:
         """
         If provided with an input date format,
         process the date column to the ISO format.

@@ -7,7 +7,8 @@ from transactionfile_reader import TransactionFileReader
 
 class BankHandler:
     """
-    handle the flow for data input, parsing, and data output for a given bank configuration
+    handle the flow for data input, parsing, and data output
+    for a given bank configuration
     """
 
     def __init__(self, config_dict: dict) -> None:
@@ -71,9 +72,10 @@ class BankHandler:
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
                         logging.info(
-                            f"Removing input file: {src_file} NOTE DELETING IS ACTUALLY DISABLED"
+                            f"Removing input file: {src_file} (commented out)"
                         )
-                        # os.remove(src_filefile) # TODO DEBUG - disabled deletion while testing
+                        # TODO DEBUG - disabled deletion while testing
+                        # os.remove(src_filefile)
                 else:
                     logging.info(
                         "No output data from this file for this bank."

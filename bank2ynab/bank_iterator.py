@@ -23,8 +23,9 @@ class BankIterator:
 
     def build_bank(self, bank_config: dict):
         # TODO mostly commented out for now as plugins need to be fixed
-        """Factory method loading the correct class for a given configuration."""
-        plugin_module = bank_config.get("plugin", None)
+        """Factory method loading the correct class
+        for a given configuration."""
+        # plugin_module = bank_config.get("plugin", None)
         """ if plugin_module:
             p_mod = importlib.import_module("plugins.{}".format(plugin_module))
             if not hasattr(p_mod, "build_bank"):

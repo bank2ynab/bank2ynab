@@ -41,12 +41,14 @@ class ConfigHandler:
     def fix_conf_params(self, section: str) -> dict:
         """from a ConfigParser object, return a dictionary of all parameters
         for a given section in the expected format.
-        Because ConfigParser defaults to values under [DEFAULT] if present, these
-        values should always appear unless the file is really bad.
+        Because ConfigParser defaults to values under [DEFAULT] if present,
+        these values should always appear unless the file is really bad.
 
-        :param section: name of section in config file to access (i.e. bank name, e.g. "MyBank" matches "[MyBank]" in file)
+        :param section: name of section in config file to access
+        (i.e. bank name, e.g. "MyBank" matches "[MyBank]" in file)
         :type section: str
-        :return: dictionary matching shorthand strings to specified values in config
+        :return: dictionary matching shorthand strings to specified
+        values in config
         :rtype: dict
         """
 
@@ -94,8 +96,9 @@ class ConfigHandler:
             "api_account": self.get_config_line_lst(
                 section, "YNAB Account ID", "|"
             ),
-            # TODO - add currency conversion factor
-            # "currency_mult":self.get_config_line_flt(section,"Currency Conversion Factor")
+            "currency_mult": self.get_config_line_flt(
+                section, "Currency Conversion Factor"
+            ),
         }
 
         # quick n' dirty fix for tabs as delimiters

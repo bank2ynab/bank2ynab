@@ -2,6 +2,6 @@
 user_configuration.conf
 test-data/temp-test.conf
 *.pyc
+# vscode stuff
 bank2ynab/workspace.code-workspace
 .vscode
-b2y_env

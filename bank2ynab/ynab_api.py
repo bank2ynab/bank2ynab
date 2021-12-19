@@ -179,12 +179,18 @@ class YNAB_API:
         )
 
         post_response = requests.post(url, json=data)
+        json_data = json.loads(post_response.text)
 
         # response handling - TODO: make this more thorough!
         try:
-            self.process_api_response(json.loads(post_response.text)["error"])
+            self.process_api_response(json_data["error"])
         except KeyError:
-            logging.info("Success!")
+            logging.info(
+                "Success: {} entries uploaded, {} entries skipped.".format(
+                    len(json_data["data"]["transaction_ids"]),
+                    len(json_data["data"]["duplicate_import_ids"]),
+                )
+            )
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")

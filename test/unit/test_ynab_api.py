@@ -1,20 +1,12 @@
 # commented out pending test rework
-'''
+
+import os
+from os.path import join
+from shutil import copyfile
+
+# from test.utils import get_project_dir, get_test_confparser
 from unittest import TestCase
 from unittest.mock import patch
-from os.path import join
-import os
-from shutil import copyfile
-import configparser
-
-from test.utils import get_test_confparser, get_project_dir
-
-from bank2ynab.b2y_utilities import (
-    get_configs,
-    string_num_diff,
-    get_config_line,
-    option_selection,
-)
 
 from bank2ynab.ynab_api import YNAB_API
 
@@ -38,25 +30,23 @@ class Test_YNAB_API(TestCase):
 
     def test_init_and_name(self):  # todo
         """Check parameters are correctly stored in the API object."""
-        """
+
         self.test_class = YNAB_API(self.defaults)
         cfe = copy(self.defaults)
         self.assertEqual(self.test_class.config, cfe)
         self.assertEqual("DEFAULT", self.test_class.name)
-        """
-        """
-        def __init__(self, config_object, transactions=None):
+
+        """ def __init__(self, config_object, transactions=None):
         self.transactions = []
         self.account_ids = []
         self.config = configparser.RawConfigParser()
         self.config.read("user_configuration.conf")
         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
-        self.budget_id = None
-        """
+        self.budget_id = None """
 
     def test_run(self):  # todo
-        """
-        if self.api_token is not None:
+
+        """if self.api_token is not None:
             logging.info("Connecting to YNAB API...")
 
             # check for API token auth (and other errors)
@@ -75,12 +65,11 @@ class Test_YNAB_API(TestCase):
                     if budget_t_data[budget]["transactions"] != []:
                         self.post_transactions(budget_t_data[budget])
         else:
-            logging.info("No API-token provided.")
-        """
+            logging.info("No API-token provided.")"""
 
     def test_api_read(self):  # todo
-        """
-         def api_read(self, budget, kwd):
+
+        """def api_read(self, budget, kwd):
 
         General function for reading data from YNAB API
         :param  budget: boolean indicating if there's a default budget
@@ -103,12 +92,11 @@ class Test_YNAB_API(TestCase):
          except KeyError:
              # the API has returned an error so let's handle it
              return self.process_api_response(response.json()["error"])
-         return read_data
-        """
+         return read_data"""
 
     def test_process_transactions(self):  # todo
-        """
-        :param transaction_data: dictionary of bank names to transaction lists
+
+        """:param transaction_data: dictionary of bank names to transaction lists
 
         logging.info("Processing transactions...")
         # go through each bank's data
@@ -126,8 +114,7 @@ class Test_YNAB_API(TestCase):
         data = {
             "transactions": transactions
         }
-        return data
-        """
+        return data"""
 
     def test_create_transaction(self):
         test_class = YNAB_API(self.cp)
@@ -454,4 +441,3 @@ class Test_YNAB_API(TestCase):
             self.assertEqual(
                 test_id, "{}||{}".format(test_budget_id, test_account_id)
             )
-'''

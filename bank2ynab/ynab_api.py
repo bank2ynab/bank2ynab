@@ -1,6 +1,6 @@
-import configparser
 import json
 import logging
+from configparser import DuplicateSectionError, NoSectionError
 
 import requests
 
@@ -275,7 +275,7 @@ class YNAB_API:
             logging.info("Previously-saved account for {} found.".format(bank))
         except IndexError:
             pass
-        except configparser.NoSectionError:
+        except NoSectionError:
             # TODO - can we handle this within the config class?
             logging.info("No user configuration for {} found.".format(bank))
 
@@ -310,13 +310,14 @@ class YNAB_API:
         return budget_id, account_id
 
     def save_account_selection(self, bank, budget_id, account_id):
+        # TODO move config saving to the ConfigHandler class
         """
         saves YNAB account to use for each bank
         """
         self.user_config.read(self.user_config_path)
         try:
             self.user_config.add_section(bank)
-        except configparser.DuplicateSectionError:
+        except DuplicateSectionError:
             pass
         self.user_config.set(
             bank, "YNAB Account ID", "{}||{}".format(budget_id, account_id)

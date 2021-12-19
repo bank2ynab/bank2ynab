@@ -8,7 +8,6 @@ from config_handler import ConfigHandler
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
-# Classes doing the actual work
 class BankIterator:
     """Main program instance, responsible for gathering configuration,
     creating the right object for each bank, and triggering elaboration."""
@@ -27,12 +26,10 @@ class BankIterator:
         # initialize variables for summary:
         files_processed = 0
         # process account for each config file
-        for bank in self.banks:
-            bank_process = bank.run()
-            # do something with bank_df so we can pass to API class
-            """TODO API linkage!"""
-            bank_process[1]
-            files_processed += bank_process[0]
+        for bank_object in self.banks:
+            bank_object.run()
+            self.transaction_data = bank_object.transaction_data
+            files_processed += bank_object.bank_files_processed
 
         logging.info(f"\nDone! {files_processed} files processed.\n")
 

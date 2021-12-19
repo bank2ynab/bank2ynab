@@ -21,8 +21,10 @@ class BankHandler:
         """
         self.name = config_dict.get("bank_name", "DEFAULT")
         self.config_dict = config_dict
+        self.bank_files_processed = 0
+        self.transaction_data = list()
 
-    def run(self) -> list:
+    def run(self) -> None:
         transaction_reader = TransactionFileReader(
             name=self.config_dict["bank_name"],
             file_pattern=self.config_dict["input_filename"],
@@ -31,9 +33,6 @@ class BankHandler:
             ext=self.config_dict["ext"],
             prefix=self.config_dict["fixed_prefix"],
         )
-        # initialise variables
-        bank_files_processed = 0
-        output_data = list()
         for src_file in transaction_reader.files:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
             try:
@@ -51,6 +50,7 @@ class BankHandler:
                     encod=src_encod,
                     input_columns=self.config_dict["input_columns"],
                     output_columns=self.config_dict["output_columns"],
+                    api_columns=self.config_dict["api_columns"],
                     cd_flags=self.config_dict["cd_flags"],
                     date_format=self.config_dict["date_format"],
                     fill_memo=self.config_dict["payee_to_memo"],
@@ -58,7 +58,7 @@ class BankHandler:
                 )
                 df_handler.parse_data()
 
-                bank_files_processed += 1
+                self.bank_files_processed += 1
             except ValueError as e:
                 logging.info(
                     f"No output data from this file for this bank. ({e})"
@@ -69,7 +69,7 @@ class BankHandler:
                     # write export file
                     self.write_data(src_file, df_handler)
                     # save transaction data for each bank to object
-                    output_data.append(df_handler)
+                    self.transaction_data.append(df_handler)
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
                         logging.info(
@@ -81,7 +81,6 @@ class BankHandler:
                     logging.info(
                         "No output data from this file for this bank."
                     )
-        return [bank_files_processed, output_data]
 
     def write_data(self, path: str, df_handler: DataframeHandler) -> str:
         """

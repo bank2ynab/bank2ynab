@@ -60,6 +60,9 @@ class ConfigHandler:
             "output_columns": self.get_config_line_lst(
                 section, "Output Columns", ","
             ),
+            "api_columns": self.get_config_line_lst(
+                section, "API Transaction Fields", ","
+            ),
             "input_filename": self.get_config_line_str(
                 section, "Source Filename Pattern"
             ),

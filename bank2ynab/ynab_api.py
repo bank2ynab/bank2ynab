@@ -98,7 +98,8 @@ class YNAB_API:
         :param transactions: list of individual transaction dictionaries
         :return budget_t_data: dict of budget_ids ready-to-post transactions
         """
-        logging.info("Processing transactions...")
+        raise NotImplementedError
+        """ logging.info("Processing transactions...")
         # go through each bank's data
         budget_t_data = {}
         budget_transactions = []
@@ -119,63 +120,14 @@ class YNAB_API:
                 )
                 budget_transactions.append(trans_dict)
             budget_t_data[budget_id]["transactions"] = budget_transactions
-        return budget_t_data
-
-    def create_transaction(self, account_id, this_trans, transactions):
-        date = this_trans[0]
-        payee = this_trans[1]
-        category = this_trans[2]
-        memo = this_trans[3]
-        amount = self.string_num_diff(this_trans[4], this_trans[5])
-
-        # assign values to transaction dictionary
-        transaction = {
-            "account_id": account_id,
-            "date": date,
-            "payee_name": payee[:50],
-            "amount": amount,
-            "memo": memo[:100],
-            "category": category,
-            "cleared": "cleared",
-            "import_id": self.create_import_id(amount, date, transactions),
-            "payee_id": None,
-            "category_id": None,
-            "approved": False,
-            "flag_color": None,
-        }
-        return transaction
-
-    def create_import_id(self, amount, date, existing_transactions):
-        """
-        Create import ID for our transaction
-        import_id format = YNAB:amount:ISO-date:occurrences
-        Maximum 36 characters ("YNAB" + ISO-date = 10 characters)
-        :param amount: transaction amount in "milliunits"
-        :param date: date in ISO format
-        :param existing_transactions: list of currently-compiled transactions
-        :return: properly formatted import ID
-        """
-        # check is there a duplicate transaction already
-        count = 1
-        for transaction in existing_transactions:
-            try:
-                if transaction["import_id"].startswith(
-                    "YNAB:{}:{}:".format(amount, date)
-                ):
-                    count += 1
-            except KeyError:
-                # transaction doesn't have import id for some reason
-                pass
-        return "YNAB:{}:{}:{}".format(amount, date, count)
+        return budget_t_data """
 
     def post_transactions(self, budget_id, data):
         # send our data to API
         logging.info("Uploading transactions to YNAB...")
         url = (
             "https://api.youneedabudget.com/v1/budgets/"
-            + "{}/transactions?access_token={}".format(
-                budget_id, self.api_token
-            )
+            + f"{budget_id}/transactions?access_token={self.api_token}"
         )
 
         post_response = requests.post(url, json=data)
@@ -287,7 +239,7 @@ class YNAB_API:
                 # "No YNAB budget for {} set! \nPick a budget".format(bank)
                 msg = instruction.format("budget", bank, "a budget")
                 budget_ids = self.list_budgets()
-                budget_id = self.option_selection(budget_ids, msg)
+                budget_id = option_selection(budget_ids, msg)
             else:
                 budget_id = self.budget_id
 
@@ -295,7 +247,7 @@ class YNAB_API:
             account_ids = self.list_accounts(budget_id)
             # msg = "Pick a YNAB account for transactions from {}".format(bank)
             msg = instruction.format("account", bank, "an account")
-            account_id = self.option_selection(account_ids, msg)
+            account_id = option_selection(account_ids, msg)
             # save account selection for bank
             save_ac_toggle = self.config_handler.get_config_line_boo(
                 bank, "Save YNAB Account"
@@ -327,61 +279,46 @@ class YNAB_API:
         with open(self.user_config_path, "w", encoding="utf-8") as config_file:
             self.user_config.write(config_file)
 
-    def option_selection(self, options, msg):
-        """
-        Used to select from a list of options
-        If only one item in list, selects that by default
-        Otherwise displays "msg" asking for input selection (integer only)
-        :param options: list of [name, option] pairs to select from
-        :param msg: the message to display on the input line
-        :return option_selected: the selected item from the list
-        """
-        selection = 1
-        count = len(options)
-        if count > 1:
-            index = 0
-            for option in options:
-                index += 1
-                print("| {} | {}".format(index, option[0]))
-            selection = self.int_input(1, count, msg)
-        option_selected = options[selection - 1][1]
-        return option_selected
 
-    def int_input(self, min, max, msg):
-        """
-        Makes a user select an integer between min & max stated values
-        :param  min: the minimum acceptable integer value
-        :param  max: the maximum acceptable integer value
-        :param  msg: the message to display on the input line
-        :return user_input: sanitised integer input in acceptable range
-        """
-        while True:
-            try:
-                user_input = int(
-                    input("{} (range {} - {}): ".format(msg, min, max))
-                )
-                if user_input not in range(min, max + 1):
-                    raise ValueError
-                break
-            except ValueError:
-                logging.info(
-                    "This integer is not in the acceptable range, try again!"
-                )
-        return user_input
+def option_selection(options, msg):
+    """
+    Used to select from a list of options
+    If only one item in list, selects that by default
+    Otherwise displays "msg" asking for input selection (integer only)
+    :param options: list of [name, option] pairs to select from
+    :param msg: the message to display on the input line
+    :return option_selected: the selected item from the list
+    """
+    selection = 1
+    count = len(options)
+    if count > 1:
+        index = 0
+        for option in options:
+            index += 1
+            print("| {} | {}".format(index, option[0]))
+        selection = int_input(1, count, msg)
+    option_selected = options[selection - 1][1]
+    return option_selected
 
-    def string_num_diff(self, str1, str2):
-        """
-        converts strings to floats and subtracts 1 from 2
-        also convert output to "milliunits"
-        """
+
+def int_input(min, max, msg):
+    """
+    Makes a user select an integer between min & max stated values
+    :param  min: the minimum acceptable integer value
+    :param  max: the maximum acceptable integer value
+    :param  msg: the message to display on the input line
+    :return user_input: sanitised integer input in acceptable range
+    """
+    while True:
         try:
-            num1 = float(str1)
+            user_input = int(
+                input("{} (range {} - {}): ".format(msg, min, max))
+            )
+            if user_input not in range(min, max + 1):
+                raise ValueError
+            break
         except ValueError:
-            num1 = 0.0
-        try:
-            num2 = float(str2)
-        except ValueError:
-            num2 = 0.0
-
-        difference = int(1000 * (num2 - num1))
-        return difference
+            logging.info(
+                "This integer is not in the acceptable range, try again!"
+            )
+    return user_input

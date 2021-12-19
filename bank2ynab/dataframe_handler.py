@@ -21,6 +21,7 @@ class DataframeHandler:
         encod: str,
         input_columns: list,
         output_columns: list,
+        api_columns: list,
         cd_flags: list,
         date_format: str,
         fill_memo: bool,
@@ -35,6 +36,8 @@ class DataframeHandler:
         :type input_columns: list
         :param output_columns: desired columns to be present in output data
         :type output_columns: list
+        :param api_columns: desired columns to be present in api data
+        :type api_columns: list
         :param cd_flags: parameter to indicate inflow/outflow for a row
         :type cd_flags: list
         :param date_format: string format for date
@@ -46,6 +49,7 @@ class DataframeHandler:
         """
         self.input_columns = input_columns
         self.output_columns = output_columns
+        self.api_columns = api_columns
         self.cd_flags = cd_flags
         self.date_format = date_format
         self.fill_memo = fill_memo
@@ -75,12 +79,14 @@ class DataframeHandler:
         self.df.columns = self.input_columns
 
         # debug to see what our df is like before transformation
-        logging.debug("\nInitial DF\n{}".format(self.df.head()))
+        logging.debug(f"\nInitial DF\n{self.df.head()}")
 
         # merge duplicate input columns
         self._merge_duplicate_columns(self.input_columns)
         # add missing columns
-        self._add_missing_columns(self.input_columns, self.output_columns)
+        self._add_missing_columns(
+            self.input_columns, self.output_columns + self.api_columns
+        )
         # fix date format
         self.df["Date"] = self._fix_date(self.df["Date"], self.date_format)
         # process Inflow/Outflow flags
@@ -93,14 +99,14 @@ class DataframeHandler:
         self._auto_payee()
         # remove invalid rows
         self._remove_invalid_rows()
-        # set final columns & order
-        self.df = self.df[self.output_columns]
+        # fill API-specific columns
+        self.fill_api_columns()
+        # set final columns & order for output file
+        self.output_df = self.df[self.output_columns]
         # display parsed line count
-        logging.info("Parsed {} lines".format(self.df.shape[0]))
-
-        logging.info(
-            "\nFinal DF\n{}".format(self.df.head(10))
-        )  # view final dataframe # TODO - switch to debug once finished here
+        logging.info(f"Parsed {self.df.shape[0]} lines")
+        # view final dataframe # TODO - switch to debug once finished here
+        logging.debug(f"\nFinal DF\n{self.df.head(10)}")
         # check if dataframe is empty
         self.empty = self.df.empty
 
@@ -133,13 +139,11 @@ class DataframeHandler:
                 # of the column name
                 for dupe_count, key_col in enumerate(key_cols[1:]):
                     # add string version of each column onto the first column
-                    self.df.iloc[:, key_cols[0]] += "{} ".format(
-                        self.df.iloc[:, key_col]
-                    )
+                    self.df.iloc[
+                        :, key_cols[0]
+                    ] += f"{self.df.iloc[:, key_col]} "
                     # rename duplicate column
-                    self.df.columns.values[key_col] = "{} {}".format(
-                        key, dupe_count
-                    )
+                    self.df.columns.values[key_col] = f"{key} {dupe_count}"
                 # remove excess spaces
                 self.df[key] = (
                     self.df[key]
@@ -147,7 +151,7 @@ class DataframeHandler:
                     .str.strip()
                 )
 
-        logging.debug("\nAfter duplicate merge\n{}".format(self.df.head()))
+        logging.debug(f"\nAfter duplicate merge\n{self.df.head()}")
 
     def _add_missing_columns(
         self, input_cols: list, output_cols: list
@@ -167,6 +171,7 @@ class DataframeHandler:
         for col in missing_cols:
             self.df.insert(loc=0, column=col, value="")
             self.df[col] = pd.to_numeric(self.df[col], errors="coerce")
+        logging.debug(f"\nAfter adding missing columns:\n{self.df.head()}")
 
     def _cd_flag_process(self, cd_flags: list) -> None:
         """
@@ -205,11 +210,15 @@ class DataframeHandler:
             self.df["Inflow"] * -1
         )
         self.df.loc[self.df["Inflow"] < 0, ["Inflow"]] = 0
+
         # negative outflow = inflow
         self.df.loc[self.df["Outflow"] < 0, ["Inflow"]] = (
             self.df["Outflow"] * -1
         )
         self.df.loc[self.df["Outflow"] < 0, ["Outflow"]] = 0
+
+        # create amount column for API (in milliunits)
+        self.df["amount"] = 1000 * (self.df["Inflow"] - self.df["Outflow"])
 
     def _clean_monetary_values(self, num_series: pd.Series) -> pd.Series:
         """
@@ -306,4 +315,53 @@ class DataframeHandler:
         :param path: path to write exported file to
         :type path: str
         """
-        self.df.to_csv(path, index=False)
+        self.output_df.to_csv(path, index=False)
+
+    def fill_api_columns(
+        self,
+    ) -> None:  # TODO handle account ID
+        self.df["account_id"] = "NOT YET IMPLEMENTED"  # TODO
+        self.df["date"] = self.df["Date"]
+        self.df["payee_name"] = self.df["Payee"[:50]]
+        self.df["memo"] = self.df["Memo"[:100]]
+        self.df["category"] = ""
+        self.df["cleared"] = "cleared"
+        self.df["payee_id"] = None
+        self.df["category_id"] = None
+        self.df["approved"] = False
+        self.df["flag_color"] = None
+
+        # import_id format = YNAB:amount:ISO-date:occurrences
+        # Maximum 36 characters ("YNAB" + ISO-date = 10 characters)
+        self.df["import_id"] = self.df.agg(
+            lambda x: f"{x['amount']}:{x['date']}:", axis=1
+        )
+        # count every instance of import id & add a counter to id
+        self.df["same_id_count"] = (
+            self.df.groupby(["import_id"]).cumcount() + 1
+        ).astype(str)
+        self.df["import_id"] = self.df["import_id"] + self.df["same_id_count"]
+        # move import_id to the end
+        cols = list(self.df.columns.values)
+        cols.pop(cols.index("import_id"))
+        self.df = self.df[cols + ["import_id"]]
+        # view dataframe
+        logging.debug(f"\nAfter API column processing\n{self.df.head()}")
+
+        """
+        # assign values to transaction dictionary
+        transaction = {
+            "account_id": account_id,
+            "date": date,
+            "payee_name": payee[:50],
+            "amount": amount,
+            "memo": memo[:100],
+            "category": category,
+            "cleared": "cleared",
+            "import_id": self.create_import_id(amount, date, transactions),
+            "payee_id": None,
+            "category_id": None,
+            "approved": False,
+            "flag_color": None,
+        }
+        """

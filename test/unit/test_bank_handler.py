@@ -14,7 +14,7 @@ class TestBankHandler(TestCase):
     def test_test(self):
         print(f"\n\nSys: {sys.path}\n")
         test_bank_handler = BankHandler(dict())
-        test_bank_handler.run()
+        # test_bank_handler.run()
         self.assertEqual(1, 1)
 
     """

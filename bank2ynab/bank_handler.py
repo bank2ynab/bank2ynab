@@ -54,6 +54,7 @@ class BankHandler:
                     cd_flags=self.config_dict["cd_flags"],
                     date_format=self.config_dict["date_format"],
                     fill_memo=self.config_dict["payee_to_memo"],
+                    currency_fix=self.config_dict["currency_mult"],
                 )
                 df_handler.parse_data()
 

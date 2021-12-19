@@ -25,7 +25,8 @@ class DataframeHandler:
         output_columns: list,
         cd_flags: list,
         date_format: str,
-        fill_memo: bool
+        fill_memo: bool,
+        currency_fix: float,
     ) -> None:
         """
         initialise cleaner object using provided dataframe and parameters
@@ -42,12 +43,15 @@ class DataframeHandler:
         :type date_format: str
         :param fill_memo: switch whether to fill blank memo with payee data
         :type fill_memo: bool
+        :param currency_fix: value to divide all currency amounts by
+        :type currency_fix: float
         """
         self.input_columns = input_columns
         self.output_columns = output_columns
         self.cd_flags = cd_flags
         self.date_format = date_format
         self.fill_memo = fill_memo
+        self.currency_fix = currency_fix
 
         self.df = pd.read_csv(
             file_path,
@@ -235,6 +239,8 @@ class DataframeHandler:
         )
         # fill in null values with 0
         num_series.fillna(value=0, inplace=True)
+        # currency conversion if multiplier specified
+        num_series = num_series.astype(float) / self.currency_fix
         return num_series.astype(float)
 
     def _remove_invalid_rows(self) -> None:

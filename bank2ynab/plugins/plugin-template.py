@@ -1,14 +1,13 @@
 # Step 1: See https://github.com/bank2ynab/bank2ynab/wiki/WorkingWithPlugins
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
-# TODO commented out until plugin structure finalised
-'''
-from bank_process import B2YBank
+
+from bank_handler import BankHandler
 
 
-class YourActualBankPlugin(B2YBank):
-    def __init__(self, config_object):
-        super(YourActualBankPlugin, self).__init__(config_object)
+class YourActualBankPlugin(BankHandler):
+    def __init__(self, config_dict: dict):
+        super(YourActualBankPlugin, self).__init__(config_dict)
         self.name = "YourActualBank"
 
     def _preprocess_file(self, file_path):
@@ -25,8 +24,8 @@ class YourActualBankPlugin(B2YBank):
         :param file_path: path to file
         """
         # what do we actually want to do?
-        header_rows = int(self.config["header_rows"])
-        footer_rows = int(self.config["footer_rows"])
+        header_rows = int(self.config_dict["header_rows"])
+        footer_rows = int(self.config_dict["footer_rows"])
 
         # get total number of rows in transaction file using a generator
         with open(file_path) as row_counter:
@@ -57,4 +56,3 @@ class YourActualBankPlugin(B2YBank):
 
 def build_bank(config):
     return YourActualBankPlugin(config)
-'''

@@ -1,3 +1,4 @@
+import importlib
 import logging
 
 from bank_handler import BankHandler
@@ -18,27 +19,8 @@ class BankIterator:
 
         for section in config_handler.config.sections():
             config_dict = config_handler.fix_conf_params(section)
-            bank_object = self.build_bank(bank_config=config_dict)
+            bank_object = build_bank(bank_config=config_dict)
             self.banks.append(bank_object)
-
-    def build_bank(self, bank_config: dict):
-        # TODO mostly commented out for now as plugins need to be fixed
-        """Factory method loading the correct class
-        for a given configuration."""
-        # plugin_module = bank_config.get("plugin", None)
-        """ if plugin_module:
-            p_mod = importlib.import_module("plugins.{}".format(plugin_module))
-            if not hasattr(p_mod, "build_bank"):
-                s = (
-                    "The specified plugin {}.py".format(plugin_module)
-                    + "does not contain the required "
-                    "build_bank(config) method."
-                )
-                raise ImportError(s)
-            bank = p_mod.build_bank(bank_config)
-            return bank
-            else: """  # DEBUG - plugins broken
-        return BankHandler(config_dict=bank_config)
 
     def run(self):
         """Main program flow"""
@@ -48,8 +30,27 @@ class BankIterator:
         for bank in self.banks:
             bank_process = bank.run()
             # do something with bank_df so we can pass to API class
-            # TODO something!
+            """TODO API linkage!"""
             bank_process[1]
             files_processed += bank_process[0]
 
-        logging.info("\nDone! {} files processed.\n".format(files_processed))
+        logging.info(f"\nDone! {files_processed} files processed.\n")
+
+
+def build_bank(bank_config: dict) -> BankHandler:
+    """Factory method loading the correct class
+    for a given configuration."""
+    plugin_module_name = bank_config.get("plugin", None)
+    if plugin_module_name:
+        module = importlib.import_module(f"plugins.{plugin_module_name}")
+        if not hasattr(module, "build_bank"):
+            s = (
+                f"The specified plugin {plugin_module_name}.py"
+                + "does not contain the required "
+                "build_bank(config) method."
+            )
+            raise ImportError(s)
+        bank = module.build_bank(bank_config)
+        return bank
+    else:
+        return BankHandler(config_dict=bank_config)

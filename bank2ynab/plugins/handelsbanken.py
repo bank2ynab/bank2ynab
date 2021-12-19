@@ -4,18 +4,18 @@
         With thanks to @joacand's script from here:
         github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py
 """
-# TODO commented out until we have a different structure to rely on
-'''
-from bank_process import B2YBank
+
 import re
 
+from bank_handler import BankHandler
 
-class Handelsbanken(B2YBank):
-    def __init__(self, config_object):
+
+class Handelsbanken(BankHandler):
+    def __init__(self, config_dict: dict):
         """
-        :param config_object: a dictionary of conf parameters
+        :param config_dict: a dictionary of conf parameters
         """
-        super(Handelsbanken, self).__init__(config_object)
+        super(Handelsbanken, self).__init__(config_dict)
         self.name = "Handelsbanken"
 
     def _preprocess_file(self, file_path):
@@ -56,5 +56,3 @@ def build_bank(config):
     :return: a B2YBank subclass instance
     """
     return Handelsbanken(config)
-
-'''

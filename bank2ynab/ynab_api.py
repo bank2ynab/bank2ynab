@@ -185,10 +185,12 @@ class YNAB_API:
         try:
             self.process_api_response(json_data["error"])
         except KeyError:
-            logging.info("Success: {} entries uploaded, {} entries skipped.".format(
-                len(json_data["data"]["transaction_ids"]),
-                len(json_data["data"]["duplicate_import_ids"])
-            ))
+            logging.info(
+                "Success: {} entries uploaded, {} entries skipped.".format(
+                    len(json_data["data"]["transaction_ids"]),
+                    len(json_data["data"]["duplicate_import_ids"]),
+                )
+            )
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")

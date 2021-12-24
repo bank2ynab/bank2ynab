@@ -30,7 +30,7 @@ class ConfigHandler:
             if not os.path.exists(conf_files[0]):
                 raise FileNotFoundError
         except FileNotFoundError:
-            s = "Configuration file not found: {}".format(conf_files[0])
+            s = f"Configuration file not found: {conf_files[0]}"
             logging.error(s)
             raise FileNotFoundError(s)
         else:

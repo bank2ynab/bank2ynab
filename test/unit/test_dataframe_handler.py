@@ -70,8 +70,41 @@ class TestDataframeHandler(TestCase):
             TestCase.assertCountEqual(self, desired_cols, list(test_df))
 
     def test_cd_flag_process(self):
-        test_df = cd_flag_process()
-        raise NotImplementedError
+        """if len(cd_flags) == 3:
+        outflow_flag = cd_flags[2]
+        # if this row is indicated to be outflow, make inflow negative
+        df.loc[df["CDFlag"] is outflow_flag, ["Inflow"]] = f"-{df['Inflow']}"
+        return df"""
+
+        test_data = [
+            {
+                "data": {"Inflow": [10]},
+                "cd_flags": [],
+                "target_inflow": 10,
+            },
+            {
+                "data": {"Inflow": [10], "CDFlag": ["Inflow"]},
+                "cd_flags": [7, "Inflow", "Outflow"],
+                "target_inflow": 10,
+            },
+            {
+                "data": {"Inflow": [10], "CDFlag": ["Outflow"]},
+                "cd_flags": [7, "Inflow", "Outflow"],
+                "target_inflow": -10,
+            },
+            {
+                "data": {"Inflow": [10], "CDFlag": ["Outflow"]},
+                "cd_flags": [7, "Inflow"],
+                "target_inflow": 10,
+            },
+        ]
+
+        for dataset in test_data:
+            test_df = pd.DataFrame(dataset["data"])
+            test_df = cd_flag_process(test_df, dataset["cd_flags"])
+            TestCase.assertEqual(
+                self, dataset["target_inflow"], test_df["Inflow"].iloc[0]
+            )
 
     def test_fix_amount(self):
         test_df = fix_amount()

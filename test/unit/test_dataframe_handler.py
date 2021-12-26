@@ -1,5 +1,20 @@
 from unittest import TestCase
 
+import pandas as pd
+from bank2ynab.dataframe_handler import (
+    add_missing_columns,
+    auto_memo,
+    auto_payee,
+    cd_flag_process,
+    clean_monetary_values,
+    fill_api_columns,
+    fix_amount,
+    fix_date,
+    merge_duplicate_columns,
+    output_json_transactions,
+    remove_invalid_rows,
+)
+
 
 class TestDataframeHandler(TestCase):
     def setUp(self) -> None:
@@ -8,51 +23,109 @@ class TestDataframeHandler(TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
+    def test_merge_duplicate_columns(self):
+        """Check that merging of duplicate columns works correctly."""
+        test_dfs = [
+            {
+                "data": {
+                    "Amount": [4, 3, 2, 1],
+                    "Payee": ["four", "three", "two", "one"],
+                },
+                "input_cols": ["Amount", "Payee"],
+                "desired_output": ["Amount", "Payee"],
+            },
+            {
+                "data": {
+                    "Amount": [4, 3, 2, 1],
+                    "Payee": ["four", "three", "two", "one"],
+                    "Memo": ["four", "three", "two", "one"],
+                },
+                "input_cols": ["Amount", "Payee", "Payee"],
+                "desired_output": ["Amount", "Payee", "Payee 0"],
+            },
+        ]
+
+        for test in test_dfs:
+            test_df = merge_duplicate_columns(
+                pd.DataFrame(test["data"]), test["input_cols"]
+            )
+
+            TestCase.assertCountEqual(
+                self, test["desired_output"], list(test_df)
+            )
+
+    def test_add_missing_columns(self):
+        """Check that adding missing columns works correctly."""
+        desired_cols = ["One", "Two", "Three", "Four"]
+        test_datasets = [
+            {"One": [], "Two": [], "Three": [], "Four": []},
+            {"One": [], "Two": [], "Four": []},
+            {"One": [], "Two": []},
+            {},
+        ]
+        for dataset in test_datasets:
+            test_df = pd.DataFrame(dataset)
+            test_df = add_missing_columns(test_df, list(test_df), desired_cols)
+            # check if column names contain all desired values
+            TestCase.assertCountEqual(self, desired_cols, list(test_df))
+
+    def test_cd_flag_process(self):
+        test_df = cd_flag_process()
+        raise NotImplementedError
+
+    def test_fix_amount(self):
+        test_df = fix_amount()
+        raise NotImplementedError
+
+    def test_clean_monetary_values(self):
+        test_df = clean_monetary_values()
+        raise NotImplementedError
+
+    def test_remove_invalid_rows(self):
+        test_df = remove_invalid_rows()
+        raise NotImplementedError
+
+    def test_auto_memo(self):
+        test_df = auto_memo()
+        raise NotImplementedError
+
+    def test_auto_payee(self):
+        test_df = auto_payee()
+        raise NotImplementedError
+
+    def test_fix_date(self):
+        test_df["Date"] = fix_date()
+        raise NotImplementedError
+
+    def test_fill_api_columns(self):
+        test_df = fill_api_columns()
+        raise NotImplementedError
+
+    def test_output_json_transactions(self):
+        # TODO let's directly reference YNAB API documentation here
+        # and compare with the desired output
+        test_df = pd.DataFrame(
+            {
+                "account_id": [1],
+                "date": [2],
+                "payee_name": [3],
+                "amount": [4],
+                "memo": [5],
+                "category": [6],
+                "cleared": [7],
+                "import_id": [8],
+                "payee_id": [9],
+                "category_id": [10],
+                "approved": [11],
+                "flag_color": [12],
+            }
+        )
+        json_output = output_json_transactions(test_df)
+        print(json_output)
+        raise NotImplementedError
+
 
 '''
-    def test_rearrange_columns(self):
-        """Check output row is the same across different formats"""
-        # todo: something where the row format is invalid
-        # if you need more tests, add sections to test.conf & specify them here
-        for section_name in [
-            "test_row_format_default",
-            "test_row_format_neg_inflow",
-            "test_row_format_CD_flag",
-            "test_row_format_invalid",
-        ]:
-            config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config)
-            for f in b.get_files():
-                output_data = b.read_data(f)
-                # test the same two rows in each scenario
-                for row, expected_row in [
-                    (
-                        23,
-                        [
-                            "2017-09-28",
-                            "HOFER DANKT  0527  K2   28.09. 17:17",
-                            "",
-                            "HOFER DANKT  0527  K2   28.09. 17:17",
-                            "44.96",
-                            "",
-                        ],
-                    ),
-                    (
-                        24,
-                        [
-                            "2017-09-28",
-                            "SOFTWARE Wien",
-                            "",
-                            "SOFTWARE Wien",
-                            "",
-                            "307.67",
-                        ],
-                    ),
-                ]:
-                    result_row = output_data[row]
-
-                    self.assertCountEqual(expected_row, result_row)
-
     def test_valid_row(self):
         """Test making sure row has an outflow or an inflow"""
         config = fix_conf_params(self.cp, "test_row_format_default")

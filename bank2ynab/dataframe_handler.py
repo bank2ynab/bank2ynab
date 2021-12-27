@@ -89,6 +89,9 @@ class DataframeHandler:
         )
         # fix date format
         self.df["Date"] = fix_date(self.df["Date"], self.date_format)
+        # fix inflow/outflow string formatting
+        self.df["Inflow"] = clean_monetary_values(self.df["Inflow"])
+        self.df["Outflow"] = clean_monetary_values(self.df["Outflow"])
         # process Inflow/Outflow flags
         self.df = cd_flag_process(self.df, self.cd_flags)
         # fix amounts (convert negative inflows and outflows etc)
@@ -203,21 +206,18 @@ def cd_flag_process(df: pd.DataFrame, cd_flags: list) -> pd.DataFrame:
     if len(cd_flags) == 3:
         outflow_flag = cd_flags[2]
         # if this row is indicated to be outflow, make inflow negative
-        df.loc[df["CDFlag"] is outflow_flag, ["Inflow"]] = f"-{df['Inflow']}"
+        df.loc[df["CDFlag"] == outflow_flag, ["Inflow"]] = -1 * df["Inflow"]
     return df
 
 
 def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
     """
-    fix currency string formattingconvert currency values to floats
+    fix currency string formatting
+    convert currency values to floats
     convert negative inflows into outflows and vice versa
 
     :return: None
     """
-    # fix various formatting issues
-    df["Inflow"] = clean_monetary_values(df["Inflow"], currency_fix)
-    df["Outflow"] = clean_monetary_values(df["Outflow"], currency_fix)
-
     # negative inflow = outflow
     df.loc[df["Inflow"] < 0, ["Outflow"]] = df["Inflow"] * -1
     df.loc[df["Inflow"] < 0, ["Inflow"]] = 0
@@ -226,14 +226,16 @@ def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
     df.loc[df["Outflow"] < 0, ["Inflow"]] = df["Outflow"] * -1
     df.loc[df["Outflow"] < 0, ["Outflow"]] = 0
 
+    # currency conversion if multiplier specified
+    df["Inflow"] = df["Inflow"] / currency_fix
+    df["Outflow"] = df["Outflow"] / currency_fix
+
     # create amount column for API (in milliunits)
     df["amount"] = 1000 * (df["Inflow"] - df["Outflow"])
     return df
 
 
-def clean_monetary_values(
-    num_series: pd.Series, currency_fix: float
-) -> pd.Series:
+def clean_monetary_values(num_series: pd.Series) -> pd.Series:
     """
     convert "," to "." then remove every instance of . except last one
     remove any characters from inflow or outflow strings except
@@ -259,8 +261,6 @@ def clean_monetary_values(
     )
     # fill in null values with 0
     num_series.fillna(value=0, inplace=True)
-    # currency conversion if multiplier specified
-    num_series = num_series.astype(float) / currency_fix
     return num_series.astype(float)
 
 

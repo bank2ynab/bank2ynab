@@ -158,8 +158,39 @@ class TestDataframeHandler(TestCase):
                 )
 
     def test_clean_monetary_values(self):
-        test_df = clean_monetary_values()
-        raise NotImplementedError
+        """Test string format fixing for monetary values."""
+        initial_data = pd.Series(
+            data={
+                "a": "10",
+                "b": "10,50",
+                "c": "$77.77",
+                "d": "€88.88",
+                "e": "99....!.99",
+                "f": "20..10",
+                "g": "10,,0",
+                "h": "0",
+            }
+        )
+        desired_output = pd.Series(
+            data={
+                "a": 10,
+                "b": 10.50,
+                "c": 77.77,
+                "d": 88.88,
+                "e": 99.99,
+                "f": 20.10,
+                "g": 10,
+                "h": 0,
+            }
+        )
+
+        test_data = clean_monetary_values(initial_data)
+        for row in range(len(desired_output)):
+            TestCase.assertEqual(
+                self,
+                desired_output.iloc[row],
+                test_data.iloc[row],
+            )
 
     def test_remove_invalid_rows(self):
         test_df = remove_invalid_rows()

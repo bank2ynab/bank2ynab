@@ -107,8 +107,55 @@ class TestDataframeHandler(TestCase):
             )
 
     def test_fix_amount(self):
-        test_df = fix_amount()
-        raise NotImplementedError
+        """
+        Test fixing of negative inflows/outflows & amount column creation
+        """
+        """
+
+        # currency conversion if multiplier specified
+        df["Inflow"] = df["Inflow"] / currency_fix
+        df["Outflow"] = df["Outflow"] / currency_fix
+        """
+        initial_df = pd.DataFrame(
+            {"Inflow": [10, -20, 0, 0, 0], "Outflow": [0, 0, -100, 0, 0]}
+        )
+        test_df = fix_amount(initial_df, 1)
+        desired_output = pd.DataFrame(
+            {
+                "Inflow": [10, 0, 100, 0, 0],
+                "Outflow": [0, 20, 0, 0, 0],
+                "amount": [10000, -20000, 100000, 0, 0],
+            }
+        )
+
+        for row in range(len(test_df)):
+            for column in desired_output.keys():
+                TestCase.assertEqual(
+                    self,
+                    desired_output[column].iloc[row],
+                    test_df[column].iloc[row],
+                )
+
+    def test_currency_fix(self):
+        initial_df = pd.DataFrame(
+            {"Inflow": [10, -20, 0, 0, 0], "Outflow": [0, 0, -100, 0, 0]}
+        )
+        test_df = fix_amount(initial_df, 4)
+        desired_output = pd.DataFrame(
+            {
+                "Inflow": [2.5, 0, 25, 0, 0],
+                "Outflow": [0, 5, 0, 0, 0],
+                "amount": [2500, -5000, 25000, 0, 0],
+            }
+        )
+
+        for row in range(len(test_df)):
+            for column in desired_output.keys():
+                TestCase.assertEqual(
+                    self,
+                    desired_output[column].iloc[row],
+                    test_df[column].iloc[row],
+                )
 
     def test_clean_monetary_values(self):
         test_df = clean_monetary_values()

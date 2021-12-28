@@ -238,6 +238,7 @@ class TestDataframeHandler(TestCase):
         pandas.testing.assert_frame_equal(desired_output, test_df, False)
 
     def test_auto_memo(self):
+        """Test auto-filling of memo field with payee if allowed."""
         # TODO establish if it's even possible for an empty string to
         # make it this far - maybe it's always NA?
         initial_df = pd.DataFrame(
@@ -265,6 +266,7 @@ class TestDataframeHandler(TestCase):
         )
 
     def test_auto_payee(self):
+        """Test auto filling of Payee with Memo info."""
         initial_df = pd.DataFrame(
             {
                 "Payee": ["A", NA, NA],
@@ -336,7 +338,7 @@ class TestDataframeHandler(TestCase):
                 pandas.testing.assert_series_equal(desired_output, test_series)
 
     def test_fill_api_columns(self):
-
+        """Test correct API column filling."""
         api_cols = [
             "account_id",
             "date",
@@ -401,9 +403,7 @@ class TestDataframeHandler(TestCase):
         pandas.testing.assert_frame_equal(expected_output, test_df[api_cols])
 
     def test_output_json_transactions(self):
-        # TODO let's directly reference YNAB API documentation here
-        # and compare with the desired output
-
+        """Test that the JSON output is in the correct format."""
         test_df = pd.DataFrame(
             {
                 "account_id": ["", "", "", ""],

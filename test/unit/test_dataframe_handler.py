@@ -1,19 +1,20 @@
+import unittest
 from unittest import TestCase
 
 import pandas as pd
+import pandas.testing
 from bank2ynab.dataframe_handler import (
     add_missing_columns,
     auto_memo,
     auto_payee,
     cd_flag_process,
     clean_monetary_values,
-    fill_api_columns,
     fix_amount,
-    fix_date,
     merge_duplicate_columns,
     output_json_transactions,
     remove_invalid_rows,
 )
+from pandas._libs.missing import NA
 
 
 class TestDataframeHandler(TestCase):
@@ -27,6 +28,7 @@ class TestDataframeHandler(TestCase):
         """Check that merging of duplicate columns works correctly."""
         test_dfs = [
             {
+                # test no duplicate columns
                 "data": {
                     "Amount": [4, 3, 2, 1],
                     "Payee": ["four", "three", "two", "one"],
@@ -35,6 +37,7 @@ class TestDataframeHandler(TestCase):
                 "desired_output": ["Amount", "Payee"],
             },
             {
+                # test two duplicate columns
                 "data": {
                     "Amount": [4, 3, 2, 1],
                     "Payee": ["four", "three", "two", "one"],
@@ -44,15 +47,19 @@ class TestDataframeHandler(TestCase):
                 "desired_output": ["Amount", "Payee", "Payee 0"],
             },
         ]
-
         for test in test_dfs:
-            test_df = merge_duplicate_columns(
-                pd.DataFrame(test["data"]), test["input_cols"]
-            )
-
-            TestCase.assertCountEqual(
-                self, test["desired_output"], list(test_df)
-            )
+            with self.subTest(
+                "Test different amount of duplicate columns.",
+                test=test,
+            ):
+                test_df = merge_duplicate_columns(
+                    pd.DataFrame(test["data"]),
+                    test["input_cols"],
+                )
+                self.assertCountEqual(
+                    test["desired_output"],
+                    list(test_df),
+                )
 
     def test_add_missing_columns(self):
         """Check that adding missing columns works correctly."""
@@ -64,18 +71,18 @@ class TestDataframeHandler(TestCase):
             {},
         ]
         for dataset in test_datasets:
-            test_df = pd.DataFrame(dataset)
-            test_df = add_missing_columns(test_df, list(test_df), desired_cols)
-            # check if column names contain all desired values
-            TestCase.assertCountEqual(self, desired_cols, list(test_df))
+            with self.subTest(
+                "Test different amount of missing columns.", dataset=dataset
+            ):
+                test_df = pd.DataFrame(dataset)
+                test_df = add_missing_columns(
+                    test_df, list(test_df), desired_cols
+                )
+                # check if column names contain all desired values
+                self.assertCountEqual(desired_cols, list(test_df))
 
     def test_cd_flag_process(self):
-        """if len(cd_flags) == 3:
-        outflow_flag = cd_flags[2]
-        # if this row is indicated to be outflow, make inflow negative
-        df.loc[df["CDFlag"] is outflow_flag, ["Inflow"]] = f"-{df['Inflow']}"
-        return df"""
-
+        """Test correct application of inflow/outflow flags."""
         test_data = [
             {
                 "data": {"Inflow": [10]},
@@ -100,21 +107,18 @@ class TestDataframeHandler(TestCase):
         ]
 
         for dataset in test_data:
-            test_df = pd.DataFrame(dataset["data"])
-            test_df = cd_flag_process(test_df, dataset["cd_flags"])
-            TestCase.assertEqual(
-                self, dataset["target_inflow"], test_df["Inflow"].iloc[0]
-            )
+            with self.subTest(
+                "Test different input/output flag scenarios.", dataset=dataset
+            ):
+                test_df = pd.DataFrame(dataset["data"])
+                test_df = cd_flag_process(test_df, dataset["cd_flags"])
+                self.assertEqual(
+                    dataset["target_inflow"], test_df["Inflow"].iloc[0]
+                )
 
     def test_fix_amount(self):
         """
-        Test fixing of negative inflows/outflows & amount column creation
-        """
-        """
-
-        # currency conversion if multiplier specified
-        df["Inflow"] = df["Inflow"] / currency_fix
-        df["Outflow"] = df["Outflow"] / currency_fix
+        Test fixing of negative inflows/outflows & amount column creation.
         """
         initial_df = pd.DataFrame(
             {"Inflow": [10, -20, 0, 0, 0], "Outflow": [0, 0, -100, 0, 0]}
@@ -127,16 +131,18 @@ class TestDataframeHandler(TestCase):
                 "amount": [10000, -20000, 100000, 0, 0],
             }
         )
-
-        for row in range(len(test_df)):
-            for column in desired_output.keys():
-                TestCase.assertEqual(
-                    self,
-                    desired_output[column].iloc[row],
-                    test_df[column].iloc[row],
+        for column in desired_output.keys():
+            with self.subTest(
+                "Test each column's negative inflow/outflow processing.",
+                column=column,
+            ):
+                pandas.testing.assert_series_equal(
+                    desired_output[column].astype(float),
+                    test_df[column],
                 )
 
     def test_currency_fix(self):
+        """Test currency conversion."""
         initial_df = pd.DataFrame(
             {"Inflow": [10, -20, 0, 0, 0], "Outflow": [0, 0, -100, 0, 0]}
         )
@@ -148,13 +154,14 @@ class TestDataframeHandler(TestCase):
                 "amount": [2500, -5000, 25000, 0, 0],
             }
         )
-
-        for row in range(len(test_df)):
-            for column in desired_output.keys():
-                TestCase.assertEqual(
-                    self,
-                    desired_output[column].iloc[row],
-                    test_df[column].iloc[row],
+        for column in desired_output.keys():
+            with self.subTest(
+                "Test each column's currency conversion.",
+                column=column,
+            ):
+                pandas.testing.assert_series_equal(
+                    desired_output[column].astype(float),
+                    test_df[column],
                 )
 
     def test_clean_monetary_values(self):
@@ -169,6 +176,8 @@ class TestDataframeHandler(TestCase):
                 "f": "20..10",
                 "g": "10,,0",
                 "h": "0",
+                "i": "+40",
+                "j": "-30.30",
             }
         )
         desired_output = pd.Series(
@@ -181,37 +190,107 @@ class TestDataframeHandler(TestCase):
                 "f": 20.10,
                 "g": 10,
                 "h": 0,
+                "i": 40,
+                "j": -30.30,
+            }
+        )
+        test_data = clean_monetary_values(initial_data)
+        pandas.testing.assert_series_equal(
+            desired_output,
+            test_data,
+        )
+
+    def test_remove_invalid_rows(self):
+        initial_df = pd.DataFrame(
+            {
+                "Inflow": [10, 0, 30, 0, 66, NA, NA],
+                "Outflow": [0, 20, 40, 100, 0, NA, 77],
+                "Payee": ["a", "b", "c", "d", "e", "f", "g"],
+                "Date": [
+                    "28.09.2017",
+                    "28.09.2017",
+                    "2017-09-28",
+                    "2017-09-28",
+                    NA,
+                    "2017-09-28",
+                    "2017-10-28",
+                ],
+            }
+        )
+        desired_output = pd.DataFrame(
+            {
+                "Inflow": [10, 0, 30, 0, 0],
+                "Outflow": [0, 20, 40, 100, 77],
+                "Payee": ["a", "b", "c", "d", "g"],
+                "Date": [
+                    "28.09.2017",
+                    "28.09.2017",
+                    "2017-09-28",
+                    "2017-09-28",
+                    "2017-10-28",
+                ],
+            }
+        ).set_index("Date")
+
+        test_df = remove_invalid_rows(initial_df).set_index("Date")
+        del test_df["index"]
+        pandas.testing.assert_frame_equal(desired_output, test_df, False)
+
+    def test_auto_memo(self):
+        # TODO establish if it's even possible for an empty string to
+        # make it this far - maybe it's always NA?
+        initial_df = pd.DataFrame(
+            {
+                "Payee": ["A", "B", "C", NA],
+                "Memo": ["Complete Memo", NA, NA, NA],
+                "Expected Unfilled Memo": ["Complete Memo", NA, NA, NA],
+                "Expected Filled Memo": ["Complete Memo", "B", "C", NA],
             }
         )
 
-        test_data = clean_monetary_values(initial_data)
-        for row in range(len(desired_output)):
-            TestCase.assertEqual(
-                self,
-                desired_output.iloc[row],
-                test_data.iloc[row],
-            )
+        test_df_no_fill = auto_memo(initial_df, False)
 
-    def test_remove_invalid_rows(self):
-        test_df = remove_invalid_rows()
-        raise NotImplementedError
+        pandas.testing.assert_series_equal(
+            initial_df["Expected Unfilled Memo"],
+            test_df_no_fill["Memo"],
+            check_names=False,  # type:ignore
+        )
+        test_df_fill = auto_memo(initial_df, True)
 
-    def test_auto_memo(self):
-        test_df = auto_memo()
-        raise NotImplementedError
+        pandas.testing.assert_series_equal(
+            initial_df["Expected Filled Memo"],
+            test_df_fill["Memo"],
+            check_names=False,  # type:ignore
+        )
 
     def test_auto_payee(self):
-        test_df = auto_payee()
-        raise NotImplementedError
+        initial_df = pd.DataFrame(
+            {
+                "Payee": ["A", NA, NA],
+                "Memo": ["Complete Memo", "Payee Memo", NA],
+                "Expected Payee": ["A", "Payee Memo", NA],
+            }
+        )
 
+        test_df = auto_payee(initial_df)
+
+        pandas.testing.assert_series_equal(
+            initial_df["Expected Payee"],
+            test_df["Payee"],
+            check_names=False,  # type:ignore
+        )
+
+    @unittest.skip("Test not implemented yet")
     def test_fix_date(self):
-        test_df["Date"] = fix_date()
+        # test_df["Date"] = fix_date()
         raise NotImplementedError
 
+    @unittest.skip("Test not implemented yet")
     def test_fill_api_columns(self):
-        test_df = fill_api_columns()
+        # test_df = fill_api_columns()
         raise NotImplementedError
 
+    @unittest.skip("Test not implemented yet")
     def test_output_json_transactions(self):
         # TODO let's directly reference YNAB API documentation here
         # and compare with the desired output
@@ -238,38 +317,8 @@ class TestDataframeHandler(TestCase):
 
 '''
     def test_valid_row(self):
-        """Test making sure row has an outflow or an inflow"""
-        config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config)
 
-        for row, row_validity in [
-            (["Pending", "Payee", "", "", "300", ""], False),
-            (["28.09.2017", "Payee", "", "", "", "400"], False),
-            (["28.09.2017", "Payee", "", "", "", ""], False),
-            (["2017-09-28", "Payee", "", "", "300", ""], True),
-            (["2017-09-28", "Payee", "", "", "", "400"], True),
-            (["2017-09-28", "Payee", "", "", "", ""], False),
-        ]:
-            is_valid = b._remove_invalid_rows(row)
-            self.assertEqual(is_valid, row_validity)
 
-    def test_clean_monetary_values(self):
-        """Test cleaning of outflow and inflow of unneeded characters"""
-        config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config)
-
-        for row, expected_row in [
-            (
-                ["28.09.2017", "Payee", "", "", "+ £300.01", ""],
-                ["28.09.2017", "Payee", "", "", "300.01", ""],
-            ),
-            (
-                ["28.09.2017", "Payee", "", "", "", "- $300"],
-                ["28.09.2017", "Payee", "", "", "", "300"],
-            ),
-        ]:
-            result_row = b._clean_monetary_values(row)
-            self.assertCountEqual(expected_row, result_row)
 
     def test_auto_memo(self):
         """Test auto-filling empty memo field with payee data"""

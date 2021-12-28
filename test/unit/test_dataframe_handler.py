@@ -1,4 +1,3 @@
-import unittest
 from unittest import TestCase
 
 import pandas as pd
@@ -401,24 +400,34 @@ class TestDataframeHandler(TestCase):
         test_df = fill_api_columns(initial_df)
         pandas.testing.assert_frame_equal(expected_output, test_df[api_cols])
 
-    @unittest.skip("Test not implemented yet")
     def test_output_json_transactions(self):
         # TODO let's directly reference YNAB API documentation here
         # and compare with the desired output
+
         test_df = pd.DataFrame(
             {
-                "account_id": [1],
-                "date": [2],
-                "payee_name": [3],
-                "amount": [4],
-                "memo": [5],
-                "category": [6],
-                "cleared": [7],
-                "import_id": [8],
-                "payee_id": [9],
-                "category_id": [10],
-                "approved": [11],
-                "flag_color": [12],
+                "account_id": ["", "", "", ""],
+                "date": [
+                    "2017-09-28",
+                    "2017-09-28",
+                    "2017-09-28",
+                    "2017-10-28",
+                ],
+                "payee_name": ["Test 1", "Test 2", "Test 3", "Test 4"],
+                "amount": [-1000, 25000, 25000, 0],
+                "memo": ["Test Memo", "", "Test Memo", "Test Memo"],
+                "category": ["", "", "", ""],
+                "cleared": ["cleared", "cleared", "cleared", "cleared"],
+                "import_id": [
+                    "YNAB:-1000:2017-09-28:1",
+                    "YNAB:25000:2017-09-28:1",
+                    "YNAB:25000:2017-09-28:2",
+                    "YNAB:0:2017-10-28:1",
+                ],
+                "payee_id": [None, None, None, None],
+                "category_id": [None, None, None, None],
+                "approved": [False, False, False, False],
+                "flag_color": [None, None, None, None],
             }
         )
         json_output = output_json_transactions(test_df)

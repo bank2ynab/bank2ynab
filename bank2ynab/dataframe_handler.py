@@ -333,16 +333,16 @@ def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:
 
     logging.debug("\nFixed dates:\n{}".format(date_series.head()))
 
-    return date_series
+    return date_series.dt.strftime("%Y-%m-%d")
 
 
 def fill_api_columns(
     df: pd.DataFrame,
 ) -> pd.DataFrame:  # TODO handle account ID
-    df["account_id"] = "NOT YET IMPLEMENTED"  # TODO
+    df["account_id"] = ""  # TODO - not yet implemented
     df["date"] = df["Date"].astype(str)
-    df["payee_name"] = df["Payee"[:50]]
-    df["memo"] = df["Memo"[:100]]
+    df["payee_name"] = df["Payee"].str.slice(0, 50)
+    df["memo"] = df["Memo"].str.slice(0, 100)
     df["category"] = ""
     df["cleared"] = "cleared"
     df["payee_id"] = None
@@ -352,7 +352,9 @@ def fill_api_columns(
 
     # import_id format = YNAB:amount:ISO-date:occurrences
     # Maximum 36 characters ("YNAB" + ISO-date = 10 characters)
-    df["import_id"] = df.agg(lambda x: f"{x['amount']}:{x['date']}:", axis=1)
+    df["import_id"] = df.agg(
+        lambda x: f"YNAB:{x['amount']}:{x['date']}:", axis=1
+    )
     # count every instance of import id & add a counter to id
     df["same_id_count"] = (df.groupby(["import_id"]).cumcount() + 1).astype(
         str

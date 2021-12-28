@@ -431,5 +431,27 @@ class TestDataframeHandler(TestCase):
             }
         )
         json_output = output_json_transactions(test_df)
-        print(json_output)
-        raise NotImplementedError
+
+        expected_output = (
+            '[{"account_id":"","date":"2017-09-28","payee_name":"Test'
+            ' 1","amount":-1000,"memo":"Test'
+            ' Memo","category":"","cleared":"cleared","import_id":'
+            '"YNAB:-1000:2017-09-28:1","payee_id":null,"category_id":null,'
+            '"approved":false,"flag_color":null},{"account_id":"",'
+            '"date":"2017-09-28","payee_name":"Test'
+            ' 2","amount":25000,"memo":"","category":"","cleared":'
+            '"cleared","import_id":"YNAB:25000:2017-09-28:1",'
+            '"payee_id":null,"category_id":null,"approved":false,'
+            '"flag_color":null},{"account_id":"","date":"2017-09-28",'
+            '"payee_name":"Test 3","amount":25000,"memo":"Test Memo",'
+            '"category":"","cleared":"cleared","import_id":'
+            '"YNAB:25000:2017-09-28:2","payee_id":null,"category_id":null,'
+            '"approved":false,"flag_color":null},{"account_id":"",'
+            '"date":"2017-10-28","payee_name":"Test'
+            ' 4","amount":0,"memo":"Test'
+            ' Memo","category":"","cleared":"cleared",'
+            '"import_id":"YNAB:0:2017-10-28:1","payee_id":null,'
+            '"category_id":null,"approved":false,"flag_color":null}]'
+        )
+
+        self.assertEqual(expected_output, json_output["transactions"])

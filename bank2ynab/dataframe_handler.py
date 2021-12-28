@@ -371,22 +371,6 @@ def fill_api_columns(
 
 def output_json_transactions(
     df: pd.DataFrame,
-) -> str:  # TODO fix output format
-    """
-    # assign values to transaction dictionary
-    transaction = {
-        "account_id": account_id,
-        "date": date,
-        "payee_name": payee[:50],
-        "amount": amount,
-        "memo": memo[:100],
-        "category": category,
-        "cleared": "cleared",
-        "import_id": self.create_import_id(amount, date, transactions),
-        "payee_id": None,
-        "category_id": None,
-        "approved": False,
-        "flag_color": None,
-    }
-    """
-    return df.to_json(orient="records")
+) -> dict[str, str]:
+
+    return {"transactions": df.to_json(orient="records")}

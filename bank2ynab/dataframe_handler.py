@@ -108,8 +108,8 @@ class DataframeHandler:
         self.output_df = self.df[self.output_columns]
         # display parsed line count
         logging.info(f"Parsed {self.df.shape[0]} lines")
-        # view final dataframe # TODO - switch to debug once finished here
-        logging.info(f"\nFinal DF\n{self.df.head(10)}")
+        # view final dataframe
+        logging.debug(f"\nFinal DF\n{self.df.head(10)}")
         # check if dataframe is empty
         self.empty = self.df.empty
         # set json output
@@ -128,7 +128,7 @@ class DataframeHandler:
 
 
 def merge_duplicate_columns(
-    df: pd.DataFrame, input_columns: list
+    df: pd.DataFrame, input_columns: list[str]
 ) -> pd.DataFrame:
     """
     Merges columns specified more than once in the input_columns list.
@@ -169,7 +169,7 @@ def merge_duplicate_columns(
 
 
 def add_missing_columns(
-    df: pd.DataFrame, input_cols: list, output_cols: list
+    df: pd.DataFrame, input_cols: list[str], output_cols: list[str]
 ) -> pd.DataFrame:
     """
     Adds any missing required columns to the Dataframe.
@@ -275,9 +275,10 @@ def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
     :return: pd.DataFrame
     """
     # filter out rows where Inflow and Outflow are both blank
-    df.query("Inflow.notna() & Outflow.notna()", inplace=True)
+    df.query("Inflow.notna() | Outflow.notna()", inplace=True)
     # filter rows with an invalid date
     df.query("Date.notna()", inplace=True)
+    df.fillna(0, inplace=True)
     df.reset_index(inplace=True)
     return df
 
@@ -293,6 +294,7 @@ def auto_memo(df: pd.DataFrame, fill_memo: bool) -> pd.DataFrame:
     :return: modified dataframe
     :rtype: pd.DataFrame
     """
+    # TODO - fix empty strings
     if fill_memo:
         df["Memo"].fillna(df["Payee"], inplace=True)
     return df

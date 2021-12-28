@@ -69,7 +69,9 @@ class BankHandler:
                     # write export file
                     self.write_data(src_file, df_handler)
                     # save transaction data for each bank to object
-                    self.transaction_data.append(df_handler)
+                    self.transaction_data.append(
+                        df_handler.api_transaction_data
+                    )
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
                         logging.info(

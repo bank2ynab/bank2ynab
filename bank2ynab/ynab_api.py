@@ -30,6 +30,7 @@ class YNAB_API:
         self.api_token = self.config_handler.config.get(
             "DEFAULT", "YNAB API Access Token"
         )
+        # self.api_token = 0  # debug - TODO remove line
         self.user_config_handler = ConfigHandler(user_mode=True)
         self.user_config = self.user_config_handler.config
         self.user_config_path = self.user_config_handler.user_conf_path
@@ -40,7 +41,7 @@ class YNAB_API:
     def run(self, transaction_data):
         if self.api_token is not None:
             logging.info("Connecting to YNAB API...")
-
+            logging.debug(transaction_data)
             # check for API token auth (and other errors)
             error_code = self.list_budgets()
             if error_code[0] == "ERROR":
@@ -59,9 +60,7 @@ class YNAB_API:
                         self.post_transactions(id, budget_t_data[id])
                     except KeyError:
                         logging.info(
-                            "No transactions to upload for {}.".format(
-                                budget[0]
-                            )
+                            "No transactions to upload for {budget[0]}."
                         )
         else:
             logging.info("No API-token provided.")
@@ -78,11 +77,9 @@ class YNAB_API:
 
         if budget_id is None:
             # only happens when we're looking for the list of budgets
-            url = base_url + "?access_token={}".format(api_t)
+            url = base_url + f"?access_token={api_t}"
         else:
-            url = base_url + "{}/{}?access_token={}".format(
-                budget_id, kwd, api_t
-            )
+            url = base_url + f"{budget_id}/{kwd}?access_token={api_t}"
 
         response = requests.get(url)
         try:
@@ -166,9 +163,9 @@ class YNAB_API:
             for account in accounts:
                 account_ids.append([account["name"], account["id"]])
                 # debug messages
-                logging.debug("id: {}".format(account["id"]))
-                logging.debug("on_budget: {}".format(account["on_budget"]))
-                logging.debug("closed: {}".format(account["closed"]))
+                logging.debug(f"id: {account['id']}")
+                logging.debug(f"on_budget: {account['on_budget']}")
+                logging.debug(f"closed: {account['closed']}")
         else:
             logging.info("no accounts found")
 
@@ -210,7 +207,7 @@ class YNAB_API:
         id = details["id"]
         name = details["name"]
         detail = errors[id]
-        logging.error("{} - {} ({})".format(id, detail, name))
+        logging.error(f"{id} - {detail} ({name})")
 
         return ["ERROR", id, detail]
 
@@ -224,12 +221,12 @@ class YNAB_API:
             )
             budget_id = config_line[0]
             account_id = config_line[1]
-            logging.info("Previously-saved account for {} found.".format(bank))
+            logging.info(f"Previously-saved account for {bank} found.")
         except IndexError:
             pass
         except NoSectionError:
             # TODO - can we handle this within the config class?
-            logging.info("No user configuration for {} found.".format(bank))
+            logging.info(f"No user configuration for {bank} found.")
 
         if account_id == "":
             instruction = "No YNAB {} for transactions from {} set!\n Pick {}"
@@ -272,10 +269,10 @@ class YNAB_API:
         except DuplicateSectionError:
             pass
         self.user_config.set(
-            bank, "YNAB Account ID", "{}||{}".format(budget_id, account_id)
+            bank, "YNAB Account ID", f"{budget_id}||{account_id}"
         )
 
-        logging.info("Saving default account for {}...".format(bank))
+        logging.info(f"Saving default account for {bank}...")
         with open(self.user_config_path, "w", encoding="utf-8") as config_file:
             self.user_config.write(config_file)
 
@@ -295,7 +292,7 @@ def option_selection(options, msg):
         index = 0
         for option in options:
             index += 1
-            print("| {} | {}".format(index, option[0]))
+            print(f"| {index} | {option[0]}")
         selection = int_input(1, count, msg)
     option_selected = options[selection - 1][1]
     return option_selected
@@ -311,9 +308,7 @@ def int_input(min, max, msg):
     """
     while True:
         try:
-            user_input = int(
-                input("{} (range {} - {}): ".format(msg, min, max))
-            )
+            user_input = int(input(f"{msg} (range {min} - {max}): "))
             if user_input not in range(min, max + 1):
                 raise ValueError
             break

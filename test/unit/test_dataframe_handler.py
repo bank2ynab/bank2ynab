@@ -9,7 +9,9 @@ from bank2ynab.dataframe_handler import (
     auto_payee,
     cd_flag_process,
     clean_monetary_values,
+    fill_api_columns,
     fix_amount,
+    fix_date,
     merge_duplicate_columns,
     output_json_transactions,
     remove_invalid_rows,
@@ -280,15 +282,124 @@ class TestDataframeHandler(TestCase):
             check_names=False,  # type:ignore
         )
 
-    @unittest.skip("Test not implemented yet")
     def test_fix_date(self):
-        # test_df["Date"] = fix_date()
-        raise NotImplementedError
+        test_params = [
+            {
+                "date_format": "%Y-%m-%d",
+                "data": {
+                    "a": "2021-10-01",
+                    "b": "2021-09-21",
+                    "c": "2021-02-29",
+                    "d": "2001-10-01",
+                },
+            },
+            {
+                "date_format": "%Y%m%d",
+                "data": {
+                    "a": "20211001",
+                    "b": "20210921",
+                    "c": "20210229",
+                    "d": "20011001",
+                },
+            },
+            {
+                "date_format": "%d.%m.%Y",
+                "data": {
+                    "a": "01.10.2021",
+                    "b": "21.09.2021",
+                    "c": "29.02.2021",
+                    "d": "01.10.2001",
+                },
+            },
+            {
+                "date_format": "%Y-%m-%d %H:%M:%S",
+                "data": {
+                    "a": "2021-10-01 01:02:03",
+                    "b": "2021-09-21 01:32:02",
+                    "c": "2021-02-29 01:59:44",
+                    "d": "2001-10-01 01:10:35",
+                },
+            },
+        ]
+        desired_output = pd.Series(
+            data={
+                "a": "2021-10-01",
+                "b": "2021-09-21",
+                "c": NA,
+                "d": "2001-10-01",
+            }
+        )
+        for test in test_params:
+            with self.subTest(test=test):
+                test_series = fix_date(
+                    pd.Series(data=test["data"]), test["date_format"]
+                )
+                pandas.testing.assert_series_equal(desired_output, test_series)
 
-    @unittest.skip("Test not implemented yet")
     def test_fill_api_columns(self):
-        # test_df = fill_api_columns()
-        raise NotImplementedError
+
+        api_cols = [
+            "account_id",
+            "date",
+            "payee_name",
+            "amount",
+            "memo",
+            "category",
+            "cleared",
+            "import_id",
+            "payee_id",
+            "category_id",
+            "approved",
+            "flag_color",
+        ]
+        really_long_payee = "a" * 60
+        truncated_payee = really_long_payee[:50]
+        really_long_memo = "m" * 200
+        truncated_memo = really_long_memo[:100]
+        initial_df = pd.DataFrame(
+            {
+                "account_id": ["", "", "", ""],
+                "Date": [
+                    "2017-09-28",
+                    "2017-09-28",
+                    "2017-09-28",
+                    "2017-10-28",
+                ],
+                "Payee": ["Test 1", "Test 2", "Test 3", really_long_payee],
+                "amount": [-1000, 25000, 25000, 0],
+                "Memo": ["Test Memo", "", really_long_memo, "Test Memo"],
+            }
+        )
+
+        expected_output = pd.DataFrame(
+            {
+                "account_id": ["", "", "", ""],
+                "date": [
+                    "2017-09-28",
+                    "2017-09-28",
+                    "2017-09-28",
+                    "2017-10-28",
+                ],
+                "payee_name": ["Test 1", "Test 2", "Test 3", truncated_payee],
+                "amount": [-1000, 25000, 25000, 0],
+                "memo": ["Test Memo", "", truncated_memo, "Test Memo"],
+                "category": ["", "", "", ""],
+                "cleared": ["cleared", "cleared", "cleared", "cleared"],
+                "import_id": [
+                    "YNAB:-1000:2017-09-28:1",
+                    "YNAB:25000:2017-09-28:1",
+                    "YNAB:25000:2017-09-28:2",
+                    "YNAB:0:2017-10-28:1",
+                ],
+                "payee_id": [None, None, None, None],
+                "category_id": [None, None, None, None],
+                "approved": [False, False, False, False],
+                "flag_color": [None, None, None, None],
+            }
+        )
+
+        test_df = fill_api_columns(initial_df)
+        pandas.testing.assert_frame_equal(expected_output, test_df[api_cols])
 
     @unittest.skip("Test not implemented yet")
     def test_output_json_transactions(self):
@@ -313,76 +424,3 @@ class TestDataframeHandler(TestCase):
         json_output = output_json_transactions(test_df)
         print(json_output)
         raise NotImplementedError
-
-
-'''
-    def test_valid_row(self):
-
-
-
-    def test_auto_memo(self):
-        """Test auto-filling empty memo field with payee data"""
-        config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config)
-        memo_index = b.config["output_columns"].index("Memo")
-
-        for row, test_memo, fill_memo in [
-            (["28.09.2017", "Payee", "", "", "300", ""], "", False),
-            (["28.09.2017", "Payee", "", "Memo", "300", ""], "Memo", False),
-            (["28.09.2017", "Payee", "", "", "300", ""], "Payee", True),
-            (["28.09.2017", "Payee", "", "Memo", "", "400"], "Memo", True),
-        ]:
-            new_memo = b._auto_memo(row, fill_memo)[memo_index]
-            self.assertEqual(test_memo, new_memo)
-
-    def test_fix_outflow(self):
-        """Test conversion of negative Inflow into Outflow"""
-        config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config)
-
-        for row, expected_row in [
-            (
-                ["28.09.2017", "Payee", "", "", "300", ""],
-                ["28.09.2017", "Payee", "", "", "300", ""],
-            ),
-            (
-                ["28.09.2017", "Payee", "", "", "", "-300"],
-                ["28.09.2017", "Payee", "", "", "300", ""],
-            ),
-            (
-                ["28.09.2017", "Payee", "", "", "", "300"],
-                ["28.09.2017", "Payee", "", "", "", "300"],
-            ),
-        ]:
-            result_row = b._fix_outflow(row)
-            self.assertCountEqual(expected_row, result_row)
-
-    def test_fix_inflow(self):
-        """Test conversion of positive Outflow into Inflow"""
-        config = fix_conf_params(self.cp, "test_row_format_default")
-        b = B2YBank(config)
-
-        for row, expected_row in [
-            (
-                ["28.09.2017", "Payee", "", "", "300", ""],
-                ["28.09.2017", "Payee", "", "", "300", ""],
-            ),
-            (
-                ["28.09.2017", "Payee", "", "", "+300", ""],
-                ["28.09.2017", "Payee", "", "", "", "300"],
-            ),
-            (
-                ["28.09.2017", "Payee", "", "", "", "300"],
-                ["28.09.2017", "Payee", "", "", "", "300"],
-            ),
-        ]:
-            result_row = b._fix_inflow(row)
-            self.assertCountEqual(expected_row, result_row)
-
-    """
-    def test_fix_date(self):
-        # todo
-
-    def test_cd_flag_process():
-        # todo
-'''

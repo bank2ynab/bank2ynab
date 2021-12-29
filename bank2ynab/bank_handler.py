@@ -37,7 +37,10 @@ class BankHandler:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
             try:
                 # perform preprocessing operations on file if required
-                self._preprocess_file(src_file)
+                src_file = self._preprocess_file(
+                    file_path=src_file,
+                    plugin_args=self.config_dict["plugin_args"],
+                )
                 # get file's encoding
                 src_encod = detect_encoding(src_file)
                 # create our base dataframe
@@ -54,6 +57,7 @@ class BankHandler:
                     api_columns=self.config_dict["api_columns"],
                     cd_flags=self.config_dict["cd_flags"],
                     date_format=self.config_dict["date_format"],
+                    date_dedupe=self.config_dict["date_dedupe"],
                     fill_memo=self.config_dict["payee_to_memo"],
                     currency_fix=self.config_dict["currency_mult"],
                 )
@@ -109,11 +113,11 @@ class BankHandler:
         df_handler.output_csv(target_filename)
         return target_filename
 
-    def _preprocess_file(self, file_path: str):
+    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
         exists solely to be used by plugins for pre-processing a file
         that otherwise can be read normally (e.g. weird format)
         :param file_path: path to file
         """
         # intentionally empty - plugins can use this function
-        return
+        return file_path

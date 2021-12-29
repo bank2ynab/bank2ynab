@@ -21,7 +21,7 @@ class NullBank(BankHandler):
         super(NullBank, self).__init__(config_dict)
         self.name = "NullBank"
 
-    def _preprocess_file(self, file_path: str):
+    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
         This is probably the only method you really want to override.
         exists solely to be used by plugins for pre-processing a file
@@ -29,7 +29,7 @@ class NullBank(BankHandler):
         :param file_path: path to file
         """
         # intentionally empty - plugins can use this function
-        return
+        return file_path
 
     def read_data(self, file_path):
         """

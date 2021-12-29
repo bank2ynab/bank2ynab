@@ -83,6 +83,9 @@ class ConfigHandler:
             "header_rows": self.get_config_line_int(section, "Header Rows"),
             "footer_rows": self.get_config_line_int(section, "Footer Rows"),
             "date_format": self.get_config_line_str(section, "Date Format"),
+            "date_dedupe": self.get_config_line_boo(
+                section, "Date De-Duplication"
+            ),
             "delete_original": self.get_config_line_boo(
                 section, "Delete Source File"
             ),
@@ -93,6 +96,9 @@ class ConfigHandler:
                 section, "Use Payee for Memo"
             ),
             "plugin": self.get_config_line_str(section, "Plugin"),
+            "plugin_args": self.get_config_line_lst(
+                section, "Plugin Arguments", ","
+            ),
             "api_token": self.get_config_line_str(
                 section, "YNAB API Access Token"
             ),

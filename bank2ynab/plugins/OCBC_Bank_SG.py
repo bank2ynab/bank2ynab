@@ -13,7 +13,7 @@ class OCBC_Bank_SG(BankHandler):
         super(OCBC_Bank_SG, self).__init__(config_dict)
         self.name = "OCBC_Bank_SG"
 
-    def _preprocess_file(self, file_path):
+    def _preprocess_file(self, file_path, plugin_args) -> str:
         """
         For every row that doesn't have a valid date field
         strip out separators and append to preceding row.
@@ -48,7 +48,7 @@ class OCBC_Bank_SG(BankHandler):
         with open(file_path, "w") as output_file:
             for row in output_rows:
                 output_file.write(row)
-        return
+        return file_path
 
 
 def build_bank(config):

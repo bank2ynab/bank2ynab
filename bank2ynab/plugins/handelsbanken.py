@@ -18,7 +18,7 @@ class Handelsbanken(BankHandler):
         super(Handelsbanken, self).__init__(config_dict)
         self.name = "Handelsbanken"
 
-    def _preprocess_file(self, file_path):
+    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
         Strips HTML from input file, modifying the input file directly
         :param file_path: path to file
@@ -44,7 +44,7 @@ class Handelsbanken(BankHandler):
         with open(file_path, "w") as output_file:
             for row in output_rows:
                 output_file.write("{}\n".format(";".join(row)))
-        return
+        return file_path
 
 
 def build_bank(config):

@@ -10,7 +10,7 @@ class YourActualBankPlugin(BankHandler):
         super(YourActualBankPlugin, self).__init__(config_dict)
         self.name = "YourActualBank"
 
-    def _preprocess_file(self, file_path):
+    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
         This is an example of how to preprocess the transaction file
         prior to feeding the data into the main read_data function.
@@ -51,7 +51,7 @@ class YourActualBankPlugin(BankHandler):
         with open(file_path, "w") as output_file:
             for row in output_rows:
                 output_file.write(row)
-        return
+        return file_path
 
 
 def build_bank(config):

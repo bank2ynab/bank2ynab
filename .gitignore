@@ -2,6 +2,7 @@
 user_configuration.conf
 test-data/temp-test.conf
 b2y_env/
+env/
 # general
 *.pyc
 # vscode stuff

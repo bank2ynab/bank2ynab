@@ -116,13 +116,15 @@ Here is a list of the banks and their formats that we already support. Note that
 1. BR Banco do Brasil, checking
 1. BR Inter, checking
 1. CA TD Canada Trust, checking+Visa
-1. CH UBS Checking account and credit card
+1. CH UBS Checking account
+1. CH UBS Credit card
 1. CH ZKB Erweiterte Suche
 1. CH ZKB Finanzassistent-Chronik
 1. CO Bancolombia
 1. CZ AirBank checking and savings
 1. CZ Ceska Sporitelna
 1. CZ Raiffeisen bank
+1. DE Amazon VISA LBB
 1. DE Commerzbank checking
 1. DE Consorsbank checking
 1. DE Deutsche Bank
@@ -136,17 +138,20 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Ostseesparkasse Rostock checking
 1. DE Ostseesparkasse Rostock credit card
 1. DE Sparkasse Rhein-Neckar-Nord
+1. DE Landesbank Berlin Amazon Kreditkarten-Banking
 1. DE Sparkasse Südholstein
 1. DK Bankernes EDB Central
 1. DK Danske Bank
 1. DK Jyske Bank VISA
 1. DK Nordea
 1. DK Portalbank
-1. Hibiscus
+1. Hibiscus banking software
 1. HU Erste Bank checking
+1. HU K&H
 1. HU OTP
 1. IE AIB Ireland
 1. IE Bank of Ireland
+1. IE First South Credit Union
 1. IE N26
 1. IE Ulster Bank, savings
 1. IT RomagnaBanca Inbank

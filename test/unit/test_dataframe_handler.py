@@ -25,6 +25,32 @@ class TestDataframeHandler(TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
+    def test_read_csv(self):
+        """Test reading of CSV file into dataframe."""
+        """
+        file_path: str,
+        delim: str,
+        header_rows: int,
+        footer_rows: int,
+        encod: str,
+        """
+        raise NotImplementedError
+
+    def test_parse_data(self):
+        """Test full parsing workflow."""
+        """
+        test_dataframe = DataframeHandler
+        self.input_columns = input_columns
+        self.output_columns = output_columns
+        self.api_columns = api_columns
+        self.cd_flags = cd_flags
+        self.date_format = date_format
+        self.fill_memo = fill_memo
+        self.currency_fix = currency_fix
+        """
+
+        raise NotImplementedError
+
     def test_merge_duplicate_columns(self):
         """Check that merging of duplicate columns works correctly."""
         test_dfs = [

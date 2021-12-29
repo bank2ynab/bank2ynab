@@ -42,7 +42,8 @@ class BankHandler:
                 src_encod = transaction_reader.detect_encoding(src_file)
                 # create our base dataframe
 
-                df_handler = DataframeHandler(
+                df_handler = DataframeHandler()
+                df_handler.run(
                     file_path=src_file,
                     delim=self.config_dict["input_delimiter"],
                     header_rows=int(self.config_dict["header_rows"]),
@@ -56,7 +57,6 @@ class BankHandler:
                     fill_memo=self.config_dict["payee_to_memo"],
                     currency_fix=self.config_dict["currency_mult"],
                 )
-                df_handler.parse_data()
 
                 self.bank_files_processed += 1
             except ValueError as e:

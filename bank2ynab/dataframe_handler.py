@@ -11,7 +11,19 @@ class DataframeHandler:
     matching a given specification
     """
 
-    def __init__(
+    def __init__(self) -> None:
+        pass
+
+    def output_csv(self, path: str) -> None:
+        """
+        Writes df to the specified filepath as a csv file
+
+        :param path: path to write exported file to
+        :type path: str
+        """
+        self.output_df.to_csv(path, index=False)
+
+    def run(
         self,
         *,
         file_path: str,
@@ -28,10 +40,20 @@ class DataframeHandler:
         currency_fix: float,
     ) -> None:
         """
-        initialise cleaner object using provided dataframe and parameters
+        Complete handling of Dataframe creation & output.
 
         :param df: dataframe to be modified
         :type df: DataFrame
+        :param file_path: Path to CSV file
+        :type file_path: str
+        :param delim: CSV separator
+        :type delim: str
+        :param header_rows: Number of header rows
+        :type header_rows: int
+        :param footer_rows: Number of footer rows
+        :type footer_rows: int
+        :param encod: CSV file encoding
+        :type encod: str
         :param input_columns: columns present in input data
         :type input_columns: list
         :param output_columns: desired columns to be present in output data
@@ -47,84 +69,135 @@ class DataframeHandler:
         :param currency_fix: value to divide all currency amounts by
         :type currency_fix: float
         """
-        self.input_columns = input_columns
-        self.output_columns = output_columns
-        self.api_columns = api_columns
-        self.cd_flags = cd_flags
-        self.date_format = date_format
-        self.fill_memo = fill_memo
-        self.currency_fix = currency_fix
-
-        self.df = pd.read_csv(
-            file_path,
-            delimiter=delim,
-            skipinitialspace=True,  # skip space after delimiter
-            names=[],  # don't set column headers initially
-            skiprows=header_rows,  # skip header rows
-            skipfooter=footer_rows,  # skip footer rows
-            skip_blank_lines=True,  # skip blank lines
-            encoding=encod,
-            memory_map=True,  # access file object directly - no I/O overhead
-            engine="python",
+        # read data from input file to dataframe
+        self.df = read_csv(
+            file_path=file_path,
+            delim=delim,
+            header_rows=header_rows,
+            footer_rows=footer_rows,
+            encod=encod,
         )
-
-    def parse_data(self) -> None:
-        """
-        convert each column of the dataframe to match ideal output data
-
-        :return: modified dataframe matching provided configuration values
-        :rtype: DataFrame
-        """
-        # set column names based on input column list
-        self.df.columns = self.input_columns
-
-        # debug to see what our df is like before transformation
-        logging.debug(f"\nInitial DF\n{self.df.head()}")
-
-        # merge duplicate input columns
-        merge_duplicate_columns(self.df, self.input_columns)
-        # add missing columns
-        add_missing_columns(
-            self.df, self.input_columns, self.output_columns + self.api_columns
+        # modify dataframe to match desired output
+        self.df = parse_data(
+            df=self.df,
+            input_columns=input_columns,
+            output_columns=output_columns,
+            api_columns=api_columns,
+            cd_flags=cd_flags,
+            date_format=date_format,
+            fill_memo=fill_memo,
+            currency_fix=currency_fix,
         )
-        # fix date format
-        self.df["Date"] = fix_date(self.df["Date"], self.date_format)
-        # fix inflow/outflow string formatting
-        self.df["Inflow"] = clean_monetary_values(self.df["Inflow"])
-        self.df["Outflow"] = clean_monetary_values(self.df["Outflow"])
-        # process Inflow/Outflow flags
-        self.df = cd_flag_process(self.df, self.cd_flags)
-        # fix amounts (convert negative inflows and outflows etc)
-        self.df = fix_amount(self.df, self.currency_fix)
-        # auto fill memo from payee if required
-        self.df = auto_memo(self.df, self.fill_memo)
-        # auto fill payee from memo
-        self.df = auto_payee(self.df)
-        # remove invalid rows
-        self.df = remove_invalid_rows(self.df)
-        # fill API-specific columns
-        self.df = fill_api_columns(self.df)
-        # set final columns & order for output file
-        self.output_df = self.df[self.output_columns]
-        # display parsed line count
-        logging.info(f"Parsed {self.df.shape[0]} lines")
-        # view final dataframe
-        logging.debug(f"\nFinal DF\n{self.df.head(10)}")
         # check if dataframe is empty
         self.empty = self.df.empty
+        # set final columns & order for output file
+        self.output_df = self.df[output_columns]
         # set json output
         self.api_transaction_data = output_json_transactions(
-            self.df[self.api_columns]
+            self.df[api_columns]
         )
 
-    def output_csv(self, path: str) -> None:
-        """
-        Writes df to the specified filepath as a csv file
 
-        :param path: path to write exported file to
-        :type path: str
-        """
-        self.output_df.to_csv(path, index=False)
+def read_csv(
+    file_path: str,
+    delim: str,
+    header_rows: int,
+    footer_rows: int,
+    encod: str,
+) -> pd.DataFrame:
+    """
+    Read a specified CSV file into a Dataframe.
+
+    :param file_path: Path to CSV file
+    :type file_path: str
+    :param delim: CSV separator
+    :type delim: str
+    :param header_rows: Number of header rows
+    :type header_rows: int
+    :param footer_rows: Number of footer rows
+    :type footer_rows: int
+    :param encod: CSV file encoding
+    :type encod: str
+    :return: Dataframe read from CSV file
+    :rtype: pd.DataFrame
+    """
+    df = pd.read_csv(
+        file_path,
+        delimiter=delim,
+        skipinitialspace=True,  # skip space after delimiter
+        names=[],  # don't set column headers initially
+        skiprows=header_rows,  # skip header rows
+        skipfooter=footer_rows,  # skip footer rows
+        skip_blank_lines=True,  # skip blank lines
+        encoding=encod,
+        memory_map=True,  # access file object directly - no I/O overhead
+        engine="python",
+    )
+    return df
+
+
+def parse_data(
+    *,
+    df: pd.DataFrame,
+    input_columns: list,
+    output_columns: list,
+    api_columns: list,
+    cd_flags: list,
+    date_format: str,
+    fill_memo: bool,
+    currency_fix: float,
+) -> pd.DataFrame:
+    """
+    Convert each column of the dataframe to match ideal output data
+
+    :param input_columns: columns present in input data
+    :type input_columns: list
+    :param output_columns: desired columns to be present in output data
+    :type output_columns: list
+    :param api_columns: desired columns to be present in api data
+    :type api_columns: list
+    :param cd_flags: parameter to indicate inflow/outflow for a row
+    :type cd_flags: list
+    :param date_format: string format for date
+    :type date_format: str
+    :param fill_memo: switch whether to fill blank memo with payee data
+    :type fill_memo: bool
+    :param currency_fix: value to divide all currency amounts by
+    :type currency_fix: float
+    :return: modified dataframe matching provided configuration values
+    :rtype: DataFrame
+    """
+    # set column names based on input column list
+    df.columns = input_columns
+    # debug to see what our df is like before transformation
+    logging.debug(f"\nInitial DF\n{df.head()}")
+    # merge duplicate input columns
+    merge_duplicate_columns(df, input_columns)
+    # add missing columns
+    add_missing_columns(df, input_columns, output_columns + api_columns)
+    # fix date format
+    df["Date"] = fix_date(df["Date"], date_format)
+    # fix inflow/outflow string formatting
+    df["Inflow"] = clean_monetary_values(df["Inflow"])
+    df["Outflow"] = clean_monetary_values(df["Outflow"])
+    # process Inflow/Outflow flags
+    df = cd_flag_process(df, cd_flags)
+    # fix amounts (convert negative inflows and outflows etc)
+    df = fix_amount(df, currency_fix)
+    # auto fill memo from payee if required
+    df = auto_memo(df, fill_memo)
+    # auto fill payee from memo
+    df = auto_payee(df)
+    # remove invalid rows
+    df = remove_invalid_rows(df)
+    # fill API-specific columns
+    df = fill_api_columns(df)
+    # display parsed line count
+    logging.info(f"Parsed {df.shape[0]} lines")
+    # view final dataframe
+    logging.debug(f"\nFinal DF\n{df.head(10)}")
+
+    return df
 
 
 def merge_duplicate_columns(

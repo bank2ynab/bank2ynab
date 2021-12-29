@@ -2,7 +2,7 @@ import logging
 from os.path import basename, dirname, isfile, join
 
 from dataframe_handler import DataframeHandler
-from transactionfile_reader import TransactionFileReader
+from transactionfile_reader import detect_encoding, get_files
 
 
 class BankHandler:
@@ -25,7 +25,7 @@ class BankHandler:
         self.transaction_data = list()
 
     def run(self) -> None:
-        transaction_reader = TransactionFileReader(
+        matching_files = get_files(
             name=self.config_dict["bank_name"],
             file_pattern=self.config_dict["input_filename"],
             try_path=self.config_dict["path"],
@@ -33,13 +33,13 @@ class BankHandler:
             ext=self.config_dict["ext"],
             prefix=self.config_dict["fixed_prefix"],
         )
-        for src_file in transaction_reader.files:
+        for src_file in matching_files:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
             try:
                 # perform preprocessing operations on file if required
                 self._preprocess_file(src_file)
                 # get file's encoding
-                src_encod = transaction_reader.detect_encoding(src_file)
+                src_encod = detect_encoding(src_file)
                 # create our base dataframe
 
                 df_handler = DataframeHandler()

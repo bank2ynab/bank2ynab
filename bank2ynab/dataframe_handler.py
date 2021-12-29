@@ -36,6 +36,7 @@ class DataframeHandler:
         api_columns: list,
         cd_flags: list,
         date_format: str,
+        date_dedupe: bool,
         fill_memo: bool,
         currency_fix: float,
     ) -> None:
@@ -64,6 +65,8 @@ class DataframeHandler:
         :type cd_flags: list
         :param date_format: string format for date
         :type date_format: str
+        :param date_dedupe: whether to fill in date with previous if blank
+        :type date_dedupe: bool
         :param fill_memo: switch whether to fill blank memo with payee data
         :type fill_memo: bool
         :param currency_fix: value to divide all currency amounts by
@@ -85,6 +88,7 @@ class DataframeHandler:
             api_columns=api_columns,
             cd_flags=cd_flags,
             date_format=date_format,
+            date_dedupe=date_dedupe,
             fill_memo=fill_memo,
             currency_fix=currency_fix,
         )
@@ -144,6 +148,7 @@ def parse_data(
     api_columns: list,
     cd_flags: list,
     date_format: str,
+    date_dedupe: bool,
     fill_memo: bool,
     currency_fix: float,
 ) -> pd.DataFrame:
@@ -160,6 +165,8 @@ def parse_data(
     :type cd_flags: list
     :param date_format: string format for date
     :type date_format: str
+    :param date_dedupe: whether to fill in date with previous if blank
+    :type date_dedupe: bool
     :param fill_memo: switch whether to fill blank memo with payee data
     :type fill_memo: bool
     :param currency_fix: value to divide all currency amounts by
@@ -177,6 +184,7 @@ def parse_data(
     add_missing_columns(df, input_columns, output_columns + api_columns)
     # fix date format
     df["Date"] = fix_date(df["Date"], date_format)
+    df["Date"] = fill_empty_dates(df["Date"], date_dedupe)
     # fix inflow/outflow string formatting
     df["Inflow"] = clean_monetary_values(df["Inflow"])
     df["Outflow"] = clean_monetary_values(df["Outflow"])
@@ -192,6 +200,8 @@ def parse_data(
     df = remove_invalid_rows(df)
     # fill API-specific columns
     df = fill_api_columns(df)
+    # remove invalid rows
+    df = remove_invalid_rows(df)
     # display parsed line count
     logging.info(f"Parsed {df.shape[0]} lines")
     # view final dataframe
@@ -352,6 +362,7 @@ def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
     # filter rows with an invalid date
     df.query("Date.notna()", inplace=True)
     df.fillna(0, inplace=True)
+    df.query("amount!=0", inplace=True)
     df.reset_index(inplace=True)
     return df
 
@@ -407,6 +418,24 @@ def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:
     logging.debug("\nFixed dates:\n{}".format(date_series.head()))
 
     return date_series.dt.strftime("%Y-%m-%d")
+
+
+def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
+    """
+    Fill in empty dates with values from previous cells.
+
+    :param date_series: data series to modify
+    :type date_series: pd.Series
+    :param fill_dates: whether to fill in empty dates or not
+    :type fill_dates: bool
+    :return: modified data series
+    :rtype: pd.Series
+    """
+    if fill_dates:
+        date_series[date_series == ""] = pd.NA
+        date_series.fillna(method="ffill", inplace=True)  # type:ignore
+
+    return date_series
 
 
 def fill_api_columns(

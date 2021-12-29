@@ -9,6 +9,7 @@ from bank2ynab.dataframe_handler import (
     cd_flag_process,
     clean_monetary_values,
     fill_api_columns,
+    fill_empty_dates,
     fix_amount,
     fix_date,
     merge_duplicate_columns,
@@ -230,9 +231,10 @@ class TestDataframeHandler(TestCase):
     def test_remove_invalid_rows(self):
         initial_df = pd.DataFrame(
             {
-                "Inflow": [10, 0, 30, 0, 66, NA, NA],
-                "Outflow": [0, 20, 40, 100, 0, NA, 77],
-                "Payee": ["a", "b", "c", "d", "e", "f", "g"],
+                "Inflow": [10, 0, 30, 0, 66, NA, NA, 0],
+                "Outflow": [0, 20, 40, 100, 0, NA, 77, 0],
+                "amount": [10, -20, -10, -100, 66, 0, -77, 0],
+                "Payee": ["a", "b", "c", "d", "e", "f", "g", "h"],
                 "Date": [
                     "28.09.2017",
                     "28.09.2017",
@@ -241,6 +243,7 @@ class TestDataframeHandler(TestCase):
                     NA,
                     "2017-09-28",
                     "2017-10-28",
+                    "2017-10-29",
                 ],
             }
         )
@@ -248,6 +251,7 @@ class TestDataframeHandler(TestCase):
             {
                 "Inflow": [10, 0, 30, 0, 0],
                 "Outflow": [0, 20, 40, 100, 77],
+                "amount": [10, -20, -10, -100, -77],
                 "Payee": ["a", "b", "c", "d", "g"],
                 "Date": [
                     "28.09.2017",
@@ -362,6 +366,33 @@ class TestDataframeHandler(TestCase):
                     pd.Series(data=test["data"]), test["date_format"]
                 )
                 pandas.testing.assert_series_equal(desired_output, test_series)
+
+    def test_fill_empty_dates(self):
+        """Test filling in of empty date values."""
+        test_series = pd.Series(
+            data={
+                "a": "2021-10-01",
+                "b": "2021-09-21",
+                "c": "",
+                "d": "2001-10-01",
+            }
+        )
+
+        target_filled_series = pd.Series(
+            data={
+                "a": "2021-10-01",
+                "b": "2021-09-21",
+                "c": "2021-09-21",
+                "d": "2001-10-01",
+            }
+        )
+
+        pandas.testing.assert_series_equal(
+            test_series, fill_empty_dates(test_series, False)
+        )
+        pandas.testing.assert_series_equal(
+            target_filled_series, fill_empty_dates(test_series, True)
+        )
 
     def test_fill_api_columns(self):
         """Test correct API column filling."""

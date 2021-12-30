@@ -432,7 +432,7 @@ def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
     :rtype: pd.Series
     """
     if fill_dates:
-        date_series[date_series == ""] = pd.NA
+        date_series.replace(r"^\s+$", pd.NA, regex=True)  # type:ignore
         date_series.fillna(method="ffill", inplace=True)  # type:ignore
 
     return date_series

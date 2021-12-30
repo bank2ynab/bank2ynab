@@ -5,6 +5,7 @@ from configparser import DuplicateSectionError, NoSectionError
 import requests
 
 from config_handler import ConfigHandler
+from ynab_api_response import YNABError
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -86,7 +87,7 @@ class YNAB_API:
             read_data = response.json()["data"][kwd]
         except KeyError:
             # the API has returned an error so let's handle it
-            return self.process_api_response(response.json()["error"])
+            raise YNABError(response.json()["error"]["id"])
         return read_data
 
     def process_transactions(self, transaction_data):
@@ -95,7 +96,7 @@ class YNAB_API:
         :param transactions: list of individual transaction dictionaries
         :return budget_t_data: dict of budget_ids ready-to-post transactions
         """
-        raise NotImplementedError
+        raise YNABError("400")
         """ logging.info("Processing transactions...")
         # go through each bank's data
         budget_t_data = {}
@@ -132,7 +133,8 @@ class YNAB_API:
 
         # response handling - TODO: make this more thorough!
         try:
-            self.process_api_response(json_data["error"])
+            # self.process_api_response(json_data["error"])
+            raise YNABError(json_data["error"]["id"])
         except KeyError:
             logging.info(
                 "Success: {} entries uploaded, {} entries skipped.".format(
@@ -184,32 +186,6 @@ class YNAB_API:
             # TODO: make this legible!
 
         return budget_ids
-
-    def process_api_response(self, details):
-        """
-        Prints details about errors returned by the YNAB api
-        :param details: dictionary of returned error info from the YNAB api
-        :return id: HTTP error ID
-        :return detail: human-understandable explanation of error
-        """
-        # TODO: make this function into a general response handler instead
-        errors = {
-            "400": "Bad syntax or validation error",
-            "401": "API access token missing, invalid, revoked, or expired",
-            "403.1": "The subscription for this account has lapsed.",
-            "403.2": "The trial for this account has expired.",
-            "404.1": "The specified URI does not exist.",
-            "404.2": "Resource not found",
-            "409": "Conflict error",
-            "429": "Too many requests. Wait a while and try again.",
-            "500": "Unexpected error",
-        }
-        id = details["id"]
-        name = details["name"]
-        detail = errors[id]
-        logging.error(f"{id} - {detail} ({name})")
-
-        return ["ERROR", id, detail]
 
     def select_account(self, bank):
         account_id = ""

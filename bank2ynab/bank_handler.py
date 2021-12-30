@@ -7,16 +7,16 @@ from transactionfile_reader import detect_encoding, get_files
 
 class BankHandler:
     """
-    handle the flow for data input, parsing, and data output
-    for a given bank configuration
+    Handle the flow for data input, parsing, and data output
+    for a given bank configuration.
     """
 
     def __init__(self, config_dict: dict) -> None:
-        # TODO revise this docstring
         """
-        load bank-specific configuration parameters
+        Initialise object and load bank-specific configuration parameters.
 
-        :param config_dict: bank's configuration
+        :param config_dict: dictionary of all banks' configurations with
+        the bank names as keys.
         :type config_dict: dict
         """
         self.name = config_dict.get("bank_name", "DEFAULT")

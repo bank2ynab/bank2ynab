@@ -1,4 +1,5 @@
 from unittest import TestCase
+import unittest
 
 import pandas as pd
 import pandas.testing
@@ -26,6 +27,7 @@ class TestDataframeHandler(TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
+    @unittest.skip("Not tested yet.")
     def test_read_csv(self):
         """Test reading of CSV file into dataframe."""
         """
@@ -37,6 +39,7 @@ class TestDataframeHandler(TestCase):
         """
         raise NotImplementedError
 
+    @unittest.skip("Not tested yet.")
     def test_parse_data(self):
         """Test full parsing workflow."""
         """

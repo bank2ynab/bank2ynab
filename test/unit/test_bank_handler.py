@@ -1,7 +1,7 @@
-import sys
+import unittest
 from unittest import TestCase
 
-# from bank2ynab.bank_handler import BankHandler
+from bank2ynab.bank_handler import BankHandler
 
 
 class TestBankHandler(TestCase):
@@ -11,11 +11,16 @@ class TestBankHandler(TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
-    def test_test(self):
-        print(f"\n\nSys: {sys.path}\n")
-        # test_bank_handler = BankHandler(dict())
-        # test_bank_handler.run()
-        self.assertEqual(1, 1)
+    def test_preprocess_file(self):
+        """Test that preprocess file returns the unchanged filepath."""
+        path = "test"
+        test_bank_handler = BankHandler({})
+        test_path = test_bank_handler._preprocess_file(path, [])
+        self.assertEqual(path, test_path)
+
+    @unittest.skip("Not tested yet.")
+    def test_get_output_path(self):
+        raise NotImplementedError
 
     '''def test_init_and_name(self):
         """Check parameters are correctly stored in the object."""
@@ -24,26 +29,6 @@ class TestBankHandler(TestCase):
         self.assertEqual(self.b.config, cfe)
         self.assertEqual("DEFAULT", self.b.name)'''
 
-    '''def test_get_files(self):
-        """Test it's finding the right amount of files"""
-        # if you need more tests, add sections to test.conf & specify them here
-        for section_name, num_files in [
-            ("test_num_files", 2),
-            ("test_num_files_noexist", 0),
-            ("test_num_files_extension", 0),
-            ("test_regex", 1),
-            ("test_regex_noexist", 0),
-        ]:
-
-            config = fix_conf_params(self.cp, section_name)
-            config["path"] = join(get_project_dir(), config["path"])
-            b = B2YBank(config)
-            files = b.get_files()
-            self.assertEqual(len(files), num_files)
-            # hack config to make sure we can deal with absolute paths too
-            b.config["path"] = abspath(self.test_data)
-            files = b.get_files()
-            self.assertEqual(len(files), num_files)'''
     """
     def run(self) -> list:
         transaction_reader = TransactionFileReader(
@@ -107,32 +92,8 @@ class TestBankHandler(TestCase):
 
         """
     """
-    def write_data(self, path: str, df_handler: DataframeHandler) -> str:
 
-        write out the new CSV file
-
-        :param path: path to output file
-        :type path: str
-        :param df: cleaned data ready to output
-        :type df: DataFrame
-        :return: target filename
-        :rtype: str
-
-        target_dir = dirname(path)
-        target_fname = basename(path)[:-4]
-        fixed_prefix = self.config_dict["fixed_prefix"]
-        new_filename = f"{fixed_prefix}{target_fname}.csv"
-        while isfile(new_filename):
-            counter = 1
-            new_filename = f"{fixed_prefix}{target_fname}_{counter}.csv"
-            counter += 1
-        target_filename = join(target_dir, new_filename)
-        logging.info(f"Writing output file: {target_filename}")
-        # write dataframe to csv
-        df_handler.output_csv(target_filename)
-        return target_filename
-    """
-    """def test_write_data(self):
+    def test_write_data(self):
 
         Test that the right amount of files are created
         and that the file paths end up where we expect
@@ -157,9 +118,3 @@ class TestBankHandler(TestCase):
                 self.assertEqual(expected_file, result_file)
                 # todo: check actual contents are what we expect
                 os.unlink(expected_file)"""
-
-
-"""
-    def test_preprocess_file(self):
-        raise NotImplementedError
-"""

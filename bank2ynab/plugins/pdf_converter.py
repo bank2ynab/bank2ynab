@@ -44,7 +44,7 @@ class PDF_Converter(BankHandler):
         # write the dataframe to output file
         combined_df.to_csv(new_path, index=False)
         logging.info("\tFinished converting PDF file.")
-        # return the path the the output file
+        # return the path of the output file
         return new_path
 
 

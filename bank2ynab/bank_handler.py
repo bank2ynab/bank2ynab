@@ -103,15 +103,16 @@ class BankHandler:
         target_fname = basename(path)[:-4]
         fixed_prefix = self.config_dict["fixed_prefix"]
         new_filename = f"{fixed_prefix}{target_fname}.csv"
-        while isfile(new_filename):
-            counter = 1
+        new_path = join(target_dir, new_filename)
+        counter = 1
+        while isfile(new_path):
             new_filename = f"{fixed_prefix}{target_fname}_{counter}.csv"
+            new_path = join(target_dir, new_filename)
             counter += 1
-        target_filename = join(target_dir, new_filename)
-        logging.info(f"Writing output file: {target_filename}")
+        logging.info(f"Writing output file: {new_path}")
         # write dataframe to csv
-        df_handler.output_csv(target_filename)
-        return target_filename
+        df_handler.output_csv(new_path)
+        return new_path
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """

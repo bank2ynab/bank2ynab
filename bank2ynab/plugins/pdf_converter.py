@@ -1,9 +1,8 @@
 import logging
-import os
 
 import pandas as pd
 import pdfplumber
-from bank_handler import BankHandler
+from bank_handler import BankHandler, get_output_path
 
 
 class PDF_Converter(BankHandler):
@@ -17,7 +16,11 @@ class PDF_Converter(BankHandler):
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         logging.info("Converting PDF file...")
         # generate output path
-        new_path = get_output_path(file_path, self.config["bank_name"])
+        new_path = get_output_path(
+            input_path=file_path,
+            prefix=f"Converted PDF_{self.config['bank_name']}_",
+            ext=".csv",
+        )
         # create the pdf object
         pdf = pdfplumber.open(file_path)
         # create empty dataframe
@@ -43,18 +46,6 @@ class PDF_Converter(BankHandler):
         logging.info("\tFinished converting PDF file.")
         # return the path the the output file
         return new_path
-
-
-def get_output_path(original_path: str, bank_name: str) -> str:
-    target_dir = os.path.dirname(original_path)
-    new_filename = f"converted pdf statement - {bank_name}.csv"
-    new_path = os.path.join(target_dir, new_filename)
-    counter = 1
-    while os.path.isfile(new_path):
-        new_filename = f"converted pdf statement - {bank_name}_{counter}.csv"
-        new_path = os.path.join(target_dir, new_filename)
-        counter += 1
-    return new_path
 
 
 def build_bank(config):

@@ -71,7 +71,13 @@ class BankHandler:
                 # make sure our data is not blank before writing
                 if not df_handler.df.empty:
                     # write export file
-                    self.write_data(src_file, df_handler)
+                    output_path = get_output_path(
+                        input_path=src_file,
+                        prefix=self.config_dict["fixed_prefix"],
+                        ext=self.config_dict["output_ext"],
+                    )
+                    logging.info(f"Writing output file: {output_path}")
+                    df_handler.output_csv(output_path)
                     # save transaction data for each bank to object
                     self.transaction_data.append(
                         df_handler.api_transaction_data
@@ -88,32 +94,6 @@ class BankHandler:
                         "No output data from this file for this bank."
                     )
 
-    def write_data(self, path: str, df_handler: DataframeHandler) -> str:
-        """
-        write out the new CSV file
-
-        :param path: path to output file
-        :type path: str
-        :param df: cleaned data ready to output
-        :type df: DataFrame
-        :return: target filename
-        :rtype: str
-        """
-        target_dir = dirname(path)
-        target_fname = basename(path)[:-4]
-        fixed_prefix = self.config_dict["fixed_prefix"]
-        new_filename = f"{fixed_prefix}{target_fname}.csv"
-        new_path = join(target_dir, new_filename)
-        counter = 1
-        while isfile(new_path):
-            new_filename = f"{fixed_prefix}{target_fname}_{counter}.csv"
-            new_path = join(target_dir, new_filename)
-            counter += 1
-        logging.info(f"Writing output file: {new_path}")
-        # write dataframe to csv
-        df_handler.output_csv(new_path)
-        return new_path
-
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
         exists solely to be used by plugins for pre-processing a file
@@ -122,3 +102,25 @@ class BankHandler:
         """
         # intentionally empty - plugins can use this function
         return file_path
+
+
+def get_output_path(input_path: str, prefix: str, ext: str) -> str:
+    """
+    Generate the name of the output file.
+
+    :param path: path to output file
+    :type path: str
+    :return: target filename
+    :rtype: str
+    """
+    target_dir = dirname(input_path)
+    target_fname = basename(input_path)[:-4]
+
+    new_filename = f"{prefix}{target_fname}{ext}"
+    new_path = join(target_dir, new_filename)
+    counter = 1
+    while isfile(new_path):
+        new_filename = f"{prefix}{target_fname}_{counter}{ext}"
+        new_path = join(target_dir, new_filename)
+        counter += 1
+    return new_path

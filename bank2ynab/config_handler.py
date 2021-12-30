@@ -77,6 +77,9 @@ class ConfigHandler:
             "fixed_prefix": self.get_config_line_str(
                 section, "Output Filename Prefix"
             ),
+            "output_ext": self.get_config_line_str(
+                section, "Output Filename Extension"
+            ),
             "input_delimiter": self.get_config_line_str(
                 section, "Source CSV Delimiter"
             ),

@@ -1,5 +1,6 @@
 import logging
 from os.path import basename, dirname, isfile, join
+from typing import Any
 
 from dataframe_handler import DataframeHandler
 from transactionfile_reader import detect_encoding, get_files
@@ -11,7 +12,7 @@ class BankHandler:
     for a given bank configuration.
     """
 
-    def __init__(self, config_dict: dict) -> None:
+    def __init__(self, config_dict: dict[str, Any]) -> None:
         """
         Initialise object and load bank-specific configuration parameters.
 
@@ -21,8 +22,8 @@ class BankHandler:
         """
         self.name = config_dict.get("bank_name", "DEFAULT")
         self.config_dict = config_dict
-        self.bank_files_processed = 0
-        self.transaction_data = list()
+        self.files_processed = 0
+        self.transaction_string: str = str()
 
     def run(self) -> None:
         matching_files = get_files(
@@ -33,6 +34,9 @@ class BankHandler:
             ext=self.config_dict["ext"],
             prefix=self.config_dict["fixed_prefix"],
         )
+
+        individual_file_transactions: list[str] = list()
+
         for src_file in matching_files:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
             try:
@@ -62,7 +66,7 @@ class BankHandler:
                     currency_fix=self.config_dict["currency_mult"],
                 )
 
-                self.bank_files_processed += 1
+                self.files_processed += 1
             except ValueError as e:
                 logging.info(
                     f"No output data from this file for this bank. ({e})"
@@ -78,8 +82,8 @@ class BankHandler:
                     )
                     logging.info(f"Writing output file: {output_path}")
                     df_handler.output_csv(output_path)
-                    # save transaction data for each bank to object
-                    self.transaction_data.append(
+                    # save api transaction data for each bank to object list
+                    individual_file_transactions.append(
                         df_handler.api_transaction_data
                     )
                     # delete original csv file
@@ -93,8 +97,13 @@ class BankHandler:
                     logging.info(
                         "No output data from this file for this bank."
                     )
+        # don't add empty transactions
+        if individual_file_transactions:
+            self.transaction_string = merge_transaction_output(
+                individual_file_transactions
+            )
 
-    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
+    def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str:
         """
         exists solely to be used by plugins for pre-processing a file
         that otherwise can be read normally (e.g. weird format)
@@ -102,6 +111,22 @@ class BankHandler:
         """
         # intentionally empty - plugins can use this function
         return file_path
+
+
+def merge_transaction_output(transaction_list: list[str]) -> str:
+    """
+    Merge the generated transaction strings by removing the
+    square parentheses and inserting a comma between each.
+
+    :param transaction_list: list of transaction strings from each file
+    :type transaction_list: list[str]
+    :return: combined transaction string
+    :rtype: str
+    """
+    modified_list = map(lambda x: x[1:-1], transaction_list)
+    merged_string = f"[{','.join(modified_list)}]"
+
+    return merged_string
 
 
 def get_output_path(input_path: str, prefix: str, ext: str) -> str:

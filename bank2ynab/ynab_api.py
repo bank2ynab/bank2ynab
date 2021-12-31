@@ -31,7 +31,7 @@ class YNAB_API:
         self.api_token = self.config_handler.config.get(
             "DEFAULT", "YNAB API Access Token"
         )
-        # self.api_token = 0  # debug - TODO remove line
+
         self.user_config_handler = ConfigHandler(user_mode=True)
         self.user_config = self.user_config_handler.config
         self.user_config_path = self.user_config_handler.user_conf_path
@@ -39,155 +39,56 @@ class YNAB_API:
         # TODO: Fix debug structure, so it will be used in logging instead
         self.debug = False
 
-    def run(self, transaction_data):
+    def run(self, transaction_data: dict[str, str]):
         if self.api_token is not None:
             logging.info("Connecting to YNAB API...")
             logging.debug(transaction_data)
-            # check for API token auth (and other errors)
-            error_code = self.list_budgets()
-            if error_code[0] == "ERROR":
-                return error_code
-            else:
-                # generate our list of budgets
-                budget_ids = self.list_budgets()
-                # if there's only one budget, silently set a default budget
-                if len(budget_ids) == 1:
-                    self.budget_id = budget_ids[0][1]
+            # get the list of budgets
+            budget_ids = list_budgets(api_token=self.api_token)
+            # if there's only one budget, silently set a default budget
+            if len(budget_ids) == 1:
+                self.budget_id = budget_ids[0][1]
 
-                budget_t_data = self.process_transactions(transaction_data)
-                for budget in budget_ids:
-                    id = budget[1]
-                    try:
-                        self.post_transactions(id, budget_t_data[id])
-                    except KeyError:
-                        logging.info(
-                            "No transactions to upload for {budget[0]}."
-                        )
+            budget_transactions = self.process_transactions(transaction_data)
+
+            for budget in budget_ids:
+                id = budget[1]
+                try:
+                    post_transactions(
+                        api_token=self.api_token,
+                        budget_id=id,
+                        transaction_data=budget_transactions[id],
+                    )
+                except KeyError:
+                    logging.info(f"No transactions to upload for {budget[0]}.")
         else:
             logging.info("No API-token provided.")
 
-    def api_read(self, budget_id, kwd):
+    def process_transactions(self, transaction_data: dict[str, str]) -> dict:
         """
-        General function for reading data from YNAB API
-        :param  budget: boolean indicating if there's a default budget
-        :param  kwd: keyword for data type, e.g. transactions
-        :return error_codes: if it fails we return our error
+        :param transaction_data: dict of bank names:combined transaction string
+        :return budget_json_dict: dict of budget_ids:ready-to-post transactions
         """
-        api_t = self.api_token
-        base_url = "https://api.youneedabudget.com/v1/budgets/"
-
-        if budget_id is None:
-            # only happens when we're looking for the list of budgets
-            url = base_url + f"?access_token={api_t}"
-        else:
-            url = base_url + f"{budget_id}/{kwd}?access_token={api_t}"
-
-        response = requests.get(url)
-        try:
-            read_data = response.json()["data"][kwd]
-        except KeyError:
-            # the API has returned an error so let's handle it
-            raise YNABError(response.json()["error"]["id"])
-        return read_data
-
-    def process_transactions(self, transaction_data):
-        """
-        :param transaction_data: dict of bank names to transaction lists
-        :param transactions: list of individual transaction dictionaries
-        :return budget_t_data: dict of budget_ids ready-to-post transactions
-        """
-        raise YNABError("400")
-        """ logging.info("Processing transactions...")
-        # go through each bank's data
-        budget_t_data = {}
-        budget_transactions = []
-        for bank in transaction_data:
-            # what budget and account to write this bank's transactions to
+        logging.info("Processing transactions...")
+        budget_json_dict: dict[str, str] = dict()
+        # get transactions for each bank
+        for bank in transaction_data.keys():
+            # get the budget ID and Account ID to write to
             budget_id, account_id = self.select_account(bank)
-            # save transaction data for each bank in main list
             account_transactions = transaction_data[bank]
 
-            try:
-                budget_transactions = budget_t_data[budget_id]["transactions"]
-            except KeyError:
-                budget_transactions = []
-                budget_t_data[budget_id] = {"transactions": []}
-            for t in account_transactions[1:]:
-                trans_dict = self.create_transaction(
-                    account_id, t, budget_transactions
-                )
-                budget_transactions.append(trans_dict)
-            budget_t_data[budget_id]["transactions"] = budget_transactions
-        return budget_t_data """
-
-    def post_transactions(self, budget_id, data):
-        # send our data to API
-        logging.info("Uploading transactions to YNAB...")
-        url = (
-            "https://api.youneedabudget.com/v1/budgets/"
-            + f"{budget_id}/transactions?access_token={self.api_token}"
-        )
-
-        post_response = requests.post(url, json=data)
-        json_data = json.loads(post_response.text)
-
-        # response handling - TODO: make this more thorough!
-        try:
-            # self.process_api_response(json_data["error"])
-            raise YNABError(json_data["error"]["id"])
-        except KeyError:
-            logging.info(
-                "Success: {} entries uploaded, {} entries skipped.".format(
-                    len(json_data["data"]["transaction_ids"]),
-                    len(json_data["data"]["duplicate_import_ids"]),
-                )
+            # insert account_id into each transaction
+            account_transactions = account_transactions.replace(
+                '"account_id":""', f'"account_id":"{account_id}"'
             )
+            if budget_id in budget_json_dict:
+                budget_json_dict[budget_id] += account_transactions
+            else:
+                budget_json_dict.setdefault(budget_id, account_transactions)
 
-    def list_transactions(self):
-        transactions = self.api_read(True, "transactions")
-        if transactions[0] == "ERROR":
-            return transactions
+        return budget_json_dict
 
-        if len(transactions) > 0:
-            logging.debug("Listing transactions:")
-            for t in transactions:
-                logging.debug(t)
-        else:
-            logging.debug("no transactions found")
-
-    def list_accounts(self, budget_id):
-        accounts = self.api_read(budget_id, "accounts")
-        if accounts[0] == "ERROR":
-            return accounts
-
-        account_ids = list()
-        if len(accounts) > 0:
-            for account in accounts:
-                account_ids.append([account["name"], account["id"]])
-                # debug messages
-                logging.debug(f"id: {account['id']}")
-                logging.debug(f"on_budget: {account['on_budget']}")
-                logging.debug(f"closed: {account['closed']}")
-        else:
-            logging.info("no accounts found")
-
-        return account_ids
-
-    def list_budgets(self):
-        budgets = self.api_read(None, "budgets")
-        if budgets[0] == "ERROR":
-            return budgets
-
-        budget_ids = list()
-        for budget in budgets:
-            budget_ids.append([budget["name"], budget["id"]])
-
-            # commented out because this is a bit messy and confusing
-            # TODO: make this legible!
-
-        return budget_ids
-
-    def select_account(self, bank):
+    def select_account(self, bank: str):
         account_id = ""
         budget_id = ""
         # check if bank has account associated with it already
@@ -205,19 +106,21 @@ class YNAB_API:
             logging.info(f"No user configuration for {bank} found.")
 
         if account_id == "":
-            instruction = "No YNAB {} for transactions from {} set!\n Pick {}"
+            instruction = "No YNAB {} for transactions from {} set!\nPick {}"
             # if no default budget, build budget list and select budget
             if self.budget_id is None:
                 # msg =
                 # "No YNAB budget for {} set! \nPick a budget".format(bank)
                 msg = instruction.format("budget", bank, "a budget")
-                budget_ids = self.list_budgets()
+                budget_ids = list_budgets(api_token=self.api_token)
                 budget_id = option_selection(budget_ids, msg)
             else:
                 budget_id = self.budget_id
 
             # build account list and select account
-            account_ids = self.list_accounts(budget_id)
+            account_ids = list_accounts(
+                api_token=self.api_token, budget_id=budget_id
+            )
             # msg = "Pick a YNAB account for transactions from {}".format(bank)
             msg = instruction.format("account", bank, "an account")
             account_id = option_selection(account_ids, msg)
@@ -235,7 +138,7 @@ class YNAB_API:
         return budget_id, account_id
 
     def save_account_selection(self, bank, budget_id, account_id):
-        # TODO move config saving to the ConfigHandler class
+        # TODO move config saving to the ConfigHandler class?
         """
         saves YNAB account to use for each bank
         """
@@ -253,28 +156,111 @@ class YNAB_API:
             self.user_config.write(config_file)
 
 
-def option_selection(options, msg):
+def api_read(api_token: str, budget_id: str, keyword: str) -> dict:
     """
-    Used to select from a list of options
-    If only one item in list, selects that by default
-    Otherwise displays "msg" asking for input selection (integer only)
+    General function for reading data from YNAB API.
+
+    :param budget_id: ID of budget to access
+    :type budget_id: str
+    :param  keyword: keyword for data type, e.g. transactions
+    :type keyword: str
+    :raises YNABError: [description]
+    :return: [description]
+    :rtype: dict
+    """
+    base_url = "https://api.youneedabudget.com/v1/budgets/"
+
+    if budget_id == "":
+        # only happens when we're looking for the list of budgets
+        url = base_url + f"?access_token={api_token}"
+    else:
+        url = base_url + f"{budget_id}/{keyword}?access_token={api_token}"
+
+    response = requests.get(url)
+    try:
+        read_data = response.json()["data"][keyword]
+    except KeyError:
+        # the API has returned an error so let's handle it
+        raise YNABError(response.json()["error"]["id"])
+    return read_data
+
+
+def list_accounts(api_token: str, budget_id: str) -> list[list[str]]:
+    accounts = api_read(
+        api_token=api_token, budget_id=budget_id, keyword="accounts"
+    )
+
+    account_ids = list()
+    if len(accounts) > 0:
+        for account in accounts:
+            account_ids.append([account["name"], account["id"]])
+            # debug messages
+            logging.debug(f"id: {account['id']}")
+            logging.debug(f"on_budget: {account['on_budget']}")
+            logging.debug(f"closed: {account['closed']}")
+    else:
+        logging.info("no accounts found")
+
+    return account_ids
+
+
+def list_budgets(api_token: str) -> list[str]:
+    budgets = api_read(api_token=api_token, budget_id="", keyword="budgets")
+    budget_ids = list()
+    for budget in budgets:
+        budget_ids.append([budget["name"], budget["id"]])
+    return budget_ids
+
+
+def post_transactions(
+    api_token: str, budget_id: str, transaction_data: str
+) -> None:
+    # send our data to API
+
+    logging.info("Uploading transactions to YNAB...")
+    url = (
+        "https://api.youneedabudget.com/v1/budgets/"
+        + f"{budget_id}/transactions?access_token={api_token}"
+    )
+    data = "{data:{transactions:" + transaction_data + "} }"
+    print(data)
+    post_response = requests.post(url, json=data)
+    json_data = json.loads(post_response.text)
+
+    # response handling - TODO: make this more thorough!
+    try:
+        raise YNABError(json_data["error"]["id"])
+    except KeyError:
+        logging.info(
+            f"Success: {len(json_data['data']['transaction_ids'])}"
+            " entries uploaded,"
+            f" {len(json_data['data']['duplicate_import_ids'])}"
+            " entries skipped."
+        )
+
+
+def option_selection(options: list, msg: str) -> str:
+    """
+    Used to select from a list of options.
+    If only one item in list, selects that by default.
+    Otherwise displays "msg" asking for input selection (integer only).
+
     :param options: list of [name, option] pairs to select from
     :param msg: the message to display on the input line
     :return option_selected: the selected item from the list
     """
+    print("\n")
     selection = 1
     count = len(options)
     if count > 1:
-        index = 0
-        for option in options:
-            index += 1
-            print(f"| {index} | {option[0]}")
+        for index, option in enumerate(options):
+            print(f"| {index+1} | {option[0]}")
         selection = int_input(1, count, msg)
     option_selected = options[selection - 1][1]
     return option_selected
 
 
-def int_input(min, max, msg):
+def int_input(min: int, max: int, msg: str) -> int:
     """
     Makes a user select an integer between min & max stated values
     :param  min: the minimum acceptable integer value

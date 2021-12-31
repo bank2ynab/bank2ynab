@@ -17,6 +17,6 @@ if __name__ == "__main__":
     else:
         bank_iterator = BankIterator(config_handler)
         bank_iterator.run()
-        if bank_iterator.transaction_data:
+        if bank_iterator.bank_transaction_dict:
             api = YNAB_API(config_handler)
-            api.run(bank_iterator.transaction_data)
+            api.run(bank_iterator.bank_transaction_dict)

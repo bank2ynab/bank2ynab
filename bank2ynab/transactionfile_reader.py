@@ -14,7 +14,7 @@ def get_files(
     regex_active: bool,
     ext: str,
     prefix: str,
-) -> list:
+) -> list[str]:
     """
     Returns list of files matching the specified search parameters.
 
@@ -34,7 +34,7 @@ def get_files(
     :rtype: list
     """
 
-    files = list()
+    files: list[str] = list()
     missing_dir = False
     path = ""
     if file_pattern != "":

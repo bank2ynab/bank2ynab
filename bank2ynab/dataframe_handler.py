@@ -31,10 +31,10 @@ class DataframeHandler:
         header_rows: int,
         footer_rows: int,
         encod: str,
-        input_columns: list,
-        output_columns: list,
-        api_columns: list,
-        cd_flags: list,
+        input_columns: list[str],
+        output_columns: list[str],
+        api_columns: list[str],
+        cd_flags: list[str],
         date_format: str,
         date_dedupe: bool,
         fill_memo: bool,
@@ -143,10 +143,10 @@ def read_csv(
 def parse_data(
     *,
     df: pd.DataFrame,
-    input_columns: list,
-    output_columns: list,
-    api_columns: list,
-    cd_flags: list,
+    input_columns: list[str],
+    output_columns: list[str],
+    api_columns: list[str],
+    cd_flags: list[str],
     date_format: str,
     date_dedupe: bool,
     fill_memo: bool,
@@ -223,7 +223,7 @@ def merge_duplicate_columns(
     """
 
     # create dictionary mapping column names to indices of duplicates
-    cols_to_merge = dict()
+    cols_to_merge: dict[str, list[int]] = dict()
     for index, col in enumerate(input_columns):
         if col not in cols_to_merge:
             cols_to_merge[col] = []
@@ -231,7 +231,7 @@ def merge_duplicate_columns(
 
     # go through each key
     for key in cols_to_merge:
-        key_cols = cols_to_merge[key]
+        key_cols: list[int] = cols_to_merge[key]
         if len(key_cols) > 1:
             # change first column to string
             df.iloc[:, key_cols[0]] = df.iloc[:, key_cols[0]].astype(str) + " "
@@ -273,7 +273,7 @@ def add_missing_columns(
     return df
 
 
-def cd_flag_process(df: pd.DataFrame, cd_flags: list) -> pd.DataFrame:
+def cd_flag_process(df: pd.DataFrame, cd_flags: list[str]) -> pd.DataFrame:
     """
     fix columns where inflow/outflow is indicated by a flag
     in a separate column
@@ -343,8 +343,8 @@ def clean_monetary_values(num_series: pd.Series) -> pd.Series:
         inplace=True,
     )
     # fill in null values with 0
-    num_series.fillna(value=0, inplace=True)
-    return num_series.astype(float)
+    return_series: pd.Series[float] = num_series.fillna(value=0).astype(float)
+    return return_series
 
 
 def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
@@ -408,16 +408,16 @@ def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:
     :return: modified dataframe
     :rtype: Series
     """
-    date_series = pd.to_datetime(
+    formatted_date_series = pd.to_datetime(
         date_series,
         format=date_format,
         infer_datetime_format=True,
         errors="coerce",
-    )
+    ).dt.strftime("%Y-%m-%d")
 
     logging.debug("\nFixed dates:\n{}".format(date_series.head()))
 
-    return date_series.dt.strftime("%Y-%m-%d")
+    return formatted_date_series
 
 
 def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
@@ -475,6 +475,6 @@ def fill_api_columns(
 
 def output_json_transactions(
     df: pd.DataFrame,
-) -> dict[str, str]:
+) -> str:
 
-    return {"transactions": df.to_json(orient="records")}
+    return df.to_json(orient="records")

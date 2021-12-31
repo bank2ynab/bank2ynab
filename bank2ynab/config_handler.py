@@ -1,6 +1,7 @@
 import configparser
 import logging
 import os
+from typing import Any
 
 
 class ConfigHandler:
@@ -21,7 +22,7 @@ class ConfigHandler:
     def get_configs(self) -> configparser.RawConfigParser:
         """Retrieve all configuration parameters."""
 
-        conf_files = []
+        conf_files: list[str] = []
 
         if not self.user_mode:
             conf_files.append(self.bank_conf_path)
@@ -38,7 +39,7 @@ class ConfigHandler:
             config.read(conf_files, encoding="utf-8")
             return config
 
-    def fix_conf_params(self, section: str) -> dict:
+    def fix_conf_params(self, section: str) -> dict[str, Any]:
         """from a ConfigParser object, return a dictionary of all parameters
         for a given section in the expected format.
         Because ConfigParser defaults to values under [DEFAULT] if present,
@@ -173,7 +174,7 @@ class ConfigHandler:
 
     def get_config_line_lst(
         self, section_name: str, param: str, splitter: str
-    ) -> list:
+    ) -> list[Any]:
         """
         Returns a list value from a given section in the config object.
 

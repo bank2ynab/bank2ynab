@@ -514,4 +514,4 @@ class TestDataframeHandler(TestCase):
             '"category_id":null,"approved":false,"flag_color":null}]'
         )
 
-        self.assertEqual(expected_output, json_output["transactions"])
+        self.assertEqual(expected_output, json_output)

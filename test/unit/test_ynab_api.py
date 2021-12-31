@@ -1,3 +1,91 @@
+import unittest
+from unittest import TestCase
+
+from bank2ynab.ynab_api import YNAB_API
+from requests.api import patch
+
+
+class TestYNAB_API(TestCase):
+    def setUp(self) -> None:
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        return super().tearDown()
+
+    @unittest.skip("Not tested yet.")
+    def test_init(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_run(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_api_read(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_process_transactions(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_post_transactions(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_list_transactions(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_list_accounts(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_list_budgets(self):
+        raise NotImplementedError
+
+    @patch("ynab_api.option_selection")
+    @patch.object(YNAB_API, "list_accounts")
+    def test_select_account(self, mock_list_acs, mock_option_sel):
+        """
+        Test account selection logic
+        """
+        test_class = YNAB_API(self.cp)
+        test_banks = [
+            ("test_api_existing_bank", "Test Budget ID 1", "Test Account ID"),
+            ("test_api_existing_bank_2", "Test Budget ID 2", "ID #2"),
+        ]
+        test_class.config_path = self.TEMPCONFPATH
+        test_class.config_handler = configparser.RawConfigParser()
+        test_class.config_handler.read(test_class.config_path)
+
+        mock_ids = [
+            ("Account 1", "Test Budget ID 1", "ID #1"),
+            ("Account 2", "Test Budget ID 2", "ID #2"),
+            ("Account 3", "Test Budget ID 1", "ID #3"),
+        ]
+        mock_list_acs.return_value = mock_ids
+        mock_option_sel.side_effect = ["Test Budget ID 2", "ID #2"]
+
+        for bank, budget_id, ac_id in test_banks:
+            with self.subTest("Test account selection."):
+                b_id, a_id = test_class.select_account(bank)
+                self.assertEqual(b_id, budget_id)
+                self.assertEqual(a_id, ac_id)
+
+    @unittest.skip("Not tested yet.")
+    def test_save_account_selection(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_option_selection(self):
+        raise NotImplementedError
+
+    @unittest.skip("Not tested yet.")
+    def test_int_input(self):
+        raise NotImplementedError
+
+
 # # commented out pending test rework
 
 # # import os
@@ -406,35 +494,6 @@
 #             return ["ERROR", id, detail]
 #         """
 
-#     @unittest.skip("Test not implemented yet")
-#     @patch("b2y_utilities.option_selection")
-#     @patch.object(YNAB_API, "list_accounts")
-#     def test_select_account(self, mock_list_acs, mock_option_sel):
-#         """
-#         Test account selection logic
-#         """
-#         test_class = YNAB_API(self.cp)
-#         test_banks = [
-#             ("test_api_existing_bank", "Test Budget ID 1",
-# "Test Account ID"),
-#             ("test_api_existing_bank_2", "Test Budget ID 2", "ID #2"),
-#         ]
-#         test_class.config_path = self.TEMPCONFPATH
-#         test_class.config_handler = configparser.RawConfigParser()
-#         test_class.config_handler.read(test_class.config_path)
-
-#         mock_ids = [
-#             ("Account 1", "Test Budget ID 1", "ID #1"),
-#             ("Account 2", "Test Budget ID 2", "ID #2"),
-#             ("Account 3", "Test Budget ID 1", "ID #3"),
-#         ]
-#         mock_list_acs.return_value = mock_ids
-#         mock_option_sel.side_effect = ["Test Budget ID 2", "ID #2"]
-
-#         for bank, budget_id, ac_id in test_banks:
-#             b_id, a_id = test_class.select_account(bank)
-#             self.assertEqual(b_id, budget_id)
-#             self.assertEqual(a_id, ac_id)
 
 #     @unittest.skip("Test not implemented yet")
 #     def test_save_account_selection(self):

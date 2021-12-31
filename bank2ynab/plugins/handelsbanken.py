@@ -6,28 +6,29 @@
 """
 
 import re
+from typing import Any
 
 from bank_handler import BankHandler
 
 
 class Handelsbanken(BankHandler):
-    def __init__(self, config_dict: dict):
+    def __init__(self, config_dict: dict[str, Any]):
         """
         :param config_dict: a dictionary of conf parameters
         """
         super(Handelsbanken, self).__init__(config_dict)
         self.name = "Handelsbanken"
 
-    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
+    def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str:
         """
         Strips HTML from input file, modifying the input file directly
         :param file_path: path to file
         """
         with open(file_path) as input_file:
-            output_rows = []
+            output_rows: list[list[str]] = list()
             for row in input_file:
                 cells = row.split(";")
-                new_row = []
+                new_row: list[str] = list()
                 for cell in cells:
                     es = re.findall(r"\\>.*?\\<", cell)
                     while "><" in es:
@@ -47,12 +48,12 @@ class Handelsbanken(BankHandler):
         return file_path
 
 
-def build_bank(config):
+def build_bank(config: dict[str, Any]) -> BankHandler:
     """This factory function is called from the main program,
-    and expected to return a B2YBank subclass.
+    and expected to return a BankHandler subclass.
     Without this, the module will fail to load properly.
 
     :param config: dict containing all available configuration parameters
-    :return: a B2YBank subclass instance
+    :return: a BankHandler subclass instance
     """
     return Handelsbanken(config)

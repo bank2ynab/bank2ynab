@@ -96,10 +96,8 @@ class DataframeHandler:
         self.empty = self.df.empty
         # set final columns & order for output file
         self.output_df = self.df[output_columns]
-        # set json output
-        self.api_transaction_data = output_json_transactions(
-            self.df[api_columns]
-        )
+        # set final columns & order for api output
+        self.api_transaction_df = self.df[api_columns]
 
 
 def read_csv(
@@ -314,7 +312,7 @@ def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
     df["Outflow"] = df["Outflow"] / currency_fix
 
     # create amount column for API (in milliunits)
-    df["amount"] = 1000 * (df["Inflow"] - df["Outflow"])
+    df["amount"] = (1000 * (df["Inflow"] - df["Outflow"])).astype(int)
     return df
 
 
@@ -449,10 +447,10 @@ def fill_api_columns(
     df["memo"] = df["Memo"].str.slice(0, 100)
     df["category"] = ""
     df["cleared"] = "cleared"
-    df["payee_id"] = None
-    df["category_id"] = None
+    df["payee_id"] = ""
+    df["category_id"] = ""
     df["approved"] = False
-    df["flag_color"] = None
+    df["flag_color"] = ""
 
     # import_id format = YNAB:amount:ISO-date:occurrences
     # Maximum 36 characters ("YNAB" + ISO-date = 10 characters)
@@ -473,8 +471,6 @@ def fill_api_columns(
     return df
 
 
-def output_json_transactions(
-    df: pd.DataFrame,
-) -> str:
-
-    return df.to_json(orient="records")
+def combine_dfs(df_list: list[pd.DataFrame]) -> pd.DataFrame:
+    merged_df = pd.concat(df_list, ignore_index=True).drop_duplicates()
+    return merged_df

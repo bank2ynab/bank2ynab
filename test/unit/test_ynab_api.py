@@ -1,8 +1,8 @@
 import unittest
 from unittest import TestCase
+from unittest.mock import patch
 
 from bank2ynab.ynab_api import YNAB_API
-from requests.api import patch
 
 
 class TestYNAB_API(TestCase):
@@ -24,9 +24,23 @@ class TestYNAB_API(TestCase):
     def test_api_read(self):
         raise NotImplementedError
 
-    @unittest.skip("Not tested yet.")
-    def test_process_transactions(self):
-        raise NotImplementedError
+    @patch.object(YNAB_API, "select_account")
+    def test_process_transactions(self, mock_account_selection):
+        mock_account_selection.return_value = "budget id", "account id"
+        tests = [
+            {"test": {}, "expected": {}},
+            {"test": {}, "expected": {}},
+        ]
+        for test in tests:
+            with self.subTest(
+                "Test different transaction dictionaries.", test=test
+            ):
+                test_dict = test["test"]
+                test_api_obj = YNAB_API()
+                test_output = test_api_obj.process_transactions(
+                    transaction_data=test_dict
+                )
+                self.assertDictEqual(test_dict["expected"], test_output)
 
     @unittest.skip("Not tested yet.")
     def test_post_transactions(self):
@@ -44,34 +58,35 @@ class TestYNAB_API(TestCase):
     def test_list_budgets(self):
         raise NotImplementedError
 
-    @patch("ynab_api.option_selection")
-    @patch.object(YNAB_API, "list_accounts")
-    def test_select_account(self, mock_list_acs, mock_option_sel):
-        """
-        Test account selection logic
-        """
-        test_class = YNAB_API(self.cp)
-        test_banks = [
-            ("test_api_existing_bank", "Test Budget ID 1", "Test Account ID"),
-            ("test_api_existing_bank_2", "Test Budget ID 2", "ID #2"),
-        ]
-        test_class.config_path = self.TEMPCONFPATH
-        test_class.config_handler = configparser.RawConfigParser()
-        test_class.config_handler.read(test_class.config_path)
+    # @patch("ynab_api.option_selection")
+    # @patch.object(YNAB_API, "list_accounts")
+    # def test_select_account(self, mock_list_acs, mock_option_sel):
+    #     """
+    #     Test account selection logic
+    #     """
+    #     test_class = YNAB_API(self.cp)
+    #     test_banks = [
+    #         ("test_api_existing_bank", "Test Budget ID 1",
+    # "Test Account ID"),
+    #         ("test_api_existing_bank_2", "Test Budget ID 2", "ID #2"),
+    #     ]
+    #     test_class.config_path = self.TEMPCONFPATH
+    #     test_class.config_handler = configparser.RawConfigParser()
+    #     test_class.config_handler.read(test_class.config_path)
 
-        mock_ids = [
-            ("Account 1", "Test Budget ID 1", "ID #1"),
-            ("Account 2", "Test Budget ID 2", "ID #2"),
-            ("Account 3", "Test Budget ID 1", "ID #3"),
-        ]
-        mock_list_acs.return_value = mock_ids
-        mock_option_sel.side_effect = ["Test Budget ID 2", "ID #2"]
+    #     mock_ids = [
+    #         ("Account 1", "Test Budget ID 1", "ID #1"),
+    #         ("Account 2", "Test Budget ID 2", "ID #2"),
+    #         ("Account 3", "Test Budget ID 1", "ID #3"),
+    #     ]
+    #     mock_list_acs.return_value = mock_ids
+    #     mock_option_sel.side_effect = ["Test Budget ID 2", "ID #2"]
 
-        for bank, budget_id, ac_id in test_banks:
-            with self.subTest("Test account selection."):
-                b_id, a_id = test_class.select_account(bank)
-                self.assertEqual(b_id, budget_id)
-                self.assertEqual(a_id, ac_id)
+    #     for bank, budget_id, ac_id in test_banks:
+    #         with self.subTest("Test account selection."):
+    #             b_id, a_id = test_class.select_account(bank)
+    #             self.assertEqual(b_id, budget_id)
+    #             self.assertEqual(a_id, ac_id)
 
     @unittest.skip("Not tested yet.")
     def test_save_account_selection(self):
@@ -81,137 +96,11 @@ class TestYNAB_API(TestCase):
     def test_option_selection(self):
         raise NotImplementedError
 
-    @unittest.skip("Not tested yet.")
+    @unittest.skip("Unsure how to test this in a way that makes sense.")
     def test_int_input(self):
+
         raise NotImplementedError
 
-
-# # commented out pending test rework
-
-# # import os
-
-# # from test.utils import get_project_dir, get_test_confparser
-# import unittest
-
-# # from os.path import join
-# # from shutil import copyfile
-# from unittest import TestCase
-# from unittest.mock import patch
-
-# from bank2ynab.ynab_api import YNAB_API
-
-
-# class Test_YNAB_API(TestCase):
-#     def setUp(self):
-#         # self.TESTCONFPATH =
-# join(get_project_dir(), "test-data", "test.conf")
-#         # self.TEMPCONFPATH = join(
-#         #     get_project_dir(), "test-data", "temp-test.conf"
-#         # )
-#         # self.cp = get_test_confparser()
-#         # self.defaults = dict(self.cp.defaults())
-#         self.test_class = None
-#         # copy config file to temp location
-#         # copyfile(self.TESTCONFPATH, self.TEMPCONFPATH)
-
-#     def tearDown(self):
-#         # delete temp config file
-#         # if os.path.exists(self.TEMPCONFPATH):
-#         #     os.remove(self.TEMPCONFPATH)
-#         pass  # debug
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_init_and_name(self):  # todo
-#         """Check parameters are correctly stored in the API object."""
-
-#         self.test_class = YNAB_API(self.defaults)
-#         cfe = copy(self.defaults)
-#         self.assertEqual(self.test_class.config, cfe)
-#         self.assertEqual("DEFAULT", self.test_class.name)
-
-#         """ def __init__(self, config_object, transactions=None):
-#         self.transactions = []
-#         self.account_ids = []
-#         self.config = configparser.RawConfigParser()
-#         self.config.read("user_configuration.conf")
-#         self.api_token = self.config.get("DEFAULT", "YNAB API Access Token")
-#         self.budget_id = None """
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_run(self):  # todo
-
-#         """if self.api_token is not None:
-#             logging.info("Connecting to YNAB API...")
-
-#             # check for API token auth (and other errors)
-#             error_code = self.list_budgets()
-#             if error_code[0] == "ERROR":
-#                 return error_code
-#             else:
-#                 # generate our list of budgets
-#                 budget_ids = self.list_budgets()
-#                 # if there's only one budget, silently set a default budget
-#                 if len(budget_ids) == 1:
-#                     self.budget_id = budget_ids[0]
-
-#                 budget_t_data = self.process_transactions(transaction_data)
-#                 for budget in budget_ids:
-#                     if budget_t_data[budget]["transactions"] != []:
-#                         self.post_transactions(budget_t_data[budget])
-#         else:
-#             logging.info("No API-token provided.")"""
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_api_read(self):  # todo
-
-#         """def api_read(self, budget, kwd):
-
-#         General function for reading data from YNAB API
-#         :param  budget: boolean indicating if there's a default budget
-#         :param  kwd: keyword for data type, e.g. transactions
-#         :return error_codes: if it fails we return our error
-
-#          id = self.budget_id
-#          api_t = self.api_token
-#          base_url = "https://api.youneedabudget.com/v1/budgets/"
-
-#          if budget is False:
-#              # only happens when we're looking for the list of budgets
-#              url = base_url + "?access_token={}".format(api_t)
-#          else:
-#              url = base_url + "{}/{}?access_token={}".format(id, kwd, api_t)
-
-#          response = requests.get(url)
-#          try:
-#              read_data = response.json()["data"][kwd]
-#          except KeyError:
-#              # the API has returned an error so let's handle it
-#              return self.process_api_response(response.json()["error"])
-#          return read_data"""
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_process_transactions(self):  # todo
-
-#         """:param transaction_data: dictionary of bank names to
-# transaction lists
-
-#         logging.info("Processing transactions...")
-#         # go through each bank's data
-#         transactions = []
-#         for bank in transaction_data:
-#             # choose what account to write this bank's transactions to
-#             account_id = self.select_account(bank)
-#             # save transaction data for each bank in main dict
-#             account_transactions = transaction_data[bank]
-#             for t in account_transactions[1:]:
-#                 trans_dict = self.create_transaction(
-#                     account_id, t, transactions)
-#                 transactions.append(trans_dict)
-#         # compile our data to post
-#         data = {
-#             "transactions": transactions
-#         }
-#         return data"""
 
 #     @unittest.skip("Test not implemented yet")
 #     def test_create_transaction(self):
@@ -374,125 +263,6 @@ class TestYNAB_API(TestCase):
 #         for amount, date, target_id in test_values:
 #             id = test_class.create_import_id(amount, date, test_transactions)
 #             self.assertEqual(id, target_id)
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_post_transactions(self):  # todo
-#         """
-#         def post_transactions(self, budget_id, data):
-#             # send our data to API
-#             logging.info("Uploading transactions to YNAB...")
-#             url = ("https://api.youneedabudget.com/v1/budgets/" +
-#                    "{}/transactions?access_token={}".format(
-#                        budget_id,
-#                        self.api_token))
-
-#             post_response = requests.post(url, json=data)
-
-#             # response handling - TODO: make this more thorough!
-#             try:
-#                 self.process_api_response(json.loads(post_response.text)["error"])
-#             except KeyError:
-#                 logging.info("Success!")
-#         """
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_list_transactions(self):  # todo
-#         """
-#         def list_transactions(self):
-#             transactions = self.api_read(True, "transactions")
-#             if transactions[0] == "ERROR":
-#                 return transactions
-
-#             if len(transactions) > 0:
-#                 logging.debug("Listing transactions:")
-#                 for t in transactions:
-#                     logging.debug(t)
-#             else:
-#                 logging.debug("no transactions found")
-#         """
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_list_accounts(self):  # todo
-#         """
-#         def list_accounts(self):
-#             accounts = self.api_read(True, "accounts")
-#             if accounts[0] == "ERROR":
-#                 return accounts
-
-#             account_ids = list()
-#             if len(accounts) > 0:
-#                 for account in accounts:
-#                     account_ids.append([account["name"], account["id"]])
-#                     # debug messages
-#                     logging.debug("id: {}".format(account["id"]))
-#                     logging.debug("on_budget: {}".
-# format(account["on_budget"]))
-#                     logging.debug("closed: {}".format(account["closed"]))
-#             else:
-#                 logging.info("no accounts found")
-
-#             return account_ids
-#         """
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_list_budgets(self):  # todo
-#         """
-#         def list_budgets(self):
-#             budgets = self.api_read(False, "budgets")
-#             if budgets[0] == "ERROR":
-#                 return budgets
-
-#             budget_ids = list()
-#             for budget in budgets:
-#                 budget_ids.append([budget["name"], budget["id"]])
-
-#                 commented out because this is a bit messy and confusing
-#                 # TODO: make this legible!
-#                 # debug messages:
-#                 # for key, value in budget.items():
-#                     if(type(value) is dict):
-#                         logging.debug("%s: " % str(key))
-#                         for subkey, subvalue in value.items():
-#                             logging.debug("  %s: %s" %
-#                                          (str(subkey), str(subvalue)))
-#                     else:
-#                         logging.debug("%s: %s" % (str(key), str(value)))
-
-#             return budget_ids
-#         """
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_process_api_response(self):  # todo
-#         """
-#         def process_api_response(self, details):
-
-#             Prints details about errors returned by the YNAB api
-#             :param details: dictionary of returned error info from the
-# YNAB api
-#             :return id: HTTP error ID
-#             :return detail: human-understandable explanation of error
-
-#             # TODO: make this function into a general response handler
-# instead
-#             errors = {
-#                 "400": "Bad syntax or validation error",
-#                 "401": "API access token missing, invalid,
-#                 revoked, or expired",
-#                 "403.1": "The subscription for this account has lapsed.",
-#                 "403.2": "The trial for this account has expired.",
-#                 "404.1": "The specified URI does not exist.",
-#                 "404.2": "Resource not found",
-#                 "409": "Conflict error",
-#                 "429": "Too many requests. Wait a while and try again.",
-#                 "500": "Unexpected error"
-#             }
-#             id = details["id"]
-#             name = details["name"]
-#             detail = errors[id]
-#             logging.error("{} - {} ({})".format(id, detail, name))
-
-#             return ["ERROR", id, detail]
-#         """
 
 
 #     @unittest.skip("Test not implemented yet")

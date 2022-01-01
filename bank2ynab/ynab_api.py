@@ -39,7 +39,7 @@ class YNAB_API:
         # TODO: Fix debug structure, so it will be used in logging instead
         self.debug = False
 
-    def run(self, transaction_data: dict[str, str]):
+    def run(self, transaction_data: dict[str, list]):
         if self.api_token is not None:
             logging.info("Connecting to YNAB API...")
             logging.debug(transaction_data)
@@ -64,13 +64,15 @@ class YNAB_API:
         else:
             logging.info("No API-token provided.")
 
-    def process_transactions(self, transaction_data: dict[str, str]) -> dict:
+    def process_transactions(
+        self, transaction_data: dict[str, list]
+    ) -> dict[str, dict]:
         """
-        :param transaction_data: dict of bank names:combined transaction string
-        :return budget_json_dict: dict of budget_ids:ready-to-post transactions
+        :param transaction_data: dict of bank names:transaction
+        :return budget_transaction_dict: dict of budget_ids:transaction list
         """
         logging.info("Processing transactions...")
-        budget_json_dict: dict[str, str] = dict()
+        budget_transaction_dict: dict[str, dict] = dict()
         # get transactions for each bank
         for bank in transaction_data.keys():
             # get the budget ID and Account ID to write to
@@ -78,15 +80,18 @@ class YNAB_API:
             account_transactions = transaction_data[bank]
 
             # insert account_id into each transaction
-            account_transactions = account_transactions.replace(
-                '"account_id":""', f'"account_id":"{account_id}"'
-            )
-            if budget_id in budget_json_dict:
-                budget_json_dict[budget_id] += account_transactions
+            for transaction in account_transactions:
+                transaction["account_id"] = account_id
+            # add transaction list into entry for relevant budget
+            if budget_id in budget_transaction_dict:
+                budget_transaction_dict[budget_id]["transactions"].append(
+                    account_transactions
+                )
             else:
-                budget_json_dict.setdefault(budget_id, account_transactions)
-
-        return budget_json_dict
+                budget_transaction_dict.setdefault(
+                    budget_id, {"transactions": account_transactions}
+                )
+        return budget_transaction_dict
 
     def select_account(self, bank: str):
         account_id = ""
@@ -179,10 +184,14 @@ def api_read(api_token: str, budget_id: str, keyword: str) -> dict:
     response = requests.get(url)
     try:
         read_data = response.json()["data"][keyword]
+        return read_data
     except KeyError:
         # the API has returned an error so let's handle it
-        raise YNABError(response.json()["error"]["id"])
-    return read_data
+        error_json = response.json()["error"]
+        raise YNABError(error_json["id"], error_json["detail"])
+    except YNABError as e:
+        print(f"YNAB API Error: {e}")
+        return {}
 
 
 def list_accounts(api_token: str, budget_id: str) -> list[list[str]]:
@@ -213,7 +222,7 @@ def list_budgets(api_token: str) -> list[str]:
 
 
 def post_transactions(
-    api_token: str, budget_id: str, transaction_data: str
+    api_token: str, budget_id: str, transaction_data: dict
 ) -> None:
     # send our data to API
 
@@ -222,21 +231,25 @@ def post_transactions(
         "https://api.youneedabudget.com/v1/budgets/"
         + f"{budget_id}/transactions?access_token={api_token}"
     )
-    data = "{data:{transactions:" + transaction_data + "} }"
-    print(data)
-    post_response = requests.post(url, json=data)
-    json_data = json.loads(post_response.text)
+    raise NotImplementedError # debug
+    data_json_str = json.dumps(transaction_data) # TODO not currently working
 
-    # response handling - TODO: make this more thorough!
+    print(data_json_str)  # debug
+    post_response = requests.post(url, json=data_json_str)
+    response_json = json.loads(post_response.text)
+
     try:
-        raise YNABError(json_data["error"]["id"])
+        error = response_json["error"]
+        raise YNABError(error["id"], error["detail"])
     except KeyError:
         logging.info(
-            f"Success: {len(json_data['data']['transaction_ids'])}"
+            f"Success: {len(response_json['data']['transaction_ids'])}"
             " entries uploaded,"
-            f" {len(json_data['data']['duplicate_import_ids'])}"
+            f" {len(response_json['data']['duplicate_import_ids'])}"
             " entries skipped."
         )
+    except YNABError as e:
+        print(f"YNAB API Error: {e}")
 
 
 def option_selection(options: list, msg: str) -> str:

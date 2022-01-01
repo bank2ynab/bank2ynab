@@ -2,7 +2,7 @@ import logging
 from os.path import basename, dirname, isfile, join
 from typing import Any
 
-from dataframe_handler import DataframeHandler
+from dataframe_handler import DataframeHandler, combine_dfs
 from transactionfile_reader import detect_encoding, get_files
 
 
@@ -23,7 +23,7 @@ class BankHandler:
         self.name = config_dict.get("bank_name", "DEFAULT")
         self.config_dict = config_dict
         self.files_processed = 0
-        self.transaction_string: str = str()
+        self.transaction_list: list[dict] = list()
 
     def run(self) -> None:
         matching_files = get_files(
@@ -35,7 +35,7 @@ class BankHandler:
             prefix=self.config_dict["fixed_prefix"],
         )
 
-        individual_file_transactions: list[str] = list()
+        file_dfs: list = list()
 
         for src_file in matching_files:
             logging.info(f"\nParsing input file: {src_file} ({self.name})")
@@ -82,10 +82,8 @@ class BankHandler:
                     )
                     logging.info(f"Writing output file: {output_path}")
                     df_handler.output_csv(output_path)
-                    # save api transaction data for each bank to object list
-                    individual_file_transactions.append(
-                        df_handler.api_transaction_data
-                    )
+                    # save api transaction data for each bank to list
+                    file_dfs.append(df_handler.api_transaction_df)
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
                         logging.info(
@@ -97,11 +95,10 @@ class BankHandler:
                     logging.info(
                         "No output data from this file for this bank."
                     )
-        # don't add empty transactions
-        if individual_file_transactions:
-            self.transaction_string = merge_transaction_output(
-                individual_file_transactions
-            )
+        # don't add empty transaction dataframes
+        if file_dfs:
+            combined_df = combine_dfs(file_dfs)
+            self.transaction_list = combined_df.to_dict(orient="records")
 
     def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str:
         """
@@ -111,22 +108,6 @@ class BankHandler:
         """
         # intentionally empty - plugins can use this function
         return file_path
-
-
-def merge_transaction_output(transaction_list: list[str]) -> str:
-    """
-    Merge the generated transaction strings by removing the
-    square parentheses and inserting a comma between each.
-
-    :param transaction_list: list of transaction strings from each file
-    :type transaction_list: list[str]
-    :return: combined transaction string
-    :rtype: str
-    """
-    modified_list = map(lambda x: x[1:-1], transaction_list)
-    merged_string = f"[{','.join(modified_list)}]"
-
-    return merged_string
 
 
 def get_output_path(input_path: str, prefix: str, ext: str) -> str:

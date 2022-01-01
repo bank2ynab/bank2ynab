@@ -15,7 +15,7 @@ class BankIterator:
 
     def __init__(self, config_handler: ConfigHandler):
         self.banks: list[BankHandler] = []
-        self.bank_transaction_dict: dict[str, str] = dict()
+        self.bank_transaction_dict: dict[str, list] = dict()
 
         for section in config_handler.config.sections():
             config_dict = config_handler.fix_conf_params(section)
@@ -29,10 +29,10 @@ class BankIterator:
         # process account for each config file
         for bank_object in self.banks:
             bank_object.run()
-            if bank_object.transaction_string != "":
+            if bank_object.transaction_list:
                 self.bank_transaction_dict[
                     bank_object.name
-                ] = bank_object.transaction_string
+                ] = bank_object.transaction_list
 
             files_processed += bank_object.files_processed
 

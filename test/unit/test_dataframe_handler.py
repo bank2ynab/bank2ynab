@@ -1,5 +1,5 @@
-from unittest import TestCase
 import unittest
+from unittest import TestCase
 
 import pandas as pd
 import pandas.testing
@@ -9,12 +9,13 @@ from bank2ynab.dataframe_handler import (
     auto_payee,
     cd_flag_process,
     clean_monetary_values,
+    clean_strings,
+    combine_dfs,
     fill_api_columns,
     fill_empty_dates,
     fix_amount,
     fix_date,
     merge_duplicate_columns,
-    output_json_transactions,
     remove_invalid_rows,
 )
 from pandas._libs.missing import NA
@@ -162,13 +163,16 @@ class TestDataframeHandler(TestCase):
                 "amount": [10000, -20000, 100000, 0, 0],
             }
         )
+        desired_output["Inflow"] = desired_output["Inflow"].astype(float)
+        desired_output["Outflow"] = desired_output["Outflow"].astype(float)
+        desired_output["amount"] = desired_output["amount"].astype(int)
         for column in desired_output.keys():
             with self.subTest(
                 "Test each column's negative inflow/outflow processing.",
                 column=column,
             ):
                 pandas.testing.assert_series_equal(
-                    desired_output[column].astype(float),
+                    desired_output[column],
                     test_df[column],
                 )
 
@@ -183,15 +187,18 @@ class TestDataframeHandler(TestCase):
                 "Inflow": [2.5, 0, 25, 0, 0],
                 "Outflow": [0, 5, 0, 0, 0],
                 "amount": [2500, -5000, 25000, 0, 0],
-            }
+            },
         )
+        desired_output["Inflow"] = desired_output["Inflow"].astype(float)
+        desired_output["Outflow"] = desired_output["Outflow"].astype(float)
+        desired_output["amount"] = desired_output["amount"].astype(int)
         for column in desired_output.keys():
             with self.subTest(
                 "Test each column's currency conversion.",
                 column=column,
             ):
                 pandas.testing.assert_series_equal(
-                    desired_output[column].astype(float),
+                    desired_output[column],
                     test_df[column],
                 )
 
@@ -316,6 +323,25 @@ class TestDataframeHandler(TestCase):
             check_names=False,  # type:ignore
         )
 
+    def test_clean_strings(self):
+        test_strings = [
+            ["Normal", "Normal"],
+            ["Extra internal    whitespace", "Extra Internal Whitespace"],
+            ["      Extra leading whitespace", "Extra Leading Whitespace"],
+            ["Extra trailing whitespace   ", "Extra Trailing Whitespace"],
+            [r"Non alphanumeric \ ! @", "Non Alphanumeric"],
+            ["RanDom CAPITAL letters", "Random Capital Letters"],
+            ["New Line\nIn The String", "New Line In The String"],
+        ]
+        for test in test_strings:
+            with self.subTest(
+                "Test different types of string input.", test=test
+            ):
+                test_series = pd.Series(data={1: test[0]})
+                desired_output = pd.Series(data={1: test[1]})
+                test_output = clean_strings(test_series)
+                pandas.testing.assert_series_equal(desired_output, test_output)
+
     def test_fix_date(self):
         test_params = [
             {
@@ -408,10 +434,10 @@ class TestDataframeHandler(TestCase):
             "category",
             "cleared",
             "import_id",
-            "payee_id",
-            "category_id",
-            "approved",
-            "flag_color",
+            # "payee_id",
+            # "category_id",
+            # "approved",
+            # "flag_color",
         ]
         really_long_payee = "a" * 60
         truncated_payee = really_long_payee[:50]
@@ -452,66 +478,21 @@ class TestDataframeHandler(TestCase):
                     "YNAB:25000:2017-09-28:2",
                     "YNAB:0:2017-10-28:1",
                 ],
-                "payee_id": [None, None, None, None],
-                "category_id": [None, None, None, None],
-                "approved": [False, False, False, False],
-                "flag_color": [None, None, None, None],
+                # "payee_id": [None, None, None, None],
+                # "category_id": [None, None, None, None],
+                # "approved": [False, False, False, False],
+                # "flag_color": [None, None, None, None],
             }
         )
 
         test_df = fill_api_columns(initial_df)
         pandas.testing.assert_frame_equal(expected_output, test_df[api_cols])
 
-    def test_output_json_transactions(self):
-        """Test that the JSON output is in the correct format."""
-        test_df = pd.DataFrame(
-            {
-                "account_id": ["", "", "", ""],
-                "date": [
-                    "2017-09-28",
-                    "2017-09-28",
-                    "2017-09-28",
-                    "2017-10-28",
-                ],
-                "payee_name": ["Test 1", "Test 2", "Test 3", "Test 4"],
-                "amount": [-1000, 25000, 25000, 0],
-                "memo": ["Test Memo", "", "Test Memo", "Test Memo"],
-                "category": ["", "", "", ""],
-                "cleared": ["cleared", "cleared", "cleared", "cleared"],
-                "import_id": [
-                    "YNAB:-1000:2017-09-28:1",
-                    "YNAB:25000:2017-09-28:1",
-                    "YNAB:25000:2017-09-28:2",
-                    "YNAB:0:2017-10-28:1",
-                ],
-                "payee_id": [None, None, None, None],
-                "category_id": [None, None, None, None],
-                "approved": [False, False, False, False],
-                "flag_color": [None, None, None, None],
-            }
-        )
-        json_output = output_json_transactions(test_df)
-
-        expected_output = (
-            '[{"account_id":"","date":"2017-09-28","payee_name":"Test'
-            ' 1","amount":-1000,"memo":"Test'
-            ' Memo","category":"","cleared":"cleared","import_id":'
-            '"YNAB:-1000:2017-09-28:1","payee_id":null,"category_id":null,'
-            '"approved":false,"flag_color":null},{"account_id":"",'
-            '"date":"2017-09-28","payee_name":"Test'
-            ' 2","amount":25000,"memo":"","category":"","cleared":'
-            '"cleared","import_id":"YNAB:25000:2017-09-28:1",'
-            '"payee_id":null,"category_id":null,"approved":false,'
-            '"flag_color":null},{"account_id":"","date":"2017-09-28",'
-            '"payee_name":"Test 3","amount":25000,"memo":"Test Memo",'
-            '"category":"","cleared":"cleared","import_id":'
-            '"YNAB:25000:2017-09-28:2","payee_id":null,"category_id":null,'
-            '"approved":false,"flag_color":null},{"account_id":"",'
-            '"date":"2017-10-28","payee_name":"Test'
-            ' 4","amount":0,"memo":"Test'
-            ' Memo","category":"","cleared":"cleared",'
-            '"import_id":"YNAB:0:2017-10-28:1","payee_id":null,'
-            '"category_id":null,"approved":false,"flag_color":null}]'
-        )
-
-        self.assertEqual(expected_output, json_output)
+    def test_combine_dfs(self):
+        dfs = [
+            pd.DataFrame({"Col1": [45], "Col2": [36]}),
+            pd.DataFrame({"Col1": [55], "Col2": [98]}),
+        ]
+        expected_output = pd.DataFrame({"Col1": [45, 55], "Col2": [36, 98]})
+        test_output = combine_dfs(dfs)
+        pandas.testing.assert_frame_equal(expected_output, test_output)

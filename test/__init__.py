@@ -1,8 +1,10 @@
-import sys
-from os.path import dirname, join, realpath
+# is this actually necessary?
 
-project_dirname = dirname(dirname(realpath(__file__)))
-path = join(project_dirname, "bank2ynab")
+# import sys
+# from os.path import dirname, join, realpath
 
-if path not in sys.path:
-    sys.path.append(path)
+# project_dirname = dirname(dirname(realpath(__file__)))
+# path = join(project_dirname, "bank2ynab")
+
+# if path not in sys.path:
+#     sys.path.append(path)

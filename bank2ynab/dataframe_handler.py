@@ -194,6 +194,9 @@ def parse_data(
     df = auto_memo(df, fill_memo)
     # auto fill payee from memo
     df = auto_payee(df)
+    # fix strings
+    df["Payee"] = clean_strings(df["Payee"])
+    df["Memo"] = clean_strings(df["Memo"])
     # remove invalid rows
     df = remove_invalid_rows(df)
     # fill API-specific columns
@@ -390,6 +393,35 @@ def auto_payee(df: pd.DataFrame) -> pd.DataFrame:
     """
     df["Payee"].fillna(df["Memo"], inplace=True)
     return df
+
+
+def clean_strings(string_series: pd.Series) -> pd.Series:
+    """
+    Perform various cleaning operations on provided string series.
+
+    :param string_series: string series to modify
+    :type string_series: pd.Series
+    :return: cleaned series
+    :rtype: pd.Series
+    """
+    modified_string_series = string_series
+    # convert string to title case
+    modified_string_series = modified_string_series.str.title()
+    # remove non-alphanumeric
+    modified_string_series = modified_string_series.replace(
+        "[^a-zA-Z0-9 ]", " ", regex=True
+    )
+    # remove newline characters
+    modified_string_series = modified_string_series.str.replace(
+        "\n", " ", regex=True
+    )
+    # strip leading and trailing whitespace
+    modified_string_series = modified_string_series.str.strip()
+    # replace multiple spacing with single
+    modified_string_series = modified_string_series.str.replace(
+        " +", " ", regex=True
+    )
+    return modified_string_series
 
 
 def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:

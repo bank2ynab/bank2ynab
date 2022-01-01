@@ -38,7 +38,10 @@ RESPONSE_CODES = {
 
 
 class YNABError(Exception):
-    def __init__(self, response_code: str):
-        message = f"Error {response_code} - {RESPONSE_CODES[response_code]}"
+    def __init__(self, response_code: str, detail: str):
+        message = (
+            f"Error {response_code} -"
+            f" {RESPONSE_CODES[response_code]} ({detail.capitalize()})."
+        )
         super().__init__(message)
         self.response_code = response_code

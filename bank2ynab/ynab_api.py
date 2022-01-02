@@ -1,4 +1,3 @@
-import json
 import logging
 from configparser import DuplicateSectionError, NoSectionError
 
@@ -57,14 +56,16 @@ class YNAB_API:
         # save account mappings
         self.save_account_mappings(bank_account_mapping)
         # map transactions to budget and account IDs
-        budget_transactions = apply_mapping(transaction_data, bank_account_mapping)
+        budget_transactions = apply_mapping(
+            transaction_data, bank_account_mapping
+        )
 
         for budget_id in budget_info:
             try:
                 api_interface.post_transactions(
                     api_token=self.api_token,
                     budget_id=budget_id,
-                    data=json.dumps(budget_transactions[budget_id]),
+                    data=budget_transactions[budget_id],
                 )
             except KeyError:
                 logging.info(

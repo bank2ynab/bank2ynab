@@ -1,9 +1,10 @@
 # bank2ynab specific stuff
 user_configuration.conf
 test-data/temp-test.conf
-bank2ynab/main
-bank2ynab/plugins/plugins
-test/tests
+b2y_env/
+env/
+# general
 *.pyc
+# vscode stuff
 bank2ynab/workspace.code-workspace
-.vscode/settings.json
+.vscode

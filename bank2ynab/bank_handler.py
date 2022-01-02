@@ -80,14 +80,19 @@ class BankHandler:
                         prefix=self.config_dict["fixed_prefix"],
                         ext=self.config_dict["output_ext"],
                     )
-                    logging.info(f"Writing output file: {output_path}")
-                    df_handler.output_csv(output_path)
+                    logging.info(
+                        f"Writing output file: {output_path} (debug -"
+                        " commented out)"
+                    )
+                    # df_handler.output_csv(output_path)
+                    # TODO debug - disabled while testing
                     # save api transaction data for each bank to list
                     file_dfs.append(df_handler.api_transaction_df)
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
                         logging.info(
-                            f"Removing input file: {src_file} (commented out)"
+                            f"Removing input file: {src_file} (debug -"
+                            " commented out)"
                         )
                         # TODO DEBUG - disabled deletion while testing
                         # os.remove(src_filefile)

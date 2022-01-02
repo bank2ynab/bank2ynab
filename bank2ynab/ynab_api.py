@@ -2,10 +2,10 @@ import json
 import logging
 from configparser import DuplicateSectionError, NoSectionError
 
-import requests
-
+import api_interface
+from api_interface import APIInterface
 from config_handler import ConfigHandler
-from ynab_api_response import YNABError
+from user_input import get_user_input
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -15,8 +15,7 @@ class YNAB_API:
     # TODO - revise docstring
     # TODO - break up class - too many responsibilities
     #           - ??? what subsets to use
-    # TODO - create API Error class?
-    # TODO - handle transaction creation in DataframeCleaner?
+
     """
     uses Personal Access Token stored in user_configuration.conf
     (note for devs: be careful not to accidentally share API access token!)
@@ -40,107 +39,91 @@ class YNAB_API:
         self.debug = False
 
     def run(self, transaction_data: dict[str, list]):
-        if self.api_token is not None:
-            logging.info("Connecting to YNAB API...")
-            logging.debug(transaction_data)
-            # get the list of budgets
-            budget_ids = list_budgets(api_token=self.api_token)
-            # if there's only one budget, silently set a default budget
-            if len(budget_ids) == 1:
-                self.budget_id = budget_ids[0][1]
+        logging.debug(f"Transaction data: {transaction_data}")
 
-            budget_transactions = self.process_transactions(transaction_data)
+        # get previously-saved budget/account mapping
+        bank_account_mapping = self.get_saved_accounts(transaction_data)
+        # load budget & account data from API
+        api_connect = APIInterface(api_token=self.api_token)
+        budget_info = api_connect.budget_info
+        # remove any account IDs that don't exist in API info
+        bank_account_mapping = remove_invalid_accounts(
+            prev_saved_map=bank_account_mapping, api_data=budget_info
+        )
+        # ask user to set budget & account for each unsaved bank
+        self.select_accounts(
+            mappings=bank_account_mapping, budget_info=budget_info
+        )
+        # save account mappings
+        self.save_account_mappings(bank_account_mapping)
+        # map transactions to budget and account IDs
+        budget_transactions = apply_mapping(transaction_data, bank_account_mapping)
 
-            for budget in budget_ids:
-                id = budget[1]
-                try:
-                    post_transactions(
-                        api_token=self.api_token,
-                        budget_id=id,
-                        transaction_data=budget_transactions[id],
-                    )
-                except KeyError:
-                    logging.info(f"No transactions to upload for {budget[0]}.")
-        else:
-            logging.info("No API-token provided.")
-
-    def process_transactions(
-        self, transaction_data: dict[str, list]
-    ) -> dict[str, dict]:
-        """
-        :param transaction_data: dict of bank names:transaction
-        :return budget_transaction_dict: dict of budget_ids:transaction list
-        """
-        logging.info("Processing transactions...")
-        budget_transaction_dict: dict[str, dict] = dict()
-        # get transactions for each bank
-        for bank in transaction_data.keys():
-            # get the budget ID and Account ID to write to
-            budget_id, account_id = self.select_account(bank)
-            account_transactions = transaction_data[bank]
-
-            # insert account_id into each transaction
-            for transaction in account_transactions:
-                transaction["account_id"] = account_id
-            # add transaction list into entry for relevant budget
-            if budget_id in budget_transaction_dict:
-                budget_transaction_dict[budget_id]["transactions"].append(
-                    account_transactions
+        for budget_id in budget_info:
+            try:
+                api_interface.post_transactions(
+                    api_token=self.api_token,
+                    budget_id=budget_id,
+                    data=json.dumps(budget_transactions[budget_id]),
                 )
-            else:
-                budget_transaction_dict.setdefault(
-                    budget_id, {"transactions": account_transactions}
+            except KeyError:
+                logging.info(
+                    "No transactions to upload for"
+                    f" {budget_info[budget_id]['name']}."
                 )
-        return budget_transaction_dict
 
-    def select_account(self, bank: str):
-        account_id = ""
-        budget_id = ""
-        # check if bank has account associated with it already
-        try:
-            config_line = self.config_handler.get_config_line_lst(
-                bank, "YNAB Account ID", "||"
+    def get_saved_accounts(self, t_data: dict) -> dict[str, dict[str, str]]:
+        bank_account_mapping = dict()
+        for bank_name in t_data.keys():
+            account_id = ""
+            budget_id = ""
+            # check if bank has account associated with it already
+            try:
+                config_line = self.config_handler.get_config_line_lst(
+                    bank_name, "YNAB Account ID", "||"
+                )
+                budget_id = config_line[0]
+                account_id = config_line[1]
+                logging.info(
+                    f"Previously-saved account for {bank_name} found."
+                )
+            except IndexError:
+                pass
+            except NoSectionError:
+                # TODO - can we handle this within the config class?
+                logging.info(f"No user configuration for {bank_name} found.")
+            bank_account_mapping.setdefault(
+                bank_name, {"account_id": account_id, "budget_id": budget_id}
             )
-            budget_id = config_line[0]
-            account_id = config_line[1]
-            logging.info(f"Previously-saved account for {bank} found.")
-        except IndexError:
-            pass
-        except NoSectionError:
-            # TODO - can we handle this within the config class?
-            logging.info(f"No user configuration for {bank} found.")
+        return bank_account_mapping
 
-        if account_id == "":
-            instruction = "No YNAB {} for transactions from {} set!\nPick {}"
-            # if no default budget, build budget list and select budget
-            if self.budget_id is None:
-                # msg =
-                # "No YNAB budget for {} set! \nPick a budget".format(bank)
-                msg = instruction.format("budget", bank, "a budget")
-                budget_ids = list_budgets(api_token=self.api_token)
-                budget_id = option_selection(budget_ids, msg)
-            else:
-                budget_id = self.budget_id
+    def select_accounts(
+        self, mappings: dict[str, dict[str, str]], budget_info: dict[str, dict]
+    ):
+        for bank in mappings.keys():
+            if mappings[bank]["account_id"] == "":
+                # get the budget ID and Account ID to write to
+                budget_id, account_id = select_account(bank, budget_info)
+                mappings[bank]["budget_id"] = budget_id
+                mappings[bank]["account_id"] = account_id
 
-            # build account list and select account
-            account_ids = list_accounts(
-                api_token=self.api_token, budget_id=budget_id
-            )
-            # msg = "Pick a YNAB account for transactions from {}".format(bank)
-            msg = instruction.format("account", bank, "an account")
-            account_id = option_selection(account_ids, msg)
+    def save_account_mappings(self, mapping: dict[str, dict]):
+        for bank_name in mapping:
             # save account selection for bank
             save_ac_toggle = self.config_handler.get_config_line_boo(
-                bank, "Save YNAB Account"
+                bank_name, "Save YNAB Account"
             )
             if save_ac_toggle is True:
-                self.save_account_selection(bank, budget_id, account_id)
+                self.save_account_selection(
+                    bank_name,
+                    mapping[bank_name]["budget_id"],
+                    mapping[bank_name]["account_id"],
+                )
             else:
                 logging.info(
-                    f"Saving default YNAB account is disabled for {bank}"
+                    f"Saving default YNAB account is disabled for {bank_name}"
                     + " - account match not saved."
                 )
-        return budget_id, account_id
 
     def save_account_selection(self, bank, budget_id, account_id):
         # TODO move config saving to the ConfigHandler class?
@@ -150,145 +133,99 @@ class YNAB_API:
         self.user_config.read(self.user_config_path)
         try:
             self.user_config.add_section(bank)
+            logging.info(f"Saving default account for {bank}...")
         except DuplicateSectionError:
             pass
         self.user_config.set(
             bank, "YNAB Account ID", f"{budget_id}||{account_id}"
         )
 
-        logging.info(f"Saving default account for {bank}...")
         with open(self.user_config_path, "w", encoding="utf-8") as config_file:
             self.user_config.write(config_file)
 
 
-def api_read(api_token: str, budget_id: str, keyword: str) -> dict:
-    """
-    General function for reading data from YNAB API.
-
-    :param budget_id: ID of budget to access
-    :type budget_id: str
-    :param  keyword: keyword for data type, e.g. transactions
-    :type keyword: str
-    :raises YNABError: [description]
-    :return: [description]
-    :rtype: dict
-    """
-    base_url = "https://api.youneedabudget.com/v1/budgets/"
-
-    if budget_id == "":
-        # only happens when we're looking for the list of budgets
-        url = base_url + f"?access_token={api_token}"
-    else:
-        url = base_url + f"{budget_id}/{keyword}?access_token={api_token}"
-
-    response = requests.get(url)
-    try:
-        read_data = response.json()["data"][keyword]
-        return read_data
-    except KeyError:
-        # the API has returned an error so let's handle it
-        error_json = response.json()["error"]
-        raise YNABError(error_json["id"], error_json["detail"])
-    except YNABError as e:
-        print(f"YNAB API Error: {e}")
-        return {}
-
-
-def list_accounts(api_token: str, budget_id: str) -> list[list[str]]:
-    accounts = api_read(
-        api_token=api_token, budget_id=budget_id, keyword="accounts"
-    )
-
-    account_ids = list()
-    if len(accounts) > 0:
-        for account in accounts:
-            account_ids.append([account["name"], account["id"]])
-            # debug messages
-            logging.debug(f"id: {account['id']}")
-            logging.debug(f"on_budget: {account['on_budget']}")
-            logging.debug(f"closed: {account['closed']}")
-    else:
-        logging.info("no accounts found")
-
-    return account_ids
-
-
-def list_budgets(api_token: str) -> list[str]:
-    budgets = api_read(api_token=api_token, budget_id="", keyword="budgets")
-    budget_ids = list()
-    for budget in budgets:
-        budget_ids.append([budget["name"], budget["id"]])
-    return budget_ids
-
-
-def post_transactions(
-    api_token: str, budget_id: str, transaction_data: dict
-) -> None:
-    # send our data to API
-
-    logging.info("Uploading transactions to YNAB...")
-    url = (
-        "https://api.youneedabudget.com/v1/budgets/"
-        + f"{budget_id}/transactions?access_token={api_token}"
-    )
-    raise NotImplementedError # debug
-    data_json_str = json.dumps(transaction_data) # TODO not currently working
-
-    print(data_json_str)  # debug
-    post_response = requests.post(url, json=data_json_str)
-    response_json = json.loads(post_response.text)
-
-    try:
-        error = response_json["error"]
-        raise YNABError(error["id"], error["detail"])
-    except KeyError:
-        logging.info(
-            f"Success: {len(response_json['data']['transaction_ids'])}"
-            " entries uploaded,"
-            f" {len(response_json['data']['duplicate_import_ids'])}"
-            " entries skipped."
-        )
-    except YNABError as e:
-        print(f"YNAB API Error: {e}")
-
-
-def option_selection(options: list, msg: str) -> str:
-    """
-    Used to select from a list of options.
-    If only one item in list, selects that by default.
-    Otherwise displays "msg" asking for input selection (integer only).
-
-    :param options: list of [name, option] pairs to select from
-    :param msg: the message to display on the input line
-    :return option_selected: the selected item from the list
-    """
-    print("\n")
-    selection = 1
-    count = len(options)
-    if count > 1:
-        for index, option in enumerate(options):
-            print(f"| {index+1} | {option[0]}")
-        selection = int_input(1, count, msg)
-    option_selected = options[selection - 1][1]
-    return option_selected
-
-
-def int_input(min: int, max: int, msg: str) -> int:
-    """
-    Makes a user select an integer between min & max stated values
-    :param  min: the minimum acceptable integer value
-    :param  max: the maximum acceptable integer value
-    :param  msg: the message to display on the input line
-    :return user_input: sanitised integer input in acceptable range
-    """
-    while True:
+def remove_invalid_accounts(
+    prev_saved_map: dict[str, dict[str, str]], api_data: dict[str, dict]
+) -> dict[str, dict[str, str]]:
+    temp_mapping = prev_saved_map
+    for bank in prev_saved_map:
+        budget_id = prev_saved_map[bank]["budget_id"]
+        account_id = prev_saved_map[bank]["account_id"]
         try:
-            user_input = int(input(f"{msg} (range {min} - {max}): "))
-            if user_input not in range(min, max + 1):
-                raise ValueError
-            break
-        except ValueError:
-            logging.info(
-                "This integer is not in the acceptable range, try again!"
+            if budget_id not in api_data.keys():
+                raise KeyError
+            if account_id not in api_data[budget_id]["accounts"].keys():
+                raise KeyError
+        except KeyError:
+            temp_mapping.setdefault(bank, {"account_id": "", "budget_id": ""})
+    return temp_mapping
+
+
+def select_account(bank_name: str, budget_info: dict[str, dict]):
+    budget_id = ""
+    account_id = ""
+    instruction = "No YNAB {} for transactions from {} set!\nPick {}"
+
+    # "No YNAB budget for {} set! \nPick a budget".format(bank)
+    msg = instruction.format("budget", bank_name, "a budget")
+
+    # generate budget name/id list
+    budget_list = generate_name_id_list(budget_info)
+    # ask user to select budget
+    budget_id = get_user_input(budget_list, msg)
+
+    # msg = "Pick a YNAB account for transactions from {}".format(bank)
+    msg = instruction.format("account", bank_name, "an account")
+    # generate account name/id list
+    account_dict = budget_info[budget_id]["accounts"]
+    account_list = generate_name_id_list(account_dict)
+    # ask user to select account
+    account_id = get_user_input(account_list, msg)
+
+    return budget_id, account_id
+
+
+def generate_name_id_list(input_dict: dict):
+    output_list = list()
+    for id in input_dict.keys():
+        output_list.append([input_dict[id]["name"], id])
+    return output_list
+
+
+def apply_mapping(
+    transaction_data: dict[str, list], mapping: dict[str, dict[str, str]]
+) -> dict[str, dict[str, list]]:
+    """
+    Create a dictionary of budget_ids mapped to a dictionary of transactions.
+    Add an account_id to each transaction.
+
+    :param transaction_data: dictionary of bank names to transaction data
+    :type transaction_data: dict[str, list]
+    :param mapping: dictionary mapping bank names to budget ID and account ID
+    :type mapping: dict[str, dict[str, str]]
+    :return: dictionary of budget_id mapped to a dictionary of transactions
+    :rtype: dict[str, dict]
+    """
+    logging.info("Adding budget and account IDs to transactions...")
+    budget_transaction_dict: dict[str, dict[str, list]] = dict()
+
+    # get transactions for each bank
+    for bank in transaction_data.keys():
+        account_transactions = transaction_data[bank]
+        budget_id = mapping[bank]["budget_id"]
+        account_id = mapping[bank]["account_id"]
+
+        # insert account_id into each transaction
+        for transaction in account_transactions:
+            transaction["account_id"] = account_id
+        # add transaction list into entry for relevant budget
+        if budget_id in budget_transaction_dict:
+            budget_transaction_dict[budget_id][
+                "transactions"
+            ] += account_transactions
+        else:
+            budget_transaction_dict.setdefault(
+                budget_id, {"transactions": account_transactions}
             )
-    return user_input
+
+    return budget_transaction_dict

@@ -50,9 +50,7 @@ class YNAB_API:
             prev_saved_map=bank_account_mapping, api_data=budget_info
         )
         # ask user to set budget & account for each unsaved bank
-        self.select_accounts(
-            mappings=bank_account_mapping, budget_info=budget_info
-        )
+        select_accounts(mappings=bank_account_mapping, budget_info=budget_info)
         # save account mappings
         self.save_account_mappings(bank_account_mapping)
         # map transactions to budget and account IDs
@@ -97,16 +95,6 @@ class YNAB_API:
                 bank_name, {"account_id": account_id, "budget_id": budget_id}
             )
         return bank_account_mapping
-
-    def select_accounts(
-        self, mappings: dict[str, dict[str, str]], budget_info: dict[str, dict]
-    ):
-        for bank in mappings.keys():
-            if mappings[bank]["account_id"] == "":
-                # get the budget ID and Account ID to write to
-                budget_id, account_id = select_account(bank, budget_info)
-                mappings[bank]["budget_id"] = budget_id
-                mappings[bank]["account_id"] = account_id
 
     def save_account_mappings(self, mapping: dict[str, dict]):
         for bank_name in mapping:
@@ -160,6 +148,17 @@ def remove_invalid_accounts(
         except KeyError:
             temp_mapping.setdefault(bank, {"account_id": "", "budget_id": ""})
     return temp_mapping
+
+
+def select_accounts(
+    mappings: dict[str, dict[str, str]], budget_info: dict[str, dict]
+):
+    for bank in mappings.keys():
+        if mappings[bank]["account_id"] == "":
+            # get the budget ID and Account ID to write to
+            budget_id, account_id = select_account(bank, budget_info)
+            mappings[bank]["budget_id"] = budget_id
+            mappings[bank]["account_id"] = account_id
 
 
 def select_account(bank_name: str, budget_info: dict[str, dict]):

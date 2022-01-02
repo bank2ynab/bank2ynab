@@ -1,7 +1,7 @@
 import unittest
 from unittest import TestCase
 
-from bank2ynab.ynab_api import apply_mapping
+from bank2ynab.ynab_api import apply_mapping, generate_name_id_list
 
 
 class TestYNAB_API(TestCase):
@@ -66,6 +66,22 @@ class TestYNAB_API(TestCase):
         test_dict = apply_mapping(test_data, test_mapping)
 
         self.assertDictEqual(expected_output, test_dict)
+
+    def test_generate_name_id_list(self):
+        test_dict = {
+            "id1": {"name": "name1", "field": "etc1"},
+            "id2": {"name": "name2", "field": "etc2"},
+            "id3": {"name": "name3", "field": "etc3"},
+            "id4": {"name": "name4", "field": "etc4"},
+        }
+        expected_output = [
+            ["name1", "id1"],
+            ["name2", "id2"],
+            ["name3", "id3"],
+            ["name4", "id4"],
+        ]
+        test_output = generate_name_id_list(test_dict)
+        self.assertListEqual(expected_output, test_output)
 
     @unittest.skip("Not tested yet.")
     def test_save_account_selection(self):

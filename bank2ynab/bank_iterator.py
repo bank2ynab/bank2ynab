@@ -33,7 +33,6 @@ class BankIterator:
                 self.bank_transaction_dict[
                     bank_object.name
                 ] = bank_object.transaction_list
-
             files_processed += bank_object.files_processed
 
         logging.info(f"\nDone! {files_processed} files processed.\n")

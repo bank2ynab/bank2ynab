@@ -11,7 +11,9 @@ RESPONSE_CODES = {
     ),
     "403.4": (
         "The request will exceed one or more data limits in place to prevent"
-        " abuse"
+        " abuse. Generally means the API request was too large for"
+        " YNAB's servers to handle - try splitting the upload into smaller"
+        " chunks."
     ),
     "404.1": "The specified URI does not exist.",
     "404.2": "Resource not found.",

@@ -8,3 +8,4 @@ env/
 # vscode stuff
 bank2ynab/workspace.code-workspace
 .vscode
+.coverage

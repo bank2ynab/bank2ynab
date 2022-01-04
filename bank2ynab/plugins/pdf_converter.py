@@ -79,10 +79,10 @@ def read_pdf_to_dataframe(
 
 def build_bank(config):
     """This factory function is called from the main program,
-    and expected to return a B2YBank subclass.
+    and expected to return a BankHandler subclass.
     Without this, the module will fail to load properly.
 
     :param config: dict containing all available configuration parameters
-    :return: a B2YBank subclass instance
+    :return: a BankHandler subclass instance
     """
     return PDF_Converter(config)

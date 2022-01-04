@@ -1,4 +1,5 @@
 import logging
+import os
 from os.path import basename, dirname, isfile, join
 from typing import Any
 
@@ -84,8 +85,7 @@ class BankHandler:
                         f"Writing output file: {output_path} (debug -"
                         " commented out)"
                     )
-                    # df_handler.output_csv(output_path)
-                    # TODO debug - disabled while testing
+                    df_handler.output_csv(output_path)
                     # save api transaction data for each bank to list
                     file_dfs.append(df_handler.api_transaction_df)
                     # delete original csv file
@@ -94,8 +94,7 @@ class BankHandler:
                             f"Removing input file: {src_file} (debug -"
                             " commented out)"
                         )
-                        # TODO DEBUG - disabled deletion while testing
-                        # os.remove(src_filefile)
+                        os.remove(src_file)
                 else:
                     logging.info(
                         "No output data from this file for this bank."

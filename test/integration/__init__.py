@@ -1,5 +1,3 @@
-# is this actually necessary?
-
 import sys
 from os.path import dirname, join, realpath
 

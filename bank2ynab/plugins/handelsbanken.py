@@ -4,30 +4,33 @@
         With thanks to @joacand's script from here:
         github.com/joacand/HandelsbankenYNABConverter/blob/master/Converter.py
 """
-from bank_process import B2YBank
+
 import re
+from typing import Any
+
+from bank_handler import BankHandler
 
 
-class Handelsbanken(B2YBank):
-    def __init__(self, config_object):
+class Handelsbanken(BankHandler):
+    def __init__(self, config_dict: dict[str, Any]):
         """
-        :param config_object: a dictionary of conf parameters
+        :param config_dict: a dictionary of conf parameters
         """
-        super(Handelsbanken, self).__init__(config_object)
+        super(Handelsbanken, self).__init__(config_dict)
         self.name = "Handelsbanken"
 
-    def _preprocess_file(self, file_path):
+    def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str:
         """
         Strips HTML from input file, modifying the input file directly
         :param file_path: path to file
         """
         with open(file_path) as input_file:
-            output_rows = []
+            output_rows: list[list[str]] = list()
             for row in input_file:
                 cells = row.split(";")
-                new_row = []
+                new_row: list[str] = list()
                 for cell in cells:
-                    es = re.findall(r"\>.*?\<", cell)
+                    es = re.findall(r"\\>.*?\\<", cell)
                     while "><" in es:
                         es.remove("><")
                         for n, i in enumerate(es):
@@ -42,15 +45,15 @@ class Handelsbanken(B2YBank):
         with open(file_path, "w") as output_file:
             for row in output_rows:
                 output_file.write("{}\n".format(";".join(row)))
-        return
+        return file_path
 
 
-def build_bank(config):
+def build_bank(config: dict[str, Any]) -> BankHandler:
     """This factory function is called from the main program,
-    and expected to return a B2YBank subclass.
+    and expected to return a BankHandler subclass.
     Without this, the module will fail to load properly.
 
     :param config: dict containing all available configuration parameters
-    :return: a B2YBank subclass instance
+    :return: a BankHandler subclass instance
     """
     return Handelsbanken(config)

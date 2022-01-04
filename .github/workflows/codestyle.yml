@@ -1,26 +1,10 @@
-on: [pull_request]
-name: Python Style Check
+name: Lint
+
+on: [push, pull_request]
+
 jobs:
-  run-linters:
-    name: Run linters
+  lint:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-
-      - name: Install Python dependencies
-        run: pip install black flake8
-
-      - name: Run linters
-        uses: wearerequired/lint-action@v1.9.0
-        with:
-          github_token: ${{ secrets.github_token }}
-          auto_fix: ${{ github.event_name == 'pull_request' }}
-          # Enable linters
-          black: true
+      - uses: actions/checkout@v2
+      - uses: psf/black@stable

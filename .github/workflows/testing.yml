@@ -9,7 +9,7 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.9.9]
 
     steps:
     - uses: actions/checkout@v1
@@ -24,10 +24,9 @@ jobs:
     - name: Test with unittest
       run: |
         python -m unittest discover -v
-    - name: Code coverage check
-      run: |
-        echo "Temporarily disabled."
-        pip install coverage
-        pip install codecov
-        codecov
-        coverage report
+    # - name: Code coverage check
+    #   run: |
+    #     pip install coverage
+    #     pip install codecov
+    #     codecov
+    #     coverage report

@@ -81,7 +81,7 @@ class B2YBank(object):
                     if f.startswith(file_pattern)
                     if prefix not in f
                 ]
-            if files != [] and missing_dir is True:
+            if not files and missing_dir:
                 s = (
                     "\nFormat: {}\n\nError: Can't find download path: {}"
                     "\nTrying default path instead:\t {}"
@@ -331,7 +331,7 @@ class B2YBank(object):
 
 
 def build_bank(bank_config):
-    """ Factory method loading the correct class for a given configuration. """
+    """Factory method loading the correct class for a given configuration."""
     plugin_module = bank_config.get("plugin", None)
     if plugin_module:
         p_mod = importlib.import_module("plugins.{}".format(plugin_module))
@@ -362,7 +362,7 @@ class Bank2Ynab(object):
             self.banks.append(bank_object)
 
     def run(self):
-        """ Main program flow """
+        """Main program flow"""
         # initialize variables for summary:
         files_processed = 0
         # process account for each config file

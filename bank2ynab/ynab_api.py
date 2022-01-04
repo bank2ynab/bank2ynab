@@ -41,7 +41,7 @@ class YNAB_API(object):  # in progress (2)
                 budget_ids = self.list_budgets()
                 # if there's only one budget, silently set a default budget
                 if len(budget_ids) == 1:
-                    self.budget_id = budget_ids[0]
+                    self.budget_id = budget_ids[0][1]
 
                 budget_t_data = self.process_transactions(transaction_data)
                 for budget in budget_ids:
@@ -170,12 +170,18 @@ class YNAB_API(object):  # in progress (2)
         )
 
         post_response = requests.post(url, json=data)
+        json_data = json.loads(post_response.text)
 
         # response handling - TODO: make this more thorough!
         try:
-            self.process_api_response(json.loads(post_response.text)["error"])
+            self.process_api_response(json_data["error"])
         except KeyError:
-            logging.info("Success!")
+            logging.info(
+                "Success: {} entries uploaded, {} entries skipped.".format(
+                    len(json_data["data"]["transaction_ids"]),
+                    len(json_data["data"]["duplicate_import_ids"]),
+                )
+            )
 
     def list_transactions(self):
         transactions = self.api_read(True, "transactions")
@@ -218,17 +224,7 @@ class YNAB_API(object):  # in progress (2)
 
             # commented out because this is a bit messy and confusing
             # TODO: make this legible!
-            """
-            # debug messages:
-            for key, value in budget.items():
-                if(type(value) is dict):
-                    logging.debug("%s: " % str(key))
-                    for subkey, subvalue in value.items():
-                        logging.debug("  %s: %s" %
-                                      (str(subkey), str(subvalue)))
-                else:
-                    logging.debug("%s: %s" % (str(key), str(value)))
-            """
+
         return budget_ids
 
     def process_api_response(self, details):
@@ -290,7 +286,17 @@ class YNAB_API(object):  # in progress (2)
             msg = instruction.format("account", bank, "an account")
             account_id = b2y_utilities.option_selection(account_ids, msg)
             # save account selection for bank
-            self.save_account_selection(bank, budget_id, account_id)
+            save_ac_toggle = b2y_utilities.get_config_line(
+                self.config, bank, ["Save YNAB Account", True, ""]
+            )
+            if save_ac_toggle is True:
+                self.save_account_selection(bank, budget_id, account_id)
+            else:
+                logging.info(
+                    "Saving default YNAB account is disabled for {} - account match not saved.".format(
+                        bank
+                    )
+                )
         return budget_id, account_id
 
     def save_account_selection(self, bank, budget_id, account_id):

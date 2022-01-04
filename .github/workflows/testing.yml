@@ -27,7 +27,7 @@ jobs:
     - name: Code coverage check
       run: |
         echo "Temporarily disabled."
-        #pip install coverage
-        #pip install codecov
-        #codecov
-        #coverage report
+        pip install coverage
+        pip install codecov
+        codecov
+        coverage report

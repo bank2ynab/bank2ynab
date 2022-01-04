@@ -218,9 +218,12 @@ def merge_duplicate_columns(
     Merges columns specified more than once in the input_columns list.
     Note: converts values into strings before merging.
 
+    :param df: dataframe to modify
+    :type df: pd.DataFrame
     :param input_columns: the list of columns in the input file
     :type input_columns: list
-    :return: None
+    :return: modified dataframe
+    :rtype: pd.DataFrame
     """
 
     # create dictionary mapping column names to indices of duplicates
@@ -258,11 +261,14 @@ def add_missing_columns(
     """
     Adds any missing required columns to the Dataframe.
 
+    :param df: dataframe to modify
+    :type df: pd.DataFrame
     :param input_columns: the list of columns in the input file
     :type input_columns: list
     :param output_columns: the desired list of columns as output
     :type output_columns: list
-    :return: None
+    :return: modified dataframe
+    :rtype: pd.DataFrame
     """
     # compare input & output column lists to find missing columns
     missing_cols = list(set(output_cols).difference(input_cols))
@@ -276,16 +282,19 @@ def add_missing_columns(
 
 def cd_flag_process(df: pd.DataFrame, cd_flags: list[str]) -> pd.DataFrame:
     """
-    fix columns where inflow/outflow is indicated by a flag
-    in a separate column
-    the cd_flag list is in the form
-    "indicator column, outflow flag, inflow flag"
+    Fix columns where inflow/outflow is indicated by a flag
+    in a separate column.
+    The cd_flag list is in the form
+    ["indicator column, outflow flag, inflow flag"]
     (the code does not use the indicator flag specified in the flag list,
     but instead the "CDFlag" column specified in Input Columns)
 
+    :param df: dataframe to modify
+    :type df: pd.DataFrame
     :param cd_flags: list of parameters for applying indicators
     :type cd_flags: list
-    :return: None
+    :return: modified dataframe
+    :rtype: pd.DataFrame
     """
     if len(cd_flags) == 3:
         outflow_flag = cd_flags[2]
@@ -296,11 +305,14 @@ def cd_flag_process(df: pd.DataFrame, cd_flags: list[str]) -> pd.DataFrame:
 
 def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
     """
-    fix currency string formatting
-    convert currency values to floats
-    convert negative inflows into outflows and vice versa
+    Fix currency string formatting.
+    Convert currency values to floats.
+    Convert negative inflows into outflows and vice versa.
 
-    :return: None
+    :param df: dataframe to modify
+    :type df: pd.DataFrame
+    :return: modified dataframe
+    :rtype: pd.DataFrame
     """
     # negative inflow = outflow
     df.loc[df["Inflow"] < 0, ["Outflow"]] = df["Inflow"] * -1
@@ -321,10 +333,11 @@ def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
 
 def clean_monetary_values(num_series: pd.Series) -> pd.Series:
     """
-    convert "," to "." then remove every instance of . except last one
-    remove any characters from inflow or outflow strings except
-    digits, "-", and "."
-    fill in null values with 0
+    Performs the following operations on a provided series of strings:
+    - Convert "," to "."
+    - Remove every instance of "." except last one
+    - Remove any characters except digits, "-", and "."
+    - Fill in null values with 0
 
     :param num_series: series of values to modify
     :type num_series: Series
@@ -356,7 +369,8 @@ def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
 
     :param df: dataframe to modify
     :type df: pd.DataFrame
-    :return: pd.DataFrame
+    :return: modified dataframe
+    :rtype: pd.DataFrame
     """
     # filter out rows where Inflow and Outflow are both blank
     df.query("Inflow.notna() | Outflow.notna()", inplace=True)
@@ -379,7 +393,6 @@ def auto_memo(df: pd.DataFrame, fill_memo: bool) -> pd.DataFrame:
     :return: modified dataframe
     :rtype: pd.DataFrame
     """
-    # TODO - fix empty strings
     if fill_memo:
         df["Memo"].fillna(df["Payee"], inplace=True)
     return df
@@ -387,9 +400,12 @@ def auto_memo(df: pd.DataFrame, fill_memo: bool) -> pd.DataFrame:
 
 def auto_payee(df: pd.DataFrame) -> pd.DataFrame:
     """
-    if Payee is blank, fill with contents of Memo column
+    If Payee is blank, fill with contents of Memo column
 
-    :return: None
+    :param df: dataframe to modify
+    :type df: pd.DataFrame
+    :return: modified dataframe
+    :rtype: pd.DataFrame
     """
     df["Payee"].fillna(df["Memo"], inplace=True)
     return df
@@ -470,10 +486,16 @@ def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
     return date_series
 
 
-def fill_api_columns(
-    df: pd.DataFrame,
-) -> pd.DataFrame:  # TODO handle account ID
-    df["account_id"] = ""  # TODO - not yet implemented
+def fill_api_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Generate API-specific columns using data in dataframe.
+
+    :param df: dataframe to read & modify
+    :type df: pd.DataFrame
+    :return: dataframe with additional columns added
+    :rtype: pd.DataFrame
+    """
+    df["account_id"] = ""
     df["date"] = df["Date"].astype(str)
     df["payee_name"] = df["Payee"].str.slice(0, 50)
     df["memo"] = df["Memo"].str.slice(0, 100)
@@ -504,5 +526,13 @@ def fill_api_columns(
 
 
 def combine_dfs(df_list: list[pd.DataFrame]) -> pd.DataFrame:
+    """
+    Concatenate a list of provided dataframes.
+
+    :param df_list: list of dataframes to concatenate
+    :type df_list: list[pd.DataFrame]
+    :return: concatenated dataframe
+    :rtype: pd.DataFrame
+    """
     merged_df = pd.concat(df_list, ignore_index=True).drop_duplicates()
     return merged_df

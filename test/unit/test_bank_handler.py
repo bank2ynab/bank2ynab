@@ -25,7 +25,7 @@ class TestBankHandler(TestCase):
 
     '''def test_init_and_name(self):
         """Check parameters are correctly stored in the object."""
-        self.b = B2YBank(self.defaults)
+        self.b = BankHandler(self.defaults)
         cfe = copy(self.defaults)
         self.assertEqual(self.b.config, cfe)
         self.assertEqual("DEFAULT", self.b.name)'''
@@ -108,7 +108,7 @@ class TestBankHandler(TestCase):
             ("test_record_headers", 74, "fixed_test_headers.csv"),
         ]:
             config = fix_conf_params(self.cp, section_name)
-            b = B2YBank(config)
+            b = BankHandler(config)
             for f in b.get_files():
                 output_data = b.read_data(f)
                 self.assertEqual(len(output_data), num_records)

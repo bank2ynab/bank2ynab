@@ -11,9 +11,6 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 class YNAB_API:
-    # TODO - revise docstring
-    # TODO - break up class - too many responsibilities
-    #           - ??? what subsets to use
 
     """
     uses Personal Access Token stored in user_configuration.conf

@@ -24,9 +24,9 @@ jobs:
     - name: Test with unittest
       run: |
         python -m unittest discover -v
-    - name: Code coverage check
-      run: |
-        pip install coverage
-        pip install codecov
-        codecov
-        coverage report
+    # - name: Code coverage check
+    #   run: |
+    #     pip install coverage
+    #     pip install codecov
+    #     codecov
+    #     coverage report

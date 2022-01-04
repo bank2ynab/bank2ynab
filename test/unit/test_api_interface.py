@@ -36,6 +36,7 @@ class TestAPIInterface(TestCase):
     def test_get_budget_accounts(self):
         raise NotImplementedError
 
+    @unittest.skip("Not tested yet.")
     def test_post_transactions(self):
         raise NotImplementedError
 

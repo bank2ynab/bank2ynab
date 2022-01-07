@@ -6,20 +6,20 @@
 """
 
 import re
-from typing import Any
+import typing
 
 from bank_handler import BankHandler
 
 
 class Handelsbanken(BankHandler):
-    def __init__(self, config_dict: dict[str, Any]):
+    def __init__(self, config_dict: dict[str, typing.Any]):
         """
         :param config_dict: a dictionary of conf parameters
         """
         super(Handelsbanken, self).__init__(config_dict)
         self.name = "Handelsbanken"
 
-    def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str:
+    def _preprocess_file(self, file_path: str, plugin_args: list[typing.Any]) -> str:
         """
         Strips HTML from input file, modifying the input file directly
         :param file_path: path to file
@@ -48,7 +48,7 @@ class Handelsbanken(BankHandler):
         return file_path
 
 
-def build_bank(config: dict[str, Any]) -> BankHandler:
+def build_bank(config: dict[str, typing.Any]) -> BankHandler:
     """This factory function is called from the main program,
     and expected to return a BankHandler subclass.
     Without this, the module will fail to load properly.

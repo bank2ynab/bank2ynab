@@ -2,7 +2,7 @@ import codecs
 import logging
 import os
 import re
-from os.path import abspath, join
+from os import path
 
 import chardet
 
@@ -36,21 +36,21 @@ def get_files(
 
     files: list[str] = list()
     missing_dir = False
-    path = ""
+    fpath = ""
     if file_pattern != "":
         try:
-            path = find_directory(try_path)
+            fpath = find_directory(try_path)
         except FileNotFoundError:
             missing_dir = True
-            path = find_directory("")
-        path = abspath(path)
+            fpath = find_directory("")
+        fpath = path.abspath(fpath)
         try:
-            directory_list = os.listdir(path)
+            directory_list = os.listdir(fpath)
         except FileNotFoundError:
             directory_list = os.listdir(".")
         if regex_active is True:
             files = [
-                join(path, f)
+                path.join(fpath, f)
                 for f in directory_list
                 if f.endswith(ext)
                 if re.match(file_pattern + r".*\.", f)
@@ -58,7 +58,7 @@ def get_files(
             ]
         else:
             files = [
-                join(path, f)
+                path.join(fpath, f)
                 for f in directory_list
                 if f.endswith(ext)
                 if f.startswith(file_pattern)
@@ -68,7 +68,7 @@ def get_files(
             logging.error(
                 f"\nFormat: {name}\n\n"
                 + "Error: Can't find download path:"
-                + f"{try_path}\nTrying default path instead:\t {path}"
+                + f"{try_path}\nTrying default path instead:\t {fpath}"
             )
     return files
 

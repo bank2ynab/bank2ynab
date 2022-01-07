@@ -1,10 +1,12 @@
 import logging
+
+from os import path
 import os
-from os.path import basename, dirname, isfile, join
 from typing import Any
 
-from dataframe_handler import DataframeHandler, combine_dfs
-from transactionfile_reader import detect_encoding, get_files
+import dataframe_handler
+from dataframe_handler import DataframeHandler
+import transactionfile_reader
 
 
 class BankHandler:
@@ -27,7 +29,7 @@ class BankHandler:
         self.transaction_list: list[dict] = list()
 
     def run(self) -> None:
-        matching_files = get_files(
+        matching_files = transactionfile_reader.get_files(
             name=self.config_dict["bank_name"],
             file_pattern=self.config_dict["input_filename"],
             try_path=self.config_dict["path"],
@@ -47,7 +49,7 @@ class BankHandler:
                     plugin_args=self.config_dict["plugin_args"],
                 )
                 # get file's encoding
-                src_encod = detect_encoding(src_file)
+                src_encod = transactionfile_reader.detect_encoding(src_file)
                 # create our base dataframe
 
                 df_handler = DataframeHandler()
@@ -101,7 +103,7 @@ class BankHandler:
                     )
         # don't add empty transaction dataframes
         if file_dfs:
-            combined_df = combine_dfs(file_dfs)
+            combined_df = dataframe_handler.combine_dfs(file_dfs)
             self.transaction_list = combined_df.to_dict(orient="records")
 
     def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str:
@@ -123,14 +125,14 @@ def get_output_path(input_path: str, prefix: str, ext: str) -> str:
     :return: target filename
     :rtype: str
     """
-    target_dir = dirname(input_path)
-    target_fname = basename(input_path)[:-4]
+    target_dir = path.dirname(input_path)
+    target_fname = path.basename(input_path)[:-4]
 
     new_filename = f"{prefix}{target_fname}{ext}"
-    new_path = join(target_dir, new_filename)
+    new_path = path.join(target_dir, new_filename)
     counter = 1
-    while isfile(new_path):
+    while path.isfile(new_path):
         new_filename = f"{prefix}{target_fname}_{counter}{ext}"
-        new_path = join(target_dir, new_filename)
+        new_path = path.join(target_dir, new_filename)
         counter += 1
     return new_path

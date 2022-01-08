@@ -22,7 +22,7 @@ from transactionfile_reader import detect_encoding
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
-class ParseMemoBank(BankHandler):
+class ExtractFromMemo(BankHandler):
     def __init__(self, config_object):
         """
         :param config_object: a dictionary of conf parameters
@@ -135,4 +135,4 @@ class ParseMemoBank(BankHandler):
 
 
 def build_bank(config):
-    return ParseMemoBank(config)
+    return ExtractFromMemo(config)

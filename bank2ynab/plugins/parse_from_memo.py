@@ -4,13 +4,14 @@ Plugin that uses information from the memo field to fill in other fields
 
 # Usage:
 # Ensure the relevant bank config has a Memo Parser config attribute
-# The attribute can contain a list of regular expressions, run from top to bottom
+# The attribute should contain a list of regular expressions, run from top to bottom
 # with named groups, used to override fields in the CSV.
 #   Memo Parser =
 #       (?<payee>\w+) (?<memo>.*)? AT (?<time>\d{2}\.\d{2})
+#       PURCHASER: (?<purchaser>\w+) AT (?<memo>.*)?
 # Valid groups are: payee, memo, date, time, purchaser
 # At that point, you can reference the plugin in conf files like this:
-#   Plugin = parse_memo_bank
+#   Plugin = parse_from_memo
 
 import re
 import logging
@@ -22,16 +23,15 @@ from transactionfile_reader import detect_encoding
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
-class ExtractFromMemo(BankHandler):
+class ParseFromMemo(BankHandler):
     def __init__(self, config_object):
         """
         :param config_object: a dictionary of conf parameters
         """
-        super(ParseMemoBank, self).__init__(config_object)
-        self.name = "ParseMemoBank"
+        super(ParseFromMemo, self).__init__(config_object)
+        self.name = "ParseFromMemo"
 
         # Parsers from the Config, skipping blank rows
-        breakpoint()
         memo_parsers = list(filter(len, self.config_dict.get("plugin_args", [])))
         if len(memo_parsers) <= 0:
             raise AttributeError(
@@ -57,7 +57,7 @@ class ExtractFromMemo(BankHandler):
         )
 
         # Apply our adjustment
-        new_df = df.apply(self._extract_from_memo, axis="columns")
+        new_df = df.apply(self._parse_from_memo, axis="columns")
 
         # Generate output path
         new_path = get_output_path(
@@ -76,7 +76,7 @@ class ExtractFromMemo(BankHandler):
 
         return new_path
 
-    def _extract_from_memo(self, row):
+    def _parse_from_memo(self, row):
         memo_index = self.config_dict["input_columns"].index("Memo")
         original_memo = row[memo_index]
 
@@ -135,4 +135,4 @@ class ExtractFromMemo(BankHandler):
 
 
 def build_bank(config):
-    return ExtractFromMemo(config)
+    return ParseFromMemo(config)

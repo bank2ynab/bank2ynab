@@ -4,7 +4,7 @@ from configparser import DuplicateSectionError, NoSectionError
 import api_interface
 from api_interface import APIInterface
 from config_handler import ConfigHandler
-from user_input import get_user_input
+import user_input
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
@@ -169,7 +169,7 @@ def select_account(bank_name: str, budget_info: dict[str, dict]):
     # generate budget name/id list
     budget_list = generate_name_id_list(budget_info)
     # ask user to select budget
-    budget_id = get_user_input(budget_list, msg)
+    budget_id = user_input.get_user_input(budget_list, msg)
 
     # msg = "Pick a YNAB account for transactions from {}".format(bank)
     msg = instruction.format("account", bank_name, "an account")
@@ -177,7 +177,7 @@ def select_account(bank_name: str, budget_info: dict[str, dict]):
     account_dict = budget_info[budget_id]["accounts"]
     account_list = generate_name_id_list(account_dict)
     # ask user to select account
-    account_id = get_user_input(account_list, msg)
+    account_id = user_input.get_user_input(account_list, msg)
 
     return budget_id, account_id
 

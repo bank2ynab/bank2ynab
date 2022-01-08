@@ -1,8 +1,9 @@
 import logging
 
+import bank_handler
 import pandas as pd
 import pdfplumber
-from bank_handler import BankHandler, get_output_path
+from bank_handler import BankHandler
 
 
 class PDF_Converter(BankHandler):
@@ -31,7 +32,7 @@ class PDF_Converter(BankHandler):
             pdf_path=file_path, table_cols=self.config["input_columns"]
         )
         # generate output path
-        new_path = get_output_path(
+        new_path = bank_handler.get_output_path(
             input_path=file_path,
             prefix=f"Converted PDF_{self.config['bank_name']}_",
             ext=".csv",

@@ -1,7 +1,7 @@
 import configparser
 import logging
 import os
-from typing import Any
+import typing
 
 
 class ConfigHandler:
@@ -39,7 +39,7 @@ class ConfigHandler:
             config.read(conf_files, encoding="utf-8")
             return config
 
-    def fix_conf_params(self, section: str) -> dict[str, Any]:
+    def fix_conf_params(self, section: str) -> dict[str, typing.Any]:
         """from a ConfigParser object, return a dictionary of all parameters
         for a given section in the expected format.
         Because ConfigParser defaults to values under [DEFAULT] if present,
@@ -174,7 +174,7 @@ class ConfigHandler:
 
     def get_config_line_lst(
         self, section_name: str, param: str, splitter: str
-    ) -> list[Any]:
+    ) -> list[typing.Any]:
         """
         Returns a list value from a given section in the config object.
 

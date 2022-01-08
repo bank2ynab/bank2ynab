@@ -72,6 +72,7 @@ class BankHandler:
                 logging.info(
                     f"No output data from this file for this bank. ({e})"
                 )
+                logging.debug(traceback.format_exc())
             else:
                 # make sure our data is not blank before writing
                 if not df_handler.df.empty:

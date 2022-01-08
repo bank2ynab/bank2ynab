@@ -9,3 +9,7 @@ env/
 bank2ynab/workspace.code-workspace
 .vscode
 .coverage
+# mac stuff
+.DS_Store
+.AppleDouble
+.LSOverride

@@ -123,18 +123,20 @@ def read_csv(
     :return: Dataframe read from CSV file
     :rtype: pd.DataFrame
     """
-    df = pd.read_csv(
-        file_path,
-        delimiter=delim,
-        skipinitialspace=True,  # skip space after delimiter
-        names=[],  # don't set column headers initially
-        skiprows=header_rows,  # skip header rows
-        skipfooter=footer_rows,  # skip footer rows
-        skip_blank_lines=True,  # skip blank lines
-        encoding=encod,
-        memory_map=True,  # access file object directly - no I/O overhead
-        engine="python",
-    )
+
+    with open(file_path, 'rU') as csv_file:
+        df = pd.read_csv(
+            csv_file,
+            delimiter=delim,
+            skipinitialspace=True,  # skip space after delimiter
+            names=[],  # don't set column headers initially
+            skiprows=header_rows,  # skip header rows
+            skipfooter=footer_rows,  # skip footer rows
+            skip_blank_lines=True,  # skip blank lines
+            encoding=encod,
+            engine="python",
+        )
+
     return df
 
 

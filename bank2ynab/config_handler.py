@@ -101,7 +101,7 @@ class ConfigHandler:
             ),
             "plugin": self.get_config_line_str(section, "Plugin"),
             "plugin_args": self.get_config_line_lst(
-                section, "Plugin Arguments", ","
+                section, "Plugin Arguments", "\n"
             ),
             "api_token": self.get_config_line_str(
                 section, "YNAB API Access Token"

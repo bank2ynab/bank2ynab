@@ -29,7 +29,6 @@ class ParseFromMemo(BankHandler):
         :param config_object: a dictionary of conf parameters
         """
         super(ParseFromMemo, self).__init__(config_object)
-        self.name = "ParseFromMemo"
 
         # Parsers from the Config, skipping blank rows
         memo_parsers = list(filter(len, self.config_dict.get("plugin_args", [])))

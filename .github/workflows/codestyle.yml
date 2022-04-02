@@ -12,3 +12,5 @@ jobs:
         with:
             requirementsFiles: "requirements.txt requirements-dev.txt"
       - run: find . -name '*.py' -print0 | xargs -0 pyupgrade --py36-plus
+      # E501 line too long
+      - run: flake8 . --ignore E501

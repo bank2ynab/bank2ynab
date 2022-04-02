@@ -23,6 +23,7 @@ from transactionfile_reader import detect_encoding
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
+
 class ParseFromMemo(BankHandler):
     def __init__(self, config_object):
         """
@@ -31,7 +32,9 @@ class ParseFromMemo(BankHandler):
         super(ParseFromMemo, self).__init__(config_object)
 
         # Parsers from the Config, skipping blank rows
-        memo_parsers = list(filter(len, self.config_dict.get("plugin_args", [])))
+        memo_parsers = list(
+            filter(len, self.config_dict.get("plugin_args", []))
+        )
         if len(memo_parsers) <= 0:
             raise AttributeError(
                 "The plugin arguments option contained no regular expresions to use for parsing"
@@ -49,7 +52,7 @@ class ParseFromMemo(BankHandler):
         src_encod = detect_encoding(file_path)
         df = read_csv(
             file_path=file_path,
-            delim=self.config_dict.get("input_delimiter", ','),
+            delim=self.config_dict.get("input_delimiter", ","),
             header_rows=0,
             footer_rows=0,
             encod=src_encod,
@@ -66,11 +69,12 @@ class ParseFromMemo(BankHandler):
         )
 
         # Write the dataframe to output file
-        new_df.to_csv(new_path,
-            index=False, # no row names (just ints)
-            header=False, # no column names (just ints)
+        new_df.to_csv(
+            new_path,
+            index=False,  # no row names (just ints)
+            header=False,  # no column names (just ints)
             encoding=src_encod,
-            sep=self.config_dict.get("input_delimiter", ','),
+            sep=self.config_dict.get("input_delimiter", ","),
         )
 
         return new_path
@@ -113,7 +117,10 @@ class ParseFromMemo(BankHandler):
                         input_date = datetime.strptime(
                             match["date"], "%d-%m-%Y"
                         )
-                        new_date = datetime.strftime(input_date, self.config_dict.get("date_format", "%Y-%m-%d"))
+                        new_date = datetime.strftime(
+                            input_date,
+                            self.config_dict.get("date_format", "%Y-%m-%d"),
+                        )
 
                         row[date_col] = new_date
                     except ValueError as exception:
@@ -124,7 +131,9 @@ class ParseFromMemo(BankHandler):
             # Field that mutate the payee
             try:
                 if len(match["payee"]):
-                    payee_index = self.config_dict["input_columns"].index("Payee")
+                    payee_index = self.config_dict["input_columns"].index(
+                        "Payee"
+                    )
 
                     row[payee_index] = match["payee"]
             except IndexError:

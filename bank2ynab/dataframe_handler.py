@@ -124,7 +124,7 @@ def read_csv(
     :rtype: pd.DataFrame
     """
 
-    with open(file_path, 'rU') as csv_file:
+    with open(file_path, "rU") as csv_file:
         df = pd.read_csv(
             csv_file,
             delimiter=delim,

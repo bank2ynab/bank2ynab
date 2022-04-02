@@ -123,7 +123,7 @@ class ParseFromMemo(BankHandler):
                         )
 
                         row[date_col] = new_date
-                    except ValueError as exception:
+                    except ValueError:
                         pass
             except IndexError:
                 pass

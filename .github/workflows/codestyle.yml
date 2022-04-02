@@ -8,3 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: psf/black@stable
+      - uses: jamescurtin/isort-action@master
+        with:
+            requirementsFiles: "requirements.txt requirements-dev.txt"

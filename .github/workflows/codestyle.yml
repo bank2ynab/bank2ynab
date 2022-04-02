@@ -11,3 +11,4 @@ jobs:
       - uses: jamescurtin/isort-action@master
         with:
             requirementsFiles: "requirements.txt requirements-dev.txt"
+      - run: find . -name '*.py' -print0 | xargs -0 pyupgrade --py36-plus

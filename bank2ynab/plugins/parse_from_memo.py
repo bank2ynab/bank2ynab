@@ -29,7 +29,7 @@ class ParseFromMemo(BankHandler):
         """
         :param config_object: a dictionary of conf parameters
         """
-        super(ParseFromMemo, self).__init__(config_object)
+        super().__init__(config_object)
 
         # Parsers from the Config, skipping blank rows
         memo_parsers = list(

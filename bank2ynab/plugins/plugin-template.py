@@ -7,7 +7,7 @@ from bank_handler import BankHandler
 
 class YourActualBankPlugin(BankHandler):
     def __init__(self, config_dict: dict):
-        super(YourActualBankPlugin, self).__init__(config_dict)
+        super().__init__(config_dict)
         self.name = "YourActualBank"
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:

@@ -11,7 +11,7 @@ class PDF_Converter(BankHandler):
         """
         :param config_object: a dictionary of conf parameters
         """
-        super(PDF_Converter, self).__init__(config_object)
+        super().__init__(config_object)
         self.config = config_object
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:

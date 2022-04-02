@@ -18,8 +18,8 @@ def build_bank(bank_config: dict[str, Any]) -> BankHandler:
         module = importlib.import_module(f"plugins.{plugin_module_name}")
         if not hasattr(module, "build_bank"):
             s = (
-                f"The specified plugin {plugin_module_name}.py"
-                + "does not contain the required build_bank(config) method."
+                f"The specified plugin {plugin_module_name}.py "
+                "does not contain the required build_bank(config) method."
             )
             raise ImportError(s)
         bank = module.build_bank(bank_config)

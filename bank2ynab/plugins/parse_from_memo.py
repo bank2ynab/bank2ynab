@@ -13,8 +13,8 @@ Plugin that uses information from the memo field to fill in other fields
 # At that point, you can reference the plugin in conf files like this:
 #   Plugin = parse_from_memo
 
-import re
 import logging
+import re
 from datetime import datetime
 
 from bank_handler import BankHandler, get_output_path

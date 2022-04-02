@@ -3,6 +3,8 @@ from unittest import TestCase
 
 import pandas as pd
 import pandas.testing
+from pandas._libs.missing import NA
+
 from bank2ynab.dataframe_handler import (
     add_missing_columns,
     auto_memo,
@@ -18,7 +20,6 @@ from bank2ynab.dataframe_handler import (
     merge_duplicate_columns,
     remove_invalid_rows,
 )
-from pandas._libs.missing import NA
 
 
 class TestDataframeHandler(TestCase):

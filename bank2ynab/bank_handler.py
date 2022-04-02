@@ -1,13 +1,12 @@
 import logging
-
-from os import path
 import os
 import traceback
+from os import path
 from typing import Any
 
 import dataframe_handler
-from dataframe_handler import DataframeHandler
 import transactionfile_reader
+from dataframe_handler import DataframeHandler
 
 
 class BankHandler:

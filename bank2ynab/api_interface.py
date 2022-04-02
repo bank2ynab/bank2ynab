@@ -1,7 +1,6 @@
 import logging
 
 import requests
-
 from ynab_api_response import YNABError
 
 

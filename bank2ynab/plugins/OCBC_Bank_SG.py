@@ -10,7 +10,7 @@ class OCBC_Bank_SG(BankHandler):
         """
         :param config_dict: a dictionary of conf parameters
         """
-        super(OCBC_Bank_SG, self).__init__(config_dict)
+        super().__init__(config_dict)
         self.name = "OCBC_Bank_SG"
 
     def _preprocess_file(self, file_path, plugin_args) -> str:

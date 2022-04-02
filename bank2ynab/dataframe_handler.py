@@ -124,7 +124,7 @@ def read_csv(
     :rtype: pd.DataFrame
     """
 
-    with open(file_path, 'rU') as csv_file:
+    with open(file_path) as csv_file:
         df = pd.read_csv(
             csv_file,
             delimiter=delim,
@@ -463,7 +463,7 @@ def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:
         errors="coerce",
     ).dt.strftime("%Y-%m-%d")
 
-    logging.debug("\nFixed dates:\n{}".format(date_series.head()))
+    logging.debug(f"\nFixed dates:\n{date_series.head()}")
 
     return formatted_date_series
 

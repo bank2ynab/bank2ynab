@@ -66,9 +66,9 @@ def get_files(
             ]
         if not files and missing_dir:
             logging.error(
-                f"\nFormat: {name}\n\n"
-                + "Error: Can't find download path:"
-                + f"{try_path}\nTrying default path instead:\t {fpath}"
+                f"\nFormat: {name}\n\n "
+                "Error: Can't find download path: "
+                f"{try_path}\nTrying default path instead:\t {fpath}"
             )
     return files
 

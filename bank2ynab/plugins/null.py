@@ -18,7 +18,7 @@ class NullBank(BankHandler):
         """
         :param config_object: a dictionary of conf parameters
         """
-        super(NullBank, self).__init__(config_dict)
+        super().__init__(config_dict)
         self.name = "NullBank"
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:

@@ -16,7 +16,7 @@ class Handelsbanken(BankHandler):
         """
         :param config_dict: a dictionary of conf parameters
         """
-        super(Handelsbanken, self).__init__(config_dict)
+        super().__init__(config_dict)
         self.name = "Handelsbanken"
 
     def _preprocess_file(

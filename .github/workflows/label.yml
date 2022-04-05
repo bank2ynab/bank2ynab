@@ -6,14 +6,16 @@
 # https://github.com/actions/labeler/blob/master/README.md
 
 name: Labeler
-on: [pull_request]
+on: [pull_request_target]
 
 jobs:
   label:
-
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/labeler@v2
+    - uses: actions/labeler@v4
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"

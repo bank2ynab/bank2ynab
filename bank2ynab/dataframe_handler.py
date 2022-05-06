@@ -101,7 +101,7 @@ class DataframeHandler:
 
 
 def read_csv(
-    file_pathp: str,
+    file_path: str,
     delim: str,
     header_rows: int,
     footer_rows: int,

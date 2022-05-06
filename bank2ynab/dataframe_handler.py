@@ -124,18 +124,17 @@ def read_csv(
     :rtype: pd.DataFrame
     """
 
-    with open(file_path) as csv_file:
-        df = pd.read_csv(
-            csv_file,
-            delimiter=delim,
-            skipinitialspace=True,  # skip space after delimiter
-            names=[],  # don't set column headers initially
-            skiprows=header_rows,  # skip header rows
-            skipfooter=footer_rows,  # skip footer rows
-            skip_blank_lines=True,  # skip blank lines
-            encoding=encod,
-            engine="python",
-        )
+    df = pd.read_csv(
+        file_path,
+        delimiter=delim,
+        skipinitialspace=True,  # skip space after delimiter
+        names=[],  # don't set column headers initially
+        skiprows=header_rows,  # skip header rows
+        skipfooter=footer_rows,  # skip footer rows
+        skip_blank_lines=True,  # skip blank lines
+        encoding=encod,
+        engine="python",
+    )
 
     return df
 

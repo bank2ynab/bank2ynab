@@ -118,7 +118,9 @@ Here is a list of the banks and their formats that we already support. Note that
 1. BR Inter, checking
 1. CA TD Canada Trust, checking+Visa
 1. CH UBS Checking account
+1. CH UBS Checking account - Alternative 1
 1. CH UBS Credit card
+1. CH SwissCard
 1. CH ZKB Erweiterte Suche
 1. CH ZKB Finanzassistent-Chronik
 1. CO Bancolombia

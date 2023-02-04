@@ -22,6 +22,7 @@ class DataframeHandler:
         :type path: str
         """
         self.output_df.to_csv(path, index=False)
+
     def run(
         self,
         *,

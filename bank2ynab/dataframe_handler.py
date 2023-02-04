@@ -238,19 +238,26 @@ def merge_duplicate_columns(
     for key in cols_to_merge:
         key_cols: list[int] = cols_to_merge[key]
         if len(key_cols) > 1:
-            # change first column to string
-            df.iloc[:, key_cols[0]] = df.iloc[:, key_cols[0]].astype(str) + " "
+            if key not in {"Inflow", "Outflow"}:
+                # change first column to string
+                df.iloc[:, key_cols[0]] = df.iloc[:, key_cols[0]].astype(str) + " "
+            
             # merge every duplicate column into the 1st instance
             # of the column name
             for dupe_count, key_col in enumerate(key_cols[1:]):
                 # add string version of each column onto the first column
-                df.iloc[:, key_cols[0]] += f"{df.iloc[:, key_col]} "
+                if key in {"Inflow", "Outflow"}:
+                    df.iloc[:, key_cols[0]] = df.iloc[:, key_cols[0]].fillna(df.iloc[:, key_col])
+                else:
+                    df.iloc[:, key_cols[0]] += f"{df.iloc[:, key_col]} "
                 # rename duplicate column
                 df.columns.values[key_col] = f"{key} {dupe_count}"
-            # remove excess spaces
-            df[key] = (
-                df[key].str.replace("\\s{2,}", " ", regex=True).str.strip()
-            )
+                
+            if key not in {"Inflow", "Outflow"}:
+                # remove excess spaces
+                df[key] = (
+                    df[key].str.replace("\\s{2,}", " ", regex=True).str.strip()
+                )
 
     logging.debug(f"\nAfter duplicate merge\n{df.head()}")
     return df

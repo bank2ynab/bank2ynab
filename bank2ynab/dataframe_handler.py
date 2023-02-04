@@ -426,7 +426,7 @@ def clean_strings(string_series: pd.Series) -> pd.Series:
     modified_string_series = modified_string_series.str.title()
     # remove non-alphanumeric
     modified_string_series = modified_string_series.replace(
-        "[^a-zA-Z0-9 ]", " ", regex=True
+        r"[^\w\d ]", " ", regex=True
     )
     # remove newline characters
     modified_string_series = modified_string_series.str.replace(

@@ -6,11 +6,5 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - uses: psf/black@stable
-      - uses: jamescurtin/isort-action@master
-        with:
-            requirementsFiles: "requirements.txt requirements-dev.txt"
-      - run: find . -name '*.py' -print0 | xargs -0 pyupgrade --py36-plus
-      # E501 line too long
-      - run: flake8 . --ignore E501

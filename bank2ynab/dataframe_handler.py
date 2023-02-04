@@ -199,7 +199,7 @@ def parse_data(
     df["Payee"] = clean_strings(df["Payee"])
     df["Memo"] = clean_strings(df["Memo"])
     # remove invalid rows
-    df = remove_invalid_rows(df)# badcomment
+    df = remove_invalid_rows(df)
     # fill API-specific columns
     df = fill_api_columns(df)
     # remove invalid rows

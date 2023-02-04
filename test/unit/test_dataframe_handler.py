@@ -333,7 +333,10 @@ class TestDataframeHandler(TestCase):
             [r"Non alphanumeric \ ! @", "Non Alphanumeric"],
             ["RanDom CAPITAL letters", "Random Capital Letters"],
             ["New Line\nIn The String", "New Line In The String"],
-            ["Ðön't rēmove ácçeñtéd chäråcterß", "Ðönt Rēmove Ácçeñtéd Chäråcterß"],
+            [
+                "Ðön't rēmove ácçeñtéd chäråcterß",
+                "Ðönt Rēmove Ácçeñtéd Chäråcterß",
+            ],
         ]
         for test in test_strings:
             with self.subTest(

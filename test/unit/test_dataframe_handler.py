@@ -109,7 +109,7 @@ class TestDataframeHandler(TestCase):
             ):
                 test_df = pd.DataFrame(dataset)
                 test_df = add_missing_columns(
-                    test_df, list(test_df), desired_cols
+                    test_df, list(test_df), desired_cols  # type: ignore
                 )
                 # check if column names contain all desired values
                 self.assertCountEqual(desired_cols, list(test_df))

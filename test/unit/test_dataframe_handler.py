@@ -334,8 +334,8 @@ class TestDataframeHandler(TestCase):
             ["RanDom CAPITAL letters", "Random Capital Letters"],
             ["New Line\nIn The String", "New Line In The String"],
             [
-                "Ðön't rēmove ácçeñtéd chäråcterß",
-                "Ðönt Rēmove Ácçeñtéd Chäråcterß",
+                "Ðö nøt rēmove ácçeñtéd chäråcterß",
+                "Ðö Nøt Rēmove Ácçeñtéd Chäråcterß",
             ],
         ]
         for test in test_strings:

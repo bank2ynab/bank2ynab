@@ -1,10 +1,11 @@
 # Plugin for handling OCBC Bank [SG] files
 
-from bank_handler import BankHandler
+from bank2ynab.bank_handler import BankHandler
 
 
 class OCBC_Bank_SG(BankHandler):
-    """Example subclass used for testing the plugin system."""
+    """Plugin for handling Oversea-Chinese Banking Corporation Singapore
+    (OCBC SG) bank files"""
 
     def __init__(self, config_dict: dict):
         """
@@ -31,6 +32,8 @@ class OCBC_Bank_SG(BankHandler):
         with open(file_path) as input_file:
             output_rows = []
             for rownum, row in enumerate(input_file):
+                # strip any single quotes, e.g. if payee is MCDONALD'S
+                row = row.replace("'","")
                 # append headers and footers without modification
                 if rownum < header_rows or rownum > (row_count - footer_rows):
                     output_rows.append(row)

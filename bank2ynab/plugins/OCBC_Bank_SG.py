@@ -1,6 +1,6 @@
 # Plugin for handling OCBC Bank [SG] files
 
-from bank2ynab.bank_handler import BankHandler
+from bank_handler import BankHandler
 
 
 class OCBC_Bank_SG(BankHandler):
@@ -33,7 +33,7 @@ class OCBC_Bank_SG(BankHandler):
             output_rows = []
             for rownum, row in enumerate(input_file):
                 # strip any single quotes, e.g. if payee is MCDONALD'S
-                row = row.replace("'","")
+                row = row.replace("'", "")
                 # append headers and footers without modification
                 if rownum < header_rows or rownum > (row_count - footer_rows):
                     output_rows.append(row)

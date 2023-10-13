@@ -117,6 +117,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. BE KBC checking
 1. BE KBC credit
 1. BE Keytrade Bank
+1. BR Bradesco, checking
 1. BR Banco do Brasil, checking
 1. BR Inter, checking
 1. CA TD Canada Trust, checking+Visa
@@ -137,6 +138,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Deutsche Bank
 1. DE Deutsche Bank Credit Card
 1. DE Deutsche Kreditbank checking
+1. DE Deutsche Kreditbank checking new
 1. DE Deutsche Kreditbank credit card
 1. DE Fiducia (Volksbank, Sparda-Bank, BBBank, PSD Bank, Raiffeisen, ...)
 1. DE ING-DiBa

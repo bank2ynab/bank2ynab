@@ -1,10 +1,10 @@
 from bank_handler import BankHandler
 
 
-class YourActualBankPlugin(BankHandler):
+class FixLineBreaksPlugin(BankHandler):
     def __init__(self, config_dict: dict):
         super().__init__(config_dict)
-        self.name = "YourActualBank"
+        self.name = "FixLineBreaks"
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
@@ -28,7 +28,9 @@ class YourActualBankPlugin(BankHandler):
         modified_contents = file_contents
 
         for char in plugin_args:
-            modified_contents = modified_contents.replace(f"/n{char}", f"char")
+            modified_contents = modified_contents.replace(
+                f"/n{char}", f"{char}"
+            )
 
         # Open the source file for writing and overwrite its contents
         with open(file_path, "w") as f:
@@ -36,4 +38,4 @@ class YourActualBankPlugin(BankHandler):
 
 
 def build_bank(config):
-    return YourActualBankPlugin(config)
+    return FixLineBreaksPlugin(config)

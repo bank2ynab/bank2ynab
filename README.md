@@ -124,6 +124,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. CH UBS Checking account
 1. CH UBS Checking account - Alternative 1
 1. CH UBS Credit card
+1. CH Neon Monthly Account Statement
 1. CH SwissCard
 1. CH ZKB Erweiterte Suche
 1. CH ZKB Finanzassistent-Chronik
@@ -213,6 +214,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. US Schwab Savings
 1. US TB Bank
 1. US USAA
+1. Wise
 <!--AUTO BANK UPDATE END-->
 ----
 

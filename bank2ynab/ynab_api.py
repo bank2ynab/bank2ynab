@@ -11,7 +11,6 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 class YNAB_API:
-
     """
     uses Personal Access Token stored in user_configuration.conf
     (note for devs: be careful not to accidentally share API access token!)

@@ -51,9 +51,9 @@ if __name__ == "__main__":
         for bank_object in bank_obj_list:
             bank_object.run()
             if bank_object.transaction_list:
-                bank_transaction_dict[
-                    bank_object.name
-                ] = bank_object.transaction_list
+                bank_transaction_dict[bank_object.name] = (
+                    bank_object.transaction_list
+                )
             files_processed += bank_object.files_processed
         logging.info(
             f"\nFile processing complete! {files_processed} files processed.\n"

@@ -15,9 +15,9 @@ class XLS_Converter(BankHandler):
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
-        Combines all tables in a PDF file into one table and writes to CSV.
+        Combines all tables in a XLS file into one table and writes to CSV.
 
-        :param file_path: path to PDF file
+        :param file_path: path to XLS file
         :type file_path: str
         :param plugin_args: plugin arguments (unused in this plugin)
         :type plugin_args: list
@@ -26,7 +26,7 @@ class XLS_Converter(BankHandler):
         """
         logging.info("Converting XLS file...")
 
-        # create dataframe from pdf
+        # create dataframe from xls
         df = read_excel(file_path)
         # generate output path
         new_path = bank_handler.get_output_path(

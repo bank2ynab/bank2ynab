@@ -1,6 +1,6 @@
 name: Python testing
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -9,12 +9,12 @@ jobs:
       max-parallel: 4
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: ["3.9", "3.10"]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -24,10 +24,9 @@ jobs:
     - name: Test with unittest
       run: |
         python -m unittest discover -v
-    - name: Code coverage check
-      run: |
-        echo "Temporarily disabled."
-        #pip install coverage
-        #pip install codecov
-        #codecov
-        #coverage report
+    # - name: Code coverage check
+    #   run: |
+    #     pip install coverage
+    #     pip install codecov
+    #     codecov
+    #     coverage report

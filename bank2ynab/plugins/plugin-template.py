@@ -2,15 +2,15 @@
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
 
-from bank_process import B2YBank
+from bank_handler import BankHandler
 
 
-class YourActualBankPlugin(B2YBank):
-    def __init__(self, config_object):
-        super(YourActualBankPlugin, self).__init__(config_object)
+class YourActualBankPlugin(BankHandler):
+    def __init__(self, config_dict: dict):
+        super().__init__(config_dict)
         self.name = "YourActualBank"
 
-    def _preprocess_file(self, file_path):
+    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """
         This is an example of how to preprocess the transaction file
         prior to feeding the data into the main read_data function.
@@ -24,8 +24,8 @@ class YourActualBankPlugin(B2YBank):
         :param file_path: path to file
         """
         # what do we actually want to do?
-        header_rows = int(self.config["header_rows"])
-        footer_rows = int(self.config["footer_rows"])
+        header_rows = int(self.config_dict["header_rows"])
+        footer_rows = int(self.config_dict["footer_rows"])
 
         # get total number of rows in transaction file using a generator
         with open(file_path) as row_counter:
@@ -51,7 +51,7 @@ class YourActualBankPlugin(B2YBank):
         with open(file_path, "w") as output_file:
             for row in output_rows:
                 output_file.write(row)
-        return
+        return file_path
 
 
 def build_bank(config):

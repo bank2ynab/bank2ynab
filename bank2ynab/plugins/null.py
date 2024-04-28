@@ -8,21 +8,31 @@
 # At that point, you can reference the plugin in conf files like this:
 #   Plugin = mymodule
 
-from bank_process import B2YBank
+from bank_handler import BankHandler
 
 
-class NullBank(B2YBank):
+class NullBank(BankHandler):
     """Example subclass used for testing the plugin system."""
 
-    def __init__(self, config_object):
+    def __init__(self, config_dict: dict):
         """
         :param config_object: a dictionary of conf parameters
         """
-        super(NullBank, self).__init__(config_object)
+        super().__init__(config_dict)
         self.name = "NullBank"
 
+    def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
+        """
+        This is probably the only method you really want to override.
+        exists solely to be used by plugins for pre-processing a file
+        that otherwise can be read normally (e.g. weird format)
+        :param file_path: path to file
+        """
+        # intentionally empty - plugins can use this function
+        return file_path
+
     def read_data(self, file_path):
-        """This is probably the only method you really want to override.
+        """
         Implement any custom parsing logic in here.
         :param file_path: absolute path to source file
         :return: list of lists representing rows in output format

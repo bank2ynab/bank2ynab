@@ -11,6 +11,7 @@ Development:
 [![GitHub last commit](https://img.shields.io/github/last-commit/bank2ynab/bank2ynab.svg)](https://github.com/bank2ynab/bank2ynab/commits/develop)
 [![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/bank2ynab/bank2ynab/blob/develop/docs/CONTRIBUTING.md)
 [![Join the chat at https://gitter.im/bank2ynab/Lobby](https://badges.gitter.im/github-release-notes/Lobby.svg)](https://gitter.im/bank2ynab/Lobby)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 Testing:
 [![Travis status](https://travis-ci.com/bank2ynab/bank2ynab.svg?branch=develop)](https://travis-ci.com/bank2ynab/bank2ynab)
@@ -68,7 +69,7 @@ There are currently more than 80 GitHub projects related to YNAB converter scrip
 ### <a name="requirements"></a>Requirements
 
 - Windows or Mac or Linux
-- Python v3.5+ installed ([download it from python.org](https://www.python.org/downloads/)) (Python v2.7 *might* work but we make no promises; Py2 has end-of-life on 01Jan2020.)
+- Python v3.9+ installed ([download it from python.org](https://www.python.org/downloads/))
 - Support for other scripting languages may follow. Contributions are welcome!
 
 ## <a name="userguide"></a>User Guide
@@ -89,7 +90,7 @@ Using `bank2ynab` is easy:
    - Linux/Mac: Open a terminal, navigate to the script directory, and run the command `python3 ./bank2ynab`.
      - *Important:* Be sure to use `python3` specifically, and not `python` or `python2` which is probably the system default.
  1. Depending on your configuration, the conversion script will now import your files into YNAB automatically, or you can add the files manually:
-    - **Automatic import** (when you have provided [your YNAB API access token](https://github.com/bank2ynab/bank2ynab/wiki/Create-your-YNAB-API-access-token): 
+    - **Automatic import** (when you have provided [your YNAB API access token](https://github.com/bank2ynab/bank2ynab/wiki/Create-your-YNAB-API-access-token):
       - The conversion script will now ask you which budget it should use to import your converted CSV file to (if you have multiple). It will also ask you which account inside the budget to use (if you have multiple); you'll only have to answer this question once.
     - **Manually drag-and-drop** the converted CSV file onto the YNAB web app:
       - YNAB will detect this and offer you import options. If you had already switched YNAB to the corresponding account view, YNAB will understand that you want to import this file to this account.
@@ -106,21 +107,29 @@ Here is a list of the banks and their formats that we already support. Note that
 1. AT Raiffeisen Bank 2018
 1. AT Raiffeisen Bank RCM
 1. AT Raiffeisen Bank 2019 checking
+1. AT Raiffeisen Bank 2021 checking
 1. AT Raiffeisen VISA
 1. AU ANZ
 1. AU ING
 1. AU National Australia Bank
+1. BE BNP Paribas Fortis old
+1. BE BNP Paribas Fortis Export
 1. BE KBC checking
 1. BE KBC credit
 1. BE Keytrade Bank
+1. BR Banco Bradesco Checking
 1. BR Banco do Brasil, checking
 1. BR Inter, checking
 1. CA TD Canada Trust, checking+Visa
 1. CH UBS Checking account
+1. CH UBS Checking account - Alternative 1
 1. CH UBS Credit card
+1. CH Neon Monthly Account Statement
+1. CH SwissCard
 1. CH ZKB Erweiterte Suche
 1. CH ZKB Finanzassistent-Chronik
 1. CO Bancolombia
+1. Crypto.com
 1. CZ AirBank checking and savings
 1. CZ Ceska Sporitelna
 1. CZ Raiffeisen bank
@@ -130,6 +139,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Deutsche Bank
 1. DE Deutsche Bank Credit Card
 1. DE Deutsche Kreditbank checking
+1. DE Deutsche Kreditbank checking new
 1. DE Deutsche Kreditbank credit card
 1. DE Fiducia (Volksbank, Sparda-Bank, BBBank, PSD Bank, Raiffeisen, ...)
 1. DE ING-DiBa
@@ -139,6 +149,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. DE Ostseesparkasse Rostock credit card
 1. DE Sparkasse Rhein-Neckar-Nord
 1. DE Landesbank Berlin Amazon Kreditkarten-Banking
+1. DE Paypal
 1. DE Sparkasse Südholstein
 1. DK Bankernes EDB Central
 1. DK Danske Bank
@@ -171,7 +182,9 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NO DNB
 1. NO Sparebank 1 VISA
 1. Personal Capital
+1. PL Alior Bank
 1. PL mBank
+1. PL PKO BP
 1. Revolut
 1. SE Handelsbanken
 1. SE Länsförsäkringar checking
@@ -185,6 +198,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SG OCBC Bank
 1. SG OCBC Bank Credit Card
 1. SG POSB savings
+1. SG UOB Savings Account
+1. SG UOB Credit Card
 1. SK Tatra Banka
 1. SK VUB
 1. UK Co-operative Bank
@@ -192,7 +207,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. UK Barclaycard credit card
 1. UK Barclaycard Business Credit Card
 1. UK first direct checking
-1. UK John Lewis Partnership Card
+1. UK John Lewis Partnership Card (Pre-2022 Format)
+1. UK John Lewis Partnership Card (NewDay Format)
 1. US Bank of America
 1. US Bank of America Credit Card
 1. US BB&T
@@ -202,6 +218,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. US Schwab Savings
 1. US TB Bank
 1. US USAA
+1. Wise
 <!--AUTO BANK UPDATE END-->
 ----
 

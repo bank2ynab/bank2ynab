@@ -78,25 +78,21 @@ class BankHandler:
             else:
                 # make sure our data is not blank before writing
                 if not df_handler.df.empty:
-                    # write export file
-                    output_path = get_output_path(
-                        input_path=src_file,
-                        prefix=self.config_dict["fixed_prefix"],
-                        ext=self.config_dict["output_ext"],
-                    )
-                    logging.info(
-                        f"Writing output file: {output_path} (debug -"
-                        " commented out)"
-                    )
-                    df_handler.output_csv(output_path)
+                    # only save a file if required
+                    if self.config_dict["save_output"] is True:
+                        # write export file
+                        output_path = get_output_path(
+                            input_path=src_file,
+                            prefix=self.config_dict["fixed_prefix"],
+                            ext=self.config_dict["output_ext"],
+                        )
+                        logging.info(f"Writing output file: {output_path}")
+                        df_handler.output_csv(output_path)
                     # save api transaction data for each bank to list
                     file_dfs.append(df_handler.api_transaction_df)
                     # delete original csv file
                     if self.config_dict["delete_original"] is True:
-                        logging.info(
-                            f"Removing input file: {src_file} (debug -"
-                            " commented out)"
-                        )
+                        logging.info(f"Removing input file: {src_file}")
                         os.remove(src_file)
                 else:
                     logging.info(

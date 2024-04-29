@@ -11,6 +11,7 @@ setuptools.setup(
     description="Easily convert and import your bank's statements into YNAB.",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    entry_points={"console_scripts": ["bank2ynab = bank2ynab.__main__:main"]},
     url="https://github.com/bank2ynab/bank2ynab",
     packages=setuptools.find_packages(),
     classifiers=[

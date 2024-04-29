@@ -17,9 +17,9 @@ import logging
 import re
 from datetime import datetime
 
-from bank_handler import BankHandler, get_output_path
-from dataframe_handler import read_csv
-from transactionfile_reader import detect_encoding
+from ..bank_handler import BankHandler, get_output_path
+from ..dataframe_handler import read_csv
+from ..transactionfile_reader import detect_encoding
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 

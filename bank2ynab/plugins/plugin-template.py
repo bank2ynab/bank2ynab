@@ -2,7 +2,7 @@
 # Step 2: Copy this template into a new file.
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
 
-from bank_handler import BankHandler
+from ..bank_handler import BankHandler
 
 
 class YourActualBankPlugin(BankHandler):

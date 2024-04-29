@@ -2,9 +2,9 @@ import importlib
 import logging
 from typing import Any
 
-from bank_handler import BankHandler
-from config_handler import ConfigHandler
-from ynab_api import YNAB_API
+from .bank_handler import BankHandler
+from .config_handler import ConfigHandler
+from .ynab_api import YNAB_API
 
 # configure our logger
 logging.basicConfig(format="%(levelname): %(message)", level=logging.INFO)
@@ -28,8 +28,7 @@ def build_bank(bank_config: dict[str, Any]) -> BankHandler:
         return BankHandler(config_dict=bank_config)
 
 
-# Let's run this thing!
-if __name__ == "__main__":
+def main():
     try:
         config_handler = ConfigHandler()
     except FileNotFoundError:
@@ -51,9 +50,9 @@ if __name__ == "__main__":
         for bank_object in bank_obj_list:
             bank_object.run()
             if bank_object.transaction_list:
-                bank_transaction_dict[
-                    bank_object.name
-                ] = bank_object.transaction_list
+                bank_transaction_dict[bank_object.name] = (
+                    bank_object.transaction_list
+                )
             files_processed += bank_object.files_processed
         logging.info(
             f"\nFile processing complete! {files_processed} files processed.\n"
@@ -62,3 +61,8 @@ if __name__ == "__main__":
         if bank_transaction_dict:
             api = YNAB_API(config_handler)
             api.run(bank_transaction_dict)
+
+
+# Let's run this thing!
+if __name__ == "__main__":
+    main()

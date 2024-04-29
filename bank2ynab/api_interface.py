@@ -1,7 +1,7 @@
 import logging
 
 import requests
-from ynab_api_response import YNABError
+from .ynab_api_response import YNABError
 
 
 class APIInterface:

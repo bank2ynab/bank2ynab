@@ -22,5 +22,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
     ],
+    install_requires=["chardet", "pandas", "requests", "pdfplumber", "xlrd"],
     python_requires=">=3.9",
 )

@@ -196,6 +196,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SG OCBC Bank
 1. SG OCBC Bank Credit Card
 1. SG POSB savings
+1. SG UOB Savings Account
+1. SG UOB Credit Card
 1. SK Tatra Banka
 1. SK VUB
 1. UK Co-operative Bank

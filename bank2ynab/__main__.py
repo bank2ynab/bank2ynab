@@ -2,9 +2,9 @@ import importlib
 import logging
 from typing import Any
 
-from bank_handler import BankHandler
-from config_handler import ConfigHandler
-from ynab_api import YNAB_API
+from .bank_handler import BankHandler
+from .config_handler import ConfigHandler
+from .ynab_api import YNAB_API
 
 # configure our logger
 logging.basicConfig(format="%(levelname): %(message)", level=logging.INFO)
@@ -15,7 +15,9 @@ def build_bank(bank_config: dict[str, Any]) -> BankHandler:
     for a given configuration."""
     plugin_module_name = bank_config.get("plugin", None)
     if plugin_module_name:
-        module = importlib.import_module(f"plugins.{plugin_module_name}")
+        module = importlib.import_module(
+            f".plugins.{plugin_module_name}", package="bank2ynab"
+        )
         if not hasattr(module, "build_bank"):
             s = (
                 f"The specified plugin {plugin_module_name}.py "
@@ -28,8 +30,7 @@ def build_bank(bank_config: dict[str, Any]) -> BankHandler:
         return BankHandler(config_dict=bank_config)
 
 
-# Let's run this thing!
-if __name__ == "__main__":
+def main():
     try:
         config_handler = ConfigHandler()
     except FileNotFoundError:
@@ -62,3 +63,8 @@ if __name__ == "__main__":
         if bank_transaction_dict:
             api = YNAB_API(config_handler)
             api.run(bank_transaction_dict)
+
+
+# Let's run this thing!
+if __name__ == "__main__":
+    main()

@@ -4,9 +4,9 @@ import traceback
 from os import path
 from typing import Any
 
-import dataframe_handler
-import transactionfile_reader
-from dataframe_handler import DataframeHandler
+from . import dataframe_handler
+from . import transactionfile_reader
+from .dataframe_handler import DataframeHandler
 
 
 class BankHandler:

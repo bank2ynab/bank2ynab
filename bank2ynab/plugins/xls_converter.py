@@ -1,8 +1,8 @@
 import logging
 
-import bank_handler
+from .. import bank_handler
 from pandas import read_excel
-from bank_handler import BankHandler
+from ..bank_handler import BankHandler
 
 
 class XLS_Converter(BankHandler):

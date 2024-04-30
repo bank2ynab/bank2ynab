@@ -1,4 +1,4 @@
-from bank_handler import BankHandler
+from ..bank_handler import BankHandler
 
 
 class FixLineBreaksPlugin(BankHandler):

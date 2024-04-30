@@ -1,9 +1,9 @@
 import logging
 
-import bank_handler
+from .. import bank_handler
 import pandas as pd
 import pdfplumber
-from bank_handler import BankHandler
+from ..bank_handler import BankHandler
 
 
 class PDF_Converter(BankHandler):

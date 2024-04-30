@@ -1,6 +1,6 @@
 # Plugin for handling OCBC Bank [SG] files
 
-from bank_handler import BankHandler
+from ..bank_handler import BankHandler
 
 
 class OCBC_Bank_SG(BankHandler):

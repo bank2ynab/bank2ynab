@@ -1,10 +1,10 @@
 import logging
 from configparser import DuplicateSectionError, NoSectionError
 
-import api_interface
-import user_input
-from api_interface import APIInterface
-from config_handler import ConfigHandler
+from . import api_interface
+from . import user_input
+from .api_interface import APIInterface
+from .config_handler import ConfigHandler
 
 # configure our logger
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)

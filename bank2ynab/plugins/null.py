@@ -8,7 +8,7 @@
 # At that point, you can reference the plugin in conf files like this:
 #   Plugin = mymodule
 
-from bank_handler import BankHandler
+from ..bank_handler import BankHandler
 
 
 class NullBank(BankHandler):

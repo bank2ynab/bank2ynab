@@ -15,7 +15,9 @@ def build_bank(bank_config: dict[str, Any]) -> BankHandler:
     for a given configuration."""
     plugin_module_name = bank_config.get("plugin", None)
     if plugin_module_name:
-        module = importlib.import_module(f"plugins.{plugin_module_name}")
+        module = importlib.import_module(
+            f".plugins.{plugin_module_name}", package="bank2ynab"
+        )
         if not hasattr(module, "build_bank"):
             s = (
                 f"The specified plugin {plugin_module_name}.py "

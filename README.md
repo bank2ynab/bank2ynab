@@ -177,6 +177,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL Rabobank
 1. NL Rabobank-2018
 1. NL Rabobank Credit Card
+1. NL RegioBank
 1. NO DNB
 1. NO Sparebank 1 VISA
 1. Personal Capital

@@ -125,6 +125,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. CH UBS Checking account - Alternative 1
 1. CH UBS Credit card
 1. CH Neon Monthly Account Statement
+1. CH Neon Yearly Account Statement
 1. CH SwissCard
 1. CH ZKB Erweiterte Suche
 1. CH ZKB Finanzassistent-Chronik
@@ -168,6 +169,7 @@ Here is a list of the banks and their formats that we already support. Note that
 1. Mint
 1. MV Bank of Maldives, checking
 1. NETELLER
+1. NL American Express (AMEX)
 1. NL Bunq checking
 1. NL bunqDesktop software
 1. NL bunqDesktop software 2
@@ -176,8 +178,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. NL KNAB
 1. NL Rabobank
 1. NL Rabobank-2018
-1. NL Rabobank Credit Card
 1. NL RegioBank
+1. NL Rabobank Credit Card
 1. NO DNB
 1. NO Sparebank 1 VISA
 1. Personal Capital
@@ -196,6 +198,8 @@ Here is a list of the banks and their formats that we already support. Note that
 1. SE Swedbank
 1. SE Swedbank 2019
 1. SE Swedbank 2020
+1. SG HSBC Savings Account
+1. SG HSBC Credit Card
 1. SG OCBC Bank
 1. SG OCBC Bank Credit Card
 1. SG POSB savings

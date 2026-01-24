@@ -377,7 +377,7 @@ def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
     df.query("Inflow.notna() | Outflow.notna()", inplace=True)
     # filter rows with an invalid date
     df.query("Date.notna()", inplace=True)
-    df.fillna(0, inplace=True)
+    df.fillna(None, inplace=True)
     df.query("amount!=0", inplace=True)
     df.reset_index(inplace=True)
     return df

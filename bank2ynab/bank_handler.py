@@ -7,6 +7,9 @@ from typing import Any
 from . import dataframe_handler, transactionfile_reader
 from .dataframe_handler import DataframeHandler
 
+@dataclass
+class BankFormat:
+    
 
 class BankHandler:
     """

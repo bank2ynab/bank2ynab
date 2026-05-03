@@ -1,42 +1,35 @@
-import unittest
-from unittest import TestCase
+import pytest
 from unittest.mock import MagicMock, patch
 
 from bank2ynab.ynab_api import YNAB_API, apply_mapping, generate_name_id_list
 
 
-class TestYNAB_API(TestCase):
-    def setUp(self) -> None:
-        return super().setUp()
+def make_config_handler(api_token: str | None) -> MagicMock:
+    mock_config = MagicMock()
+    mock_config.get.return_value = api_token
+    handler = MagicMock()
+    handler.config = mock_config
+    return handler
 
-    def tearDown(self) -> None:
-        return super().tearDown()
 
-    def _make_config_handler(self, api_token: str | None) -> MagicMock:
-        mock_config = MagicMock()
-        mock_config.get.return_value = api_token
-        handler = MagicMock()
-        handler.config = mock_config
-        return handler
-
+class TestYNAB_API:
     @patch("bank2ynab.ynab_api.ConfigHandler")
     def test_init_raises_when_api_token_missing(self, mock_config_handler_cls):
-        mock_config_handler_cls.return_value = self._make_config_handler("")
-        with self.assertRaises(ValueError) as ctx:
-            YNAB_API(config_object=self._make_config_handler(""))
-        self.assertIn("No YNAB API token", str(ctx.exception))
+        mock_config_handler_cls.return_value = make_config_handler("")
+        with pytest.raises(ValueError, match="No YNAB API token"):
+            YNAB_API(config_object=make_config_handler(""))
 
     @patch("bank2ynab.ynab_api.ConfigHandler")
     def test_init_raises_when_api_token_none(self, mock_config_handler_cls):
-        mock_config_handler_cls.return_value = self._make_config_handler(None)
-        with self.assertRaises(ValueError):
-            YNAB_API(config_object=self._make_config_handler(None))
+        mock_config_handler_cls.return_value = make_config_handler(None)
+        with pytest.raises(ValueError):
+            YNAB_API(config_object=make_config_handler(None))
 
-    @unittest.skip("Not tested yet.")
+    @pytest.mark.skip(reason="Not tested yet.")
     def test_init(self):
         raise NotImplementedError
 
-    @unittest.skip("Not tested yet.")
+    @pytest.mark.skip(reason="Not tested yet.")
     def test_run(self):
         raise NotImplementedError
 
@@ -63,7 +56,6 @@ class TestYNAB_API(TestCase):
             "bank 2": {"budget_id": "budget 1", "account_id": "account_2"},
             "bank 3": {"budget_id": "budget 3", "account_id": "account_4"},
         }
-
         expected_output = {
             "budget 1": {
                 "transactions": [
@@ -83,10 +75,7 @@ class TestYNAB_API(TestCase):
                 ]
             },
         }
-
-        test_dict = apply_mapping(test_data, test_mapping)
-
-        self.assertDictEqual(expected_output, test_dict)
+        assert apply_mapping(test_data, test_mapping) == expected_output
 
     def test_generate_name_id_list(self):
         test_dict = {
@@ -101,38 +90,8 @@ class TestYNAB_API(TestCase):
             ["name3", "id3"],
             ["name4", "id4"],
         ]
-        test_output = generate_name_id_list(test_dict)
-        self.assertListEqual(expected_output, test_output)
+        assert generate_name_id_list(test_dict) == expected_output
 
-    @unittest.skip("Not tested yet.")
+    @pytest.mark.skip(reason="Not tested yet.")
     def test_save_account_selection(self):
         raise NotImplementedError
-
-
-#     @unittest.skip("Test not implemented yet")
-#     def test_save_account_selection(self):
-#         """
-#         Test that account info is saved under the correct bank and
-#         in the correct file.
-#         """
-#         test_class = YNAB_API(self.cp)
-#         test_budget_id = "Test Budget ID"
-#         test_account_id = "Test Account ID"
-#         test_banks = ["New Bank", "Existing Bank"]
-#         test_class.config_path = self.TEMPCONFPATH
-#         test_class.config_handler = configparser.RawConfigParser()
-#         test_class.config_handler.read(test_class.config_path)
-
-#         # save test bank details to test config
-#         for test_bank in test_banks:
-#             test_class.save_account_selection(
-#                 test_bank, test_budget_id, test_account_id
-#             )
-#         # check test config for test bank details & make sure ID matches
-#         config = configparser.RawConfigParser()
-#         config.read(test_class.user_config_path)
-#         for test_bank in test_banks:
-#             test_id = config.get(test_bank, "YNAB Account ID")
-#             self.assertEqual(
-#                 test_id, "{}||{}".format(test_budget_id, test_account_id)
-#             )

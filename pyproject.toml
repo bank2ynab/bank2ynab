@@ -45,6 +45,7 @@ dev = [
   "bandit>=1.7.1",
   "pydocstyle>=6.1.1",
   "pyupgrade>=2.31.1",
+  "pytest>=8.0.0",
   "ruff>=0.8.0",
 ]
 

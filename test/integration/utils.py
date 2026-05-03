@@ -1,10 +1,11 @@
+from configparser import RawConfigParser
 from os.path import dirname, join, realpath
 
 PRODPATH = "bank2ynab.conf"
 TESTCONFPATH = join("test-data", "test.conf")
 
 
-def get_test_confparser():
+def get_test_confparser() -> RawConfigParser:
     import configparser
 
     cp = configparser.RawConfigParser()
@@ -24,6 +25,6 @@ def get_test_confparser():
     return cp
 
 
-def get_project_dir():
+def get_project_dir() -> str:
     path = realpath(__file__)
     return dirname(dirname(path))

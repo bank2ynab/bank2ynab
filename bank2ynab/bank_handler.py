@@ -1,3 +1,4 @@
+import importlib
 import logging
 import os
 import traceback
@@ -8,6 +9,8 @@ from . import dataframe_handler, transactionfile_reader
 from .config_handler import BankConfig
 from .dataframe_handler import DataframeHandler
 
+
+# TODO - there's a lot of overlap between BankHandler and BankConfig, review the division of responsibilities between these two classes and refactor if necessary
 class BankHandler:
     """Handle the flow for data input, parsing, and data output for a given bank configuration."""
 
@@ -65,9 +68,7 @@ class BankHandler:
 
                 self.files_processed += 1
             except ValueError as e:
-                logging.info(
-                    f"No output data from this file for this bank. ({e})"
-                )
+                logging.info(f"No output data from this file for this bank. ({e})")
                 logging.debug(traceback.format_exc())
             else:
                 # make sure our data is not blank before writing
@@ -89,9 +90,7 @@ class BankHandler:
                         logging.info(f"Removing input file: {src_file}")
                         os.remove(src_file)
                 else:
-                    logging.info(
-                        "No output data from this file for this bank."
-                    )
+                    logging.info("No output data from this file for this bank.")
         # don't add empty transaction dataframes
         if file_dfs:
             combined_df = dataframe_handler.combine_dfs(file_dfs)
@@ -133,3 +132,30 @@ def get_output_path(input_path: str, prefix: str, ext: str) -> str:
         new_path = path.join(target_dir, new_filename)
         counter += 1
     return new_path
+
+
+def build_bank(bank_config: BankConfig) -> BankHandler:
+    """Load the correct bank handler class for a given configuration.
+
+    Args:
+        bank_config: Bank configuration parameters.
+
+    Returns:
+        BankHandler: Bank handler instance for the given configuration.
+
+    Raises:
+        ImportError: If the specified plugin does not contain a build_bank method.
+    """
+    plugin_module_name = bank_config.plugin or None
+    if plugin_module_name:
+        module = importlib.import_module(f".plugins.{plugin_module_name}", package="bank2ynab")
+        if not hasattr(module, "build_bank"):
+            s = (
+                f"The specified plugin {plugin_module_name}.py "
+                "does not contain the required build_bank(config) method."
+            )
+            raise ImportError(s)
+        bank = module.build_bank(bank_config)
+        return bank
+    else:
+        return BankHandler(config=bank_config)

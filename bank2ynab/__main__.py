@@ -1,41 +1,11 @@
-import importlib
 import logging
 
-from .bank_handler import BankHandler
-from .config_handler import BankConfig, ConfigHandler
+from .bank_handler import BankHandler, build_bank
+from .config_handler import ConfigHandler
 from .ynab_api import YNAB_API
 
 # configure our logger
 logging.basicConfig(format="%(levelname): %(message)", level=logging.INFO)
-
-
-def build_bank(bank_config: BankConfig) -> BankHandler:
-    """Load the correct bank handler class for a given configuration.
-
-    Args:
-        bank_config: Bank configuration parameters.
-
-    Returns:
-        BankHandler: Bank handler instance for the given configuration.
-
-    Raises:
-        ImportError: If the specified plugin does not contain a build_bank method.
-    """
-    plugin_module_name = bank_config.plugin or None
-    if plugin_module_name:
-        module = importlib.import_module(
-            f".plugins.{plugin_module_name}", package="bank2ynab"
-        )
-        if not hasattr(module, "build_bank"):
-            s = (
-                f"The specified plugin {plugin_module_name}.py "
-                "does not contain the required build_bank(config) method."
-            )
-            raise ImportError(s)
-        bank = module.build_bank(bank_config)
-        return bank
-    else:
-        return BankHandler(config=bank_config)
 
 
 def main() -> None:
@@ -60,13 +30,9 @@ def main() -> None:
         for bank_object in bank_obj_list:
             bank_object.run()
             if bank_object.transaction_list:
-                bank_transaction_dict[bank_object.name] = (
-                    bank_object.transaction_list
-                )
+                bank_transaction_dict[bank_object.name] = bank_object.transaction_list
             files_processed += bank_object.files_processed
-        logging.info(
-            f"\nFile processing complete! {files_processed} files processed.\n"
-        )
+        logging.info(f"\nFile processing complete! {files_processed} files processed.\n")
 
         if bank_transaction_dict:
             try:
@@ -74,8 +40,6 @@ def main() -> None:
                 api.run(bank_transaction_dict)
             except ValueError as e:
                 logging.error(f"{e}")
-
-
 
 
 # Let's run this thing!

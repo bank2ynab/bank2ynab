@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from bank2ynab.ynab_api import YNAB_API, apply_mapping, generate_name_id_list
 

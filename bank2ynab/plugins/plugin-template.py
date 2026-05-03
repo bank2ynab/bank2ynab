@@ -3,11 +3,12 @@
 # Step 3: Replace "YourActualBank" below with a descriptive bank name
 
 from ..bank_handler import BankHandler
+from ..config_handler import BankConfig
 
 
 class YourActualBankPlugin(BankHandler):
-    def __init__(self, config_dict: dict):
-        super().__init__(config_dict)
+    def __init__(self, config: BankConfig):
+        super().__init__(config)
         self.name = "YourActualBank"
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
@@ -24,8 +25,8 @@ class YourActualBankPlugin(BankHandler):
         :param file_path: path to file
         """
         # what do we actually want to do?
-        header_rows = int(self.config_dict["header_rows"])
-        footer_rows = int(self.config_dict["footer_rows"])
+        header_rows = self.config.header_rows
+        footer_rows = self.config.footer_rows
 
         # get total number of rows in transaction file using a generator
         with open(file_path) as row_counter:

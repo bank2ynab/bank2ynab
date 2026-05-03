@@ -1,20 +1,19 @@
 import importlib
 import logging
-from typing import Any
 
 from .bank_handler import BankHandler
-from .config_handler import ConfigHandler
+from .config_handler import BankConfig, ConfigHandler
 from .ynab_api import YNAB_API
 
 # configure our logger
 logging.basicConfig(format="%(levelname): %(message)", level=logging.INFO)
 
 
-def build_bank(bank_config: dict[str, Any]) -> BankHandler:
+def build_bank(bank_config: BankConfig) -> BankHandler:
     """Load the correct bank handler class for a given configuration.
 
     Args:
-        bank_config: Dictionary of bank configuration parameters.
+        bank_config: Bank configuration parameters.
 
     Returns:
         BankHandler: Bank handler instance for the given configuration.
@@ -22,7 +21,7 @@ def build_bank(bank_config: dict[str, Any]) -> BankHandler:
     Raises:
         ImportError: If the specified plugin does not contain a build_bank method.
     """
-    plugin_module_name = bank_config.get("plugin", None)
+    plugin_module_name = bank_config.plugin or None
     if plugin_module_name:
         module = importlib.import_module(
             f".plugins.{plugin_module_name}", package="bank2ynab"
@@ -36,7 +35,7 @@ def build_bank(bank_config: dict[str, Any]) -> BankHandler:
         bank = module.build_bank(bank_config)
         return bank
     else:
-        return BankHandler(config_dict=bank_config)
+        return BankHandler(config=bank_config)
 
 
 def main() -> None:

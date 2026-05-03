@@ -1,18 +1,19 @@
 # Plugin for handling OCBC Bank [SG] files
 
 from ..bank_handler import BankHandler
+from ..config_handler import BankConfig
 
 
 class OCBC_Bank_SG(BankHandler):
     """Plugin for handling Oversea-Chinese Banking Corporation Singapore (OCBC SG) bank files."""
 
-    def __init__(self, config_dict: dict):
+    def __init__(self, config: BankConfig):
         """Initialise OCBC Singapore bank handler.
 
         Args:
-            config_dict: A dictionary of conf parameters.
+            config: Bank configuration parameters.
         """
-        super().__init__(config_dict)
+        super().__init__(config)
         self.name = "OCBC_Bank_SG"
 
     def _preprocess_file(self, file_path, plugin_args) -> str:
@@ -29,8 +30,8 @@ class OCBC_Bank_SG(BankHandler):
             str: Path to the modified file.
         """
         # what do we actually want to do?
-        header_rows = int(self.config_dict["header_rows"])
-        footer_rows = int(self.config_dict["footer_rows"])
+        header_rows = self.config.header_rows
+        footer_rows = self.config.footer_rows
 
         # get total number of rows in transaction file using a generator
         with open(file_path) as row_counter:

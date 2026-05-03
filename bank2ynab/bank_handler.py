@@ -5,30 +5,31 @@ from os import path
 from typing import Any
 
 from . import dataframe_handler, transactionfile_reader
+from .config_handler import BankConfig
 from .dataframe_handler import DataframeHandler
 
 class BankHandler:
     """Handle the flow for data input, parsing, and data output for a given bank configuration."""
 
-    def __init__(self, config_dict: dict[str, Any]) -> None:
+    def __init__(self, config: BankConfig) -> None:
         """Initialise object and load bank-specific configuration parameters.
 
         Args:
-            config_dict: Dictionary of bank configuration with bank name as key.
+            config: Bank configuration parameters.
         """
-        self.name = config_dict.get("bank_name", "DEFAULT")
-        self.config_dict = config_dict
+        self.name = config.bank_name
+        self.config = config
         self.files_processed = 0
         self.transaction_list: list[dict] = list()
 
     def run(self) -> None:
         matching_files = transactionfile_reader.get_files(
-            name=self.config_dict["bank_name"],
-            file_pattern=self.config_dict["input_filename"],
-            try_path=self.config_dict["path"],
-            regex_active=self.config_dict["regex"],
-            ext=self.config_dict["ext"],
-            prefix=self.config_dict["fixed_prefix"],
+            name=self.config.bank_name,
+            file_pattern=self.config.input_filename,
+            try_path=self.config.path,
+            regex_active=self.config.regex,
+            ext=self.config.ext,
+            prefix=self.config.fixed_prefix,
         )
 
         file_dfs: list = list()
@@ -39,7 +40,7 @@ class BankHandler:
                 # perform preprocessing operations on file if required
                 src_file = self._preprocess_file(
                     file_path=src_file,
-                    plugin_args=self.config_dict["plugin_args"],
+                    plugin_args=self.config.plugin_args,
                 )
                 # get file's encoding
                 src_encod = transactionfile_reader.detect_encoding(src_file)
@@ -48,18 +49,18 @@ class BankHandler:
                 df_handler = DataframeHandler()
                 df_handler.run(
                     file_path=src_file,
-                    delim=self.config_dict["input_delimiter"],
-                    header_rows=int(self.config_dict["header_rows"]),
-                    footer_rows=int(self.config_dict["footer_rows"]),
+                    delim=self.config.input_delimiter,
+                    header_rows=self.config.header_rows,
+                    footer_rows=self.config.footer_rows,
                     encod=src_encod,
-                    input_columns=self.config_dict["input_columns"],
-                    output_columns=self.config_dict["output_columns"],
-                    api_columns=self.config_dict["api_columns"],
-                    cd_flags=self.config_dict["cd_flags"],
-                    date_format=self.config_dict["date_format"],
-                    date_dedupe=self.config_dict["date_dedupe"],
-                    fill_memo=self.config_dict["payee_to_memo"],
-                    currency_fix=self.config_dict["currency_mult"],
+                    input_columns=self.config.input_columns,
+                    output_columns=self.config.output_columns,
+                    api_columns=self.config.api_columns,
+                    cd_flags=self.config.cd_flags,
+                    date_format=self.config.date_format,
+                    date_dedupe=self.config.date_dedupe,
+                    fill_memo=self.config.payee_to_memo,
+                    currency_fix=self.config.currency_mult,
                 )
 
                 self.files_processed += 1
@@ -72,19 +73,19 @@ class BankHandler:
                 # make sure our data is not blank before writing
                 if not df_handler.df.empty:
                     # only save a file if required
-                    if self.config_dict["save_output"] is True:
+                    if self.config.save_output is True:
                         # write export file
                         output_path = get_output_path(
                             input_path=src_file,
-                            prefix=self.config_dict["fixed_prefix"],
-                            ext=self.config_dict["output_ext"],
+                            prefix=self.config.fixed_prefix,
+                            ext=self.config.output_ext,
                         )
                         logging.info(f"Writing output file: {output_path}")
                         df_handler.output_csv(output_path)
                     # save api transaction data for each bank to list
                     file_dfs.append(df_handler.api_transaction_df)
                     # delete original csv file
-                    if self.config_dict["delete_original"] is True:
+                    if self.config.delete_original is True:
                         logging.info(f"Removing input file: {src_file}")
                         os.remove(src_file)
                 else:

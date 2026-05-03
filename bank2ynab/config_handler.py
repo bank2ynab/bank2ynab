@@ -3,10 +3,44 @@ import logging
 import os
 import shutil
 import typing
+from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
 
 from platformdirs import user_config_dir
+
+
+@dataclass
+class BankConfig:
+    bank_name: str
+    input_columns: list[str]
+    output_columns: list[str]
+    api_columns: list[str]
+    input_filename: str
+    path: str
+    ext: str
+    encoding: str
+    regex: bool
+    fixed_prefix: str
+    output_ext: str
+    input_delimiter: str
+    header_rows: int
+    footer_rows: int
+    date_format: str
+    date_dedupe: bool
+    delete_original: bool
+    cd_flags: list[str]
+    payee_to_memo: bool
+    plugin: str
+    plugin_args: list[str]
+    api_token: str
+    api_account: list[str]
+    currency_mult: float
+    save_output: bool
+
+    def __post_init__(self) -> None:
+        if self.input_delimiter == "\\t":
+            self.input_delimiter = "\t"
 
 
 class ConfigHandler:
@@ -72,8 +106,8 @@ class ConfigHandler:
             config.read(conf_files, encoding="utf-8")
             return config
 
-    def fix_conf_params(self, section: str) -> dict[str, typing.Any]:
-        """Return a dictionary of all parameters for a given config section.
+    def fix_conf_params(self, section: str) -> BankConfig:
+        """Return a BankConfig for a given config section.
 
         Uses ConfigParser defaults under [DEFAULT] if present.
 
@@ -82,78 +116,35 @@ class ConfigHandler:
                 matches "[MyBank]" in file.
 
         Returns:
-            dict[str, Any]: Dictionary matching shorthand strings to config values.
+            BankConfig: Typed configuration for the given bank section.
         """
-
-        bank_config = {
-            "bank_name": section,
-            "input_columns": self.get_config_line_lst(
-                section, "Input Columns", ","
-            ),
-            "output_columns": self.get_config_line_lst(
-                section, "Output Columns", ","
-            ),
-            "api_columns": self.get_config_line_lst(
-                section, "API Transaction Fields", ","
-            ),
-            "input_filename": self.get_config_line_str(
-                section, "Source Filename Pattern"
-            ),
-            "path": self.get_config_line_str(section, "Source Path"),
-            "ext": self.get_config_line_str(
-                section, "Source Filename Extension"
-            ),
-            "encoding": self.get_config_line_str(section, "Encoding"),
-            "regex": self.get_config_line_boo(
-                section, "Use Regex For Filename"
-            ),
-            "fixed_prefix": self.get_config_line_str(
-                section, "Output Filename Prefix"
-            ),
-            "output_ext": self.get_config_line_str(
-                section, "Output Filename Extension"
-            ),
-            "input_delimiter": self.get_config_line_str(
-                section, "Source CSV Delimiter"
-            ),
-            "header_rows": self.get_config_line_int(section, "Header Rows"),
-            "footer_rows": self.get_config_line_int(section, "Footer Rows"),
-            "date_format": self.get_config_line_str(section, "Date Format"),
-            "date_dedupe": self.get_config_line_boo(
-                section, "Date De-Duplication"
-            ),
-            "delete_original": self.get_config_line_boo(
-                section, "Delete Source File"
-            ),
-            "cd_flags": self.get_config_line_lst(
-                section, "Inflow or Outflow Indicator", ","
-            ),
-            "payee_to_memo": self.get_config_line_boo(
-                section, "Use Payee for Memo"
-            ),
-            "plugin": self.get_config_line_str(section, "Plugin"),
-            "plugin_args": self.get_config_line_lst(
-                section, "Plugin Arguments", "\n"
-            ),
-            "api_token": self.get_config_line_str(
-                section, "YNAB API Access Token"
-            ),
-            "api_account": self.get_config_line_lst(
-                section, "YNAB Account ID", "|"
-            ),
-            "currency_mult": self.get_config_line_flt(
-                section, "Currency Conversion Factor"
-            ),
-            "save_output": self.get_config_line_boo(
-                section, "Save Output File"
-            ),
-        }
-
-        # quick n' dirty fix for tabs as delimiters
-        if bank_config["input_delimiter"] == "\\t":
-            bank_config["input_delimiter"] = "\t"
-
-        return bank_config
+        return BankConfig(
+            bank_name=section,
+            input_columns=self.config.get(section, "Input Columns").split(","),
+            output_columns=self.config.get(section, "Output Columns").split(","),
+            api_columns=self.config.get(section, "API Transaction Fields").split(","),
+            input_filename=self.config.get(section, "Source Filename Pattern"),
+            path=self.config.get(section, "Source Path"),
+            ext=self.config.get(section, "Source Filename Extension"),
+            encoding=self.config.get(section, "Encoding"),
+            regex=self.config.getboolean(section, "Use Regex For Filename"),
+            fixed_prefix=self.config.get(section, "Output Filename Prefix"),
+            output_ext=self.config.get(section, "Output Filename Extension"),
+            input_delimiter=self.config.get(section, "Source CSV Delimiter"),
+            header_rows=self.config.getint(section, "Header Rows"),
+            footer_rows=self.config.getint(section, "Footer Rows"),
+            date_format=self.config.get(section, "Date Format"),
+            date_dedupe=self.config.getboolean(section, "Date De-Duplication"),
+            delete_original=self.config.getboolean(section, "Delete Source File"),
+            cd_flags=self.config.get(section, "Inflow or Outflow Indicator").split(","),
+            payee_to_memo=self.config.getboolean(section, "Use Payee for Memo"),
+            plugin=self.config.get(section, "Plugin"),
+            plugin_args=self.config.get(section, "Plugin Arguments").split("\n"),
+            api_token=self.config.get(section, "YNAB API Access Token"),
+            api_account=self.config.get(section, "YNAB Account ID").split("|"),
+            currency_mult=self.config.getfloat(section, "Currency Conversion Factor"),
+            save_output=self.config.getboolean(section, "Save Output File"),
+        )
 
     def get_config_line_str(self, section_name: str, param: str) -> str:
         """Returns a string value from a given section in the config object.

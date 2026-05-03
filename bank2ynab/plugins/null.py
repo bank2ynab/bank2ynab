@@ -9,18 +9,19 @@
 #   Plugin = mymodule
 
 from ..bank_handler import BankHandler
+from ..config_handler import BankConfig
 
 
 class NullBank(BankHandler):
     """Example subclass used for testing the plugin system."""
 
-    def __init__(self, config_dict: dict):
+    def __init__(self, bank_config: BankConfig) -> None:
         """Initialise NullBank handler.
 
         Args:
-            config_dict: A dictionary of conf parameters.
+            bank_config: A BankConfig instance containing conf parameters.
         """
-        super().__init__(config_dict)
+        super().__init__(bank_config)
         self.name = "NullBank"
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
@@ -36,7 +37,7 @@ class NullBank(BankHandler):
         # intentionally empty - plugins can use this function
         return file_path
 
-    def read_data(self, file_path):
+    def read_data(self, file_path):  # -> list[Any]:
         """Implement any custom parsing logic in here.
 
         Args:
@@ -58,7 +59,7 @@ class NullBank(BankHandler):
         """
         return []
 
-    def write_data(self, source_file_path, data):
+    def write_data(self, source_file_path, data) -> None:
         """Override this if read_data does not return records in standard format.
 
         Args:
@@ -71,11 +72,11 @@ class NullBank(BankHandler):
         return None
 
 
-def build_bank(config):
+def build_bank(config) -> NullBank:
     """Return a NullBank instance for a given bank configuration.
 
     Args:
-        config: Dict containing all available configuration parameters.
+        config: A BankConfig instance containing conf parameters.
 
     Returns:
         NullBank: A BankHandler subclass instance.

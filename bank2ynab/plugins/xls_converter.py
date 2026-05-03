@@ -4,17 +4,18 @@ from pandas import read_excel
 
 from .. import bank_handler
 from ..bank_handler import BankHandler
+from ..config_handler import BankConfig
 
 
 class XLS_Converter(BankHandler):
-    def __init__(self, config_object: dict):
+    def __init__(self, bank_config: BankConfig) -> None:
         """Initialise XLS converter with bank configuration.
 
         Args:
-            config_object: A dictionary of conf parameters.
+            bank_config: A BankConfig instance containing conf parameters.
         """
-        super().__init__(config_object)
-        self.config = config_object
+        super().__init__(bank_config)
+        self.config = bank_config
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
         """Combine all tables in an XLS file into one table and write to CSV.
@@ -33,7 +34,7 @@ class XLS_Converter(BankHandler):
         # generate output path
         new_path = bank_handler.get_output_path(
             input_path=file_path,
-            prefix=f"Converted XLS_{self.config['bank_name']}_",
+            prefix=f"Converted XLS_{self.config.bank_name}_",
             ext=".csv",
         )
         # write the dataframe to output file
@@ -42,11 +43,11 @@ class XLS_Converter(BankHandler):
         return new_path
 
 
-def build_bank(config):
+def build_bank(config) -> XLS_Converter:
     """Return an XLS_Converter instance for a given bank configuration.
 
     Args:
-        config: Dict containing all available configuration parameters.
+        config: A BankConfig instance containing conf parameters.
 
     Returns:
         XLS_Converter: A BankHandler subclass instance.

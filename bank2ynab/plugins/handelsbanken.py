@@ -9,21 +9,20 @@ import re
 import typing
 
 from ..bank_handler import BankHandler
+from ..config_handler import BankConfig
 
 
 class Handelsbanken(BankHandler):
-    def __init__(self, config_dict: dict[str, typing.Any]):
+    def __init__(self, bank_config: BankConfig) -> None:
         """Initialise Handelsbanken bank handler.
 
         Args:
-            config_dict: A dictionary of conf parameters.
+            bank_config: A BankConfig instance containing conf parameters.
         """
-        super().__init__(config_dict)
+        super().__init__(bank_config)
         self.name = "Handelsbanken"
 
-    def _preprocess_file(
-        self, file_path: str, plugin_args: list[typing.Any]
-    ) -> str:
+    def _preprocess_file(self, file_path: str, plugin_args: list[typing.Any]) -> str:
         """Strip HTML from input file, modifying the input file directly.
 
         Args:
@@ -57,7 +56,7 @@ class Handelsbanken(BankHandler):
         return file_path
 
 
-def build_bank(config: dict[str, typing.Any]) -> BankHandler:
+def build_bank(config: BankConfig) -> BankHandler:
     """Return a Handelsbanken instance for a given bank configuration.
 
     Args:

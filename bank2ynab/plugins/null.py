@@ -15,27 +15,35 @@ class NullBank(BankHandler):
     """Example subclass used for testing the plugin system."""
 
     def __init__(self, config_dict: dict):
-        """
-        :param config_object: a dictionary of conf parameters
+        """Initialise NullBank handler.
+
+        Args:
+            config_dict: A dictionary of conf parameters.
         """
         super().__init__(config_dict)
         self.name = "NullBank"
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
-        """
-        This is probably the only method you really want to override.
-        exists solely to be used by plugins for pre-processing a file
-        that otherwise can be read normally (e.g. weird format)
-        :param file_path: path to file
+        """Pre-process a file before reading (intentionally empty, override in subclasses).
+
+        Args:
+            file_path: Path to file.
+            plugin_args: Plugin-specific arguments.
+
+        Returns:
+            str: Path to the (unmodified) file.
         """
         # intentionally empty - plugins can use this function
         return file_path
 
     def read_data(self, file_path):
-        """
-        Implement any custom parsing logic in here.
-        :param file_path: absolute path to source file
-        :return: list of lists representing rows in output format
+        """Implement any custom parsing logic in here.
+
+        Args:
+            file_path: Absolute path to source file.
+
+        Returns:
+            list: List of lists representing rows in output format.
         """
         return [
             # format of each row should be:
@@ -43,29 +51,33 @@ class NullBank(BankHandler):
         ]
 
     def get_files(self):
-        """Only override this if you need custom logic to find source
-        data, e.g. downloading from somewhere.
-        :return: list of absolute pathnames to source files
+        """Override this for custom logic to find source data.
+
+        Returns:
+            list: List of absolute pathnames to source files.
         """
         return []
 
     def write_data(self, source_file_path, data):
-        """Only override this if you know read_data is not returning
-        records in standard format (which you really shouldn't do anyway).
-        :param source_file_path: absolute path to SOURCE file. The method will
-                determine output file on its own.
-        :param data: list of lists representing records
-        :return: absolute path to output file
+        """Override this if read_data does not return records in standard format.
+
+        Args:
+            source_file_path: Absolute path to SOURCE file.
+            data: List of lists representing records.
+
+        Returns:
+            str or None: Absolute path to output file.
         """
         return None
 
 
 def build_bank(config):
-    """This factory function is called from the main program,
-    and expected to return a B2YBank subclass.
-    Without this, the module will fail to load properly.
+    """Return a NullBank instance for a given bank configuration.
 
-    :param config: dict containing all available configuration parameters
-    :return: a B2YBank subclass instance
+    Args:
+        config: Dict containing all available configuration parameters.
+
+    Returns:
+        NullBank: A BankHandler subclass instance.
     """
     return NullBank(config)

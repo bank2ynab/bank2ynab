@@ -7,23 +7,14 @@ from typing import Any
 from . import dataframe_handler, transactionfile_reader
 from .dataframe_handler import DataframeHandler
 
-@dataclass
-class BankFormat:
-    
-
 class BankHandler:
-    """
-    Handle the flow for data input, parsing, and data output
-    for a given bank configuration.
-    """
+    """Handle the flow for data input, parsing, and data output for a given bank configuration."""
 
     def __init__(self, config_dict: dict[str, Any]) -> None:
-        """
-        Initialise object and load bank-specific configuration parameters.
+        """Initialise object and load bank-specific configuration parameters.
 
-        :param config_dict: dictionary of all banks' configurations with
-        the bank names as keys.
-        :type config_dict: dict
+        Args:
+            config_dict: Dictionary of bank configuration with bank name as key.
         """
         self.name = config_dict.get("bank_name", "DEFAULT")
         self.config_dict = config_dict
@@ -106,23 +97,29 @@ class BankHandler:
             self.transaction_list = combined_df.to_dict(orient="records")
 
     def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str:
-        """
-        exists solely to be used by plugins for pre-processing a file
-        that otherwise can be read normally (e.g. weird format)
-        :param file_path: path to file
+        """Pre-process a file before reading (used by plugins for unusual formats).
+
+        Args:
+            file_path: Path to file.
+            plugin_args: Plugin-specific arguments.
+
+        Returns:
+            str: Path to the (possibly modified) file.
         """
         # intentionally empty - plugins can use this function
         return file_path
 
 
 def get_output_path(input_path: str, prefix: str, ext: str) -> str:
-    """
-    Generate the name of the output file.
+    """Generate the name of the output file.
 
-    :param path: path to output file
-    :type path: str
-    :return: target filename
-    :rtype: str
+    Args:
+        input_path: Path to the input file.
+        prefix: Prefix to add to the output filename.
+        ext: Extension for the output file.
+
+    Returns:
+        str: Target filename for the output file.
     """
     target_dir = path.dirname(input_path)
     target_fname = path.basename(input_path)[:-4]

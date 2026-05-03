@@ -6,20 +6,16 @@ import pandas as pd
 class DataframeHandler:
     # TODO - integrate payee mapping in this class
 
-    """
-    use the details for a specified config to produce a cleaned dataframe
-    matching a given specification
-    """
+    """Use config to produce a cleaned dataframe matching a given specification."""
 
     def __init__(self) -> None:
         pass
 
     def output_csv(self, path: str) -> None:
-        """
-        Writes df to the specified filepath as a csv file
+        """Write df to the specified filepath as a csv file.
 
-        :param path: path to write exported file to
-        :type path: str
+        Args:
+            path: Path to write exported file to.
         """
         self.output_df.to_csv(path, index=False)
 
@@ -40,37 +36,22 @@ class DataframeHandler:
         fill_memo: bool,
         currency_fix: float,
     ) -> None:
-        """
-        Complete handling of Dataframe creation & output.
+        """Complete handling of Dataframe creation & output.
 
-        :param df: dataframe to be modified
-        :type df: DataFrame
-        :param file_path: Path to CSV file
-        :type file_path: str
-        :param delim: CSV separator
-        :type delim: str
-        :param header_rows: Number of header rows
-        :type header_rows: int
-        :param footer_rows: Number of footer rows
-        :type footer_rows: int
-        :param encod: CSV file encoding
-        :type encod: str
-        :param input_columns: columns present in input data
-        :type input_columns: list
-        :param output_columns: desired columns to be present in output data
-        :type output_columns: list
-        :param api_columns: desired columns to be present in api data
-        :type api_columns: list
-        :param cd_flags: parameter to indicate inflow/outflow for a row
-        :type cd_flags: list
-        :param date_format: string format for date
-        :type date_format: str
-        :param date_dedupe: whether to fill in date with previous if blank
-        :type date_dedupe: bool
-        :param fill_memo: switch whether to fill blank memo with payee data
-        :type fill_memo: bool
-        :param currency_fix: value to divide all currency amounts by
-        :type currency_fix: float
+        Args:
+            file_path: Path to CSV file.
+            delim: CSV separator.
+            header_rows: Number of header rows.
+            footer_rows: Number of footer rows.
+            encod: CSV file encoding.
+            input_columns: Columns present in input data.
+            output_columns: Desired columns to be present in output data.
+            api_columns: Desired columns to be present in API data.
+            cd_flags: Parameter to indicate inflow/outflow for a row.
+            date_format: String format for date.
+            date_dedupe: Whether to fill in date with previous if blank.
+            fill_memo: Whether to fill blank memo with payee data.
+            currency_fix: Value to divide all currency amounts by.
         """
         # read data from input file to dataframe
         self.df = read_csv(
@@ -107,21 +88,17 @@ def read_csv(
     footer_rows: int,
     encod: str,
 ) -> pd.DataFrame:
-    """
-    Read a specified CSV file into a Dataframe.
+    """Read a specified CSV file into a Dataframe.
 
-    :param file_path: Path to CSV file
-    :type file_path: str
-    :param delim: CSV separator
-    :type delim: str
-    :param header_rows: Number of header rows
-    :type header_rows: int
-    :param footer_rows: Number of footer rows
-    :type footer_rows: int
-    :param encod: CSV file encoding
-    :type encod: str
-    :return: Dataframe read from CSV file
-    :rtype: pd.DataFrame
+    Args:
+        file_path: Path to CSV file.
+        delim: CSV separator.
+        header_rows: Number of header rows.
+        footer_rows: Number of footer rows.
+        encod: CSV file encoding.
+
+    Returns:
+        pd.DataFrame: Dataframe read from CSV file.
     """
 
     df = pd.read_csv(
@@ -151,27 +128,21 @@ def parse_data(
     fill_memo: bool,
     currency_fix: float,
 ) -> pd.DataFrame:
-    """
-    Convert each column of the dataframe to match ideal output data
+    """Convert each column of the dataframe to match ideal output data.
 
-    :param input_columns: columns present in input data
-    :type input_columns: list
-    :param output_columns: desired columns to be present in output data
-    :type output_columns: list
-    :param api_columns: desired columns to be present in api data
-    :type api_columns: list
-    :param cd_flags: parameter to indicate inflow/outflow for a row
-    :type cd_flags: list
-    :param date_format: string format for date
-    :type date_format: str
-    :param date_dedupe: whether to fill in date with previous if blank
-    :type date_dedupe: bool
-    :param fill_memo: switch whether to fill blank memo with payee data
-    :type fill_memo: bool
-    :param currency_fix: value to divide all currency amounts by
-    :type currency_fix: float
-    :return: modified dataframe matching provided configuration values
-    :rtype: DataFrame
+    Args:
+        df: Dataframe to process.
+        input_columns: Columns present in input data.
+        output_columns: Desired columns to be present in output data.
+        api_columns: Desired columns to be present in API data.
+        cd_flags: Parameter to indicate inflow/outflow for a row.
+        date_format: String format for date.
+        date_dedupe: Whether to fill in date with previous if blank.
+        fill_memo: Whether to fill blank memo with payee data.
+        currency_fix: Value to divide all currency amounts by.
+
+    Returns:
+        pd.DataFrame: Modified dataframe matching provided configuration values.
     """
     # set column names based on input column list
     df.columns = input_columns
@@ -215,16 +186,16 @@ def parse_data(
 def merge_duplicate_columns(
     df: pd.DataFrame, input_columns: list[str]
 ) -> pd.DataFrame:
-    """
-    Merges columns specified more than once in the input_columns list.
-    Note: converts values into strings before merging.
+    """Merge columns specified more than once in the input_columns list.
 
-    :param df: dataframe to modify
-    :type df: pd.DataFrame
-    :param input_columns: the list of columns in the input file
-    :type input_columns: list
-    :return: modified dataframe
-    :rtype: pd.DataFrame
+    Converts values into strings before merging.
+
+    Args:
+        df: Dataframe to modify.
+        input_columns: The list of columns in the input file.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
     """
 
     # create dictionary mapping column names to indices of duplicates
@@ -267,17 +238,15 @@ def merge_duplicate_columns(
 def add_missing_columns(
     df: pd.DataFrame, input_cols: list[str], output_cols: list[str]
 ) -> pd.DataFrame:
-    """
-    Adds any missing required columns to the Dataframe.
+    """Add any missing required columns to the Dataframe.
 
-    :param df: dataframe to modify
-    :type df: pd.DataFrame
-    :param input_columns: the list of columns in the input file
-    :type input_columns: list
-    :param output_columns: the desired list of columns as output
-    :type output_columns: list
-    :return: modified dataframe
-    :rtype: pd.DataFrame
+    Args:
+        df: Dataframe to modify.
+        input_cols: The list of columns in the input file.
+        output_cols: The desired list of columns as output.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
     """
     # compare input & output column lists to find missing columns
     missing_cols = list(set(output_cols).difference(input_cols))
@@ -290,20 +259,18 @@ def add_missing_columns(
 
 
 def cd_flag_process(df: pd.DataFrame, cd_flags: list[str]) -> pd.DataFrame:
-    """
-    Fix columns where inflow/outflow is indicated by a flag
-    in a separate column.
-    The cd_flag list is in the form
-    ["indicator column, outflow flag, inflow flag"]
-    (the code does not use the indicator flag specified in the flag list,
-    but instead the "CDFlag" column specified in Input Columns)
+    """Fix columns where inflow/outflow is indicated by a flag in a separate column.
 
-    :param df: dataframe to modify
-    :type df: pd.DataFrame
-    :param cd_flags: list of parameters for applying indicators
-    :type cd_flags: list
-    :return: modified dataframe
-    :rtype: pd.DataFrame
+    The cd_flag list is in the form ["indicator column, outflow flag, inflow flag"].
+    Uses the "CDFlag" column specified in Input Columns rather than the indicator
+    flag in the flag list.
+
+    Args:
+        df: Dataframe to modify.
+        cd_flags: List of parameters for applying indicators.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
     """
     if len(cd_flags) == 3:
         outflow_flag = cd_flags[2]
@@ -313,15 +280,14 @@ def cd_flag_process(df: pd.DataFrame, cd_flags: list[str]) -> pd.DataFrame:
 
 
 def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
-    """
-    Fix currency string formatting.
-    Convert currency values to floats.
-    Convert negative inflows into outflows and vice versa.
+    """Fix currency string formatting and convert negative inflows/outflows.
 
-    :param df: dataframe to modify
-    :type df: pd.DataFrame
-    :return: modified dataframe
-    :rtype: pd.DataFrame
+    Args:
+        df: Dataframe to modify.
+        currency_fix: Value to divide all currency amounts by.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
     """
     # negative inflow = outflow
     df.loc[df["Inflow"] < 0, ["Outflow"]] = df["Inflow"] * -1
@@ -341,17 +307,16 @@ def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
 
 
 def clean_monetary_values(num_series: pd.Series) -> pd.Series:
-    """
-    Performs the following operations on a provided series of strings:
-    - Convert "," to "."
-    - Remove every instance of "." except last one
-    - Remove any characters except digits, "-", and "."
-    - Fill in null values with 0
+    """Clean a series of monetary strings into numeric values.
 
-    :param num_series: series of values to modify
-    :type num_series: Series
-    :return: modified series
-    :rtype: Series
+    Converts "," to ".", removes all but the last ".", strips non-numeric
+    characters, and fills nulls with 0.
+
+    Args:
+        num_series: Series of values to modify.
+
+    Returns:
+        pd.Series: Modified series as floats.
     """
     # convert all commas to full stops
     num_series.replace({"\\,": "."}, regex=True, inplace=True)
@@ -371,15 +336,15 @@ def clean_monetary_values(num_series: pd.Series) -> pd.Series:
 
 
 def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Removes invalid rows from dataframe.
-    An invalid row is one which does not have a date
-    or one without an Inflow or Outflow value.
+    """Remove invalid rows from dataframe.
 
-    :param df: dataframe to modify
-    :type df: pd.DataFrame
-    :return: modified dataframe
-    :rtype: pd.DataFrame
+    An invalid row is one without a date or without an Inflow or Outflow value.
+
+    Args:
+        df: Dataframe to modify.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
     """
     # filter out rows where Inflow and Outflow are both blank
     df.query("Inflow.notna() | Outflow.notna()", inplace=True)
@@ -394,15 +359,14 @@ def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def auto_memo(df: pd.DataFrame, fill_memo: bool) -> pd.DataFrame:
-    """
-    If memo is blank, fill with contents of payee column.
+    """If memo is blank, fill with contents of payee column.
 
-    :param df: dataframe to modify
-    :type df: pd.DataFrame
-    :param fill_memo: boolean to check
-    :type fill_memo: bool
-    :return: modified dataframe
-    :rtype: pd.DataFrame
+    Args:
+        df: Dataframe to modify.
+        fill_memo: Whether to fill blank memo with payee data.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
     """
     if fill_memo:
         df["Memo"] = df["Memo"].fillna(df["Payee"])
@@ -410,26 +374,26 @@ def auto_memo(df: pd.DataFrame, fill_memo: bool) -> pd.DataFrame:
 
 
 def auto_payee(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    If Payee is blank, fill with contents of Memo column
+    """If Payee is blank, fill with contents of Memo column.
 
-    :param df: dataframe to modify
-    :type df: pd.DataFrame
-    :return: modified dataframe
-    :rtype: pd.DataFrame
+    Args:
+        df: Dataframe to modify.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
     """
     df["Payee"] = df["Payee"].fillna(df["Memo"])
     return df
 
 
 def clean_strings(string_series: pd.Series) -> pd.Series:
-    """
-    Perform various cleaning operations on provided string series.
+    """Perform various cleaning operations on provided string series.
 
-    :param string_series: string series to modify
-    :type string_series: pd.Series
-    :return: cleaned series
-    :rtype: pd.Series
+    Args:
+        string_series: String series to modify.
+
+    Returns:
+        pd.Series: Cleaned series.
     """
     modified_string_series = string_series
     # convert string to title case
@@ -452,18 +416,16 @@ def clean_strings(string_series: pd.Series) -> pd.Series:
 
 
 def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:
-    """
-    If provided with an input date format,
-    process the date column to the ISO format.
-    Any non-parseable dates are returned as a NaT null value
+    """Process dates from input format to ISO format.
 
-    :param df: dataframe to modify
-    :type df: Series
-    :param date_format: date format codes according to 1989 C standard
-    (https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior)
-    :type date_format: str
-    :return: modified dataframe
-    :rtype: Series
+    Any non-parseable dates are returned as a NaT null value.
+
+    Args:
+        date_series: Series of dates to process.
+        date_format: Date format codes per the 1989 C standard.
+
+    Returns:
+        pd.Series: Series with dates in ISO format.
     """
     formatted_date_series = pd.to_datetime(
         date_series,
@@ -477,15 +439,14 @@ def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:
 
 
 def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
-    """
-    Fill in empty dates with values from previous cells.
+    """Fill in empty dates with values from previous cells.
 
-    :param date_series: data series to modify
-    :type date_series: pd.Series
-    :param fill_dates: whether to fill in empty dates or not
-    :type fill_dates: bool
-    :return: modified data series
-    :rtype: pd.Series
+    Args:
+        date_series: Data series to modify.
+        fill_dates: Whether to fill in empty dates or not.
+
+    Returns:
+        pd.Series: Modified data series.
     """
     if fill_dates:
         date_series = date_series.replace(r"^\s*$", pd.NA, regex=True)
@@ -495,13 +456,13 @@ def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
 
 
 def fill_api_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Generate API-specific columns using data in dataframe.
+    """Generate API-specific columns using data in dataframe.
 
-    :param df: dataframe to read & modify
-    :type df: pd.DataFrame
-    :return: dataframe with additional columns added
-    :rtype: pd.DataFrame
+    Args:
+        df: Dataframe to read & modify.
+
+    Returns:
+        pd.DataFrame: Dataframe with additional columns added.
     """
     df["account_id"] = ""
     df["date"] = df["Date"].astype(str)
@@ -534,13 +495,13 @@ def fill_api_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def combine_dfs(df_list: list[pd.DataFrame]) -> pd.DataFrame:
-    """
-    Concatenate a list of provided dataframes.
+    """Concatenate a list of provided dataframes.
 
-    :param df_list: list of dataframes to concatenate
-    :type df_list: list[pd.DataFrame]
-    :return: concatenated dataframe
-    :rtype: pd.DataFrame
+    Args:
+        df_list: List of dataframes to concatenate.
+
+    Returns:
+        pd.DataFrame: Concatenated dataframe.
     """
     merged_df = pd.concat(df_list, ignore_index=True).drop_duplicates()
     return merged_df

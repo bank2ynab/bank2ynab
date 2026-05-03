@@ -8,22 +8,23 @@ from ..bank_handler import BankHandler
 
 class XLS_Converter(BankHandler):
     def __init__(self, config_object: dict):
-        """
-        :param config_object: a dictionary of conf parameters
+        """Initialise XLS converter with bank configuration.
+
+        Args:
+            config_object: A dictionary of conf parameters.
         """
         super().__init__(config_object)
         self.config = config_object
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
-        """
-        Combines all tables in a XLS file into one table and writes to CSV.
+        """Combine all tables in an XLS file into one table and write to CSV.
 
-        :param file_path: path to XLS file
-        :type file_path: str
-        :param plugin_args: plugin arguments (unused in this plugin)
-        :type plugin_args: list
-        :return: path to CSV file
-        :rtype: str
+        Args:
+            file_path: Path to XLS file.
+            plugin_args: Plugin arguments (unused in this plugin).
+
+        Returns:
+            str: Path to CSV file.
         """
         logging.info("Converting XLS file...")
 
@@ -42,11 +43,12 @@ class XLS_Converter(BankHandler):
 
 
 def build_bank(config):
-    """This factory function is called from the main program,
-    and expected to return a BankHandler subclass.
-    Without this, the module will fail to load properly.
+    """Return an XLS_Converter instance for a given bank configuration.
 
-    :param config: dict containing all available configuration parameters
-    :return: a BankHandler subclass instance
+    Args:
+        config: Dict containing all available configuration parameters.
+
+    Returns:
+        XLS_Converter: A BankHandler subclass instance.
     """
     return XLS_Converter(config)

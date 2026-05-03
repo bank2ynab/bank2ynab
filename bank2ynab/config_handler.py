@@ -73,17 +73,16 @@ class ConfigHandler:
             return config
 
     def fix_conf_params(self, section: str) -> dict[str, typing.Any]:
-        """from a ConfigParser object, return a dictionary of all parameters
-        for a given section in the expected format.
-        Because ConfigParser defaults to values under [DEFAULT] if present,
-        these values should always appear unless the file is really bad.
+        """Return a dictionary of all parameters for a given config section.
 
-        :param section: name of section in config file to access
-        (i.e. bank name, e.g. "MyBank" matches "[MyBank]" in file)
-        :type section: str
-        :return: dictionary matching shorthand strings to specified
-        values in config
-        :rtype: dict
+        Uses ConfigParser defaults under [DEFAULT] if present.
+
+        Args:
+            section: Name of section in config file, e.g. "MyBank"
+                matches "[MyBank]" in file.
+
+        Returns:
+            dict[str, Any]: Dictionary matching shorthand strings to config values.
         """
 
         bank_config = {
@@ -157,68 +156,64 @@ class ConfigHandler:
         return bank_config
 
     def get_config_line_str(self, section_name: str, param: str) -> str:
-        """
-        Returns a string value from a given section in the config object.
+        """Returns a string value from a given section in the config object.
 
-        :param section_name: section to search for parameter
-        :type section_name: str
-        :param param: parameter to obtain from section
-        :type param: str
-        :return: value matching parameter
-        :rtype: str
+        Args:
+            section_name: Section to search for parameter.
+            param: Parameter to obtain from section.
+
+        Returns:
+            str: Value matching parameter.
         """
         return self.config.get(section_name, param)
 
     def get_config_line_int(self, section_name: str, param: str) -> int:
-        """
-        Returns an integer value from a given section in the config object.
+        """Returns an integer value from a given section in the config object.
 
-        :param section_name: section to search for parameter
-        :type section_name: str
-        :param param: parameter to obtain from section
-        :type param: str
-        :return: value matching parameter
-        :rtype: int
+        Args:
+            section_name: Section to search for parameter.
+            param: Parameter to obtain from section.
+
+        Returns:
+            int: Value matching parameter.
         """
         return self.config.getint(section_name, param)
 
     def get_config_line_flt(self, section_name: str, param: str) -> float:
-        """
-        Returns a float value from a given section in the config object.
+        """Returns a float value from a given section in the config object.
 
-        :param section_name: section to search for parameter
-        :type section_name: str
-        :param param: parameter to obtain from section
-        :type param: str
-        :return: value matching parameter
-        :rtype: float
+        Args:
+            section_name: Section to search for parameter.
+            param: Parameter to obtain from section.
+
+        Returns:
+            float: Value matching parameter.
         """
         return self.config.getfloat(section_name, param)
 
     def get_config_line_boo(self, section_name: str, param: str) -> bool:
-        """
-        Returns a bool value from a given section in the config object.
+        """Returns a bool value from a given section in the config object.
 
-        :param section_name: section to search for parameter
-        :type section_name: str
-        :param param: parameter to obtain from section
-        :type param: str
-        :return: value matching parameter
-        :rtype: bool
+        Args:
+            section_name: Section to search for parameter.
+            param: Parameter to obtain from section.
+
+        Returns:
+            bool: Value matching parameter.
         """
         return self.config.getboolean(section_name, param)
 
     def get_config_line_lst(
         self, section_name: str, param: str, splitter: str
     ) -> list[typing.Any]:
-        """
-        Returns a list value from a given section in the config object.
+        """Returns a list value from a given section in the config object.
 
-        :param section_name: section to search for parameter
-        :type section_name: str
-        :param param: parameter to obtain from section
-        :type param: str
-        :return: value matching parameter
-        :rtype: list
+        Args:
+            section_name: Section to search for parameter.
+            param: Parameter to obtain from section.
+            splitter: String to split the config value by.
+
+        Returns:
+            list: Value matching parameter.
         """
         return self.config.get(section_name, param).split(splitter)

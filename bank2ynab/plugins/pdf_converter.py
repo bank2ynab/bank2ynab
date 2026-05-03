@@ -9,22 +9,23 @@ from ..bank_handler import BankHandler
 
 class PDF_Converter(BankHandler):
     def __init__(self, config_object: dict):
-        """
-        :param config_object: a dictionary of conf parameters
+        """Initialise PDF converter with bank configuration.
+
+        Args:
+            config_object: A dictionary of conf parameters.
         """
         super().__init__(config_object)
         self.config = config_object
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
-        """
-        Combines all tables in a PDF file into one table and writes to CSV.
+        """Combine all tables in a PDF file into one table and write to CSV.
 
-        :param file_path: path to PDF file
-        :type file_path: str
-        :param plugin_args: plugin arguments (unused in this plugin)
-        :type plugin_args: list
-        :return: path to CSV file
-        :rtype: str
+        Args:
+            file_path: Path to PDF file.
+            plugin_args: Plugin arguments (unused in this plugin).
+
+        Returns:
+            str: Path to CSV file.
         """
         logging.info("Converting PDF file...")
 
@@ -47,17 +48,16 @@ class PDF_Converter(BankHandler):
 def read_pdf_to_dataframe(
     pdf_path: str, table_cols: list[str]
 ) -> pd.DataFrame:
-    """
-    Reads the main table from each page of a PDF and
-    combines them into a single dataframe.
-    If the table does not have the right number of columns, it is ignored.
+    """Read the main table from each page of a PDF and combine into a single dataframe.
 
-    :param pdf_path: filepath for PDF file
-    :type pdf_path: str
-    :param table_cols: columns to use for dataframe
-    :type table_cols: list[str]
-    :return: dataframe of combined tables
-    :rtype: pd.DataFrame
+    Tables with the wrong number of columns are ignored.
+
+    Args:
+        pdf_path: Filepath for PDF file.
+        table_cols: Columns to use for dataframe.
+
+    Returns:
+        pd.DataFrame: Dataframe of combined tables.
     """
     # TODO - fix excessive text output from pdfplumber
     # create the pdf object
@@ -86,11 +86,12 @@ def read_pdf_to_dataframe(
 
 
 def build_bank(config):
-    """This factory function is called from the main program,
-    and expected to return a BankHandler subclass.
-    Without this, the module will fail to load properly.
+    """Return a PDF_Converter instance for a given bank configuration.
 
-    :param config: dict containing all available configuration parameters
-    :return: a BankHandler subclass instance
+    Args:
+        config: Dict containing all available configuration parameters.
+
+    Returns:
+        PDF_Converter: A BankHandler subclass instance.
     """
     return PDF_Converter(config)

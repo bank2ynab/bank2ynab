@@ -7,16 +7,11 @@ class FixLineBreaksPlugin(BankHandler):
         self.name = "FixLineBreaks"
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> None:
-        """
-        Remove all linebreaks followed by any character specified in
-        plugin_args.
+        """Remove all linebreaks followed by any character specified in plugin_args.
 
-        :param file_path: path of file to modify
-        :type file_path: str
-        :param plugin_args: target characters
-        :type plugin_args: list
-        :return: file path
-        :rtype: str
+        Args:
+            file_path: Path of file to modify.
+            plugin_args: Target characters after which linebreaks are removed.
         """
 
         # Open the source file for reading

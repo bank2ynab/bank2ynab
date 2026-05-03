@@ -11,8 +11,17 @@ logging.basicConfig(format="%(levelname): %(message)", level=logging.INFO)
 
 
 def build_bank(bank_config: dict[str, Any]) -> BankHandler:
-    """Factory method loading the correct class
-    for a given configuration."""
+    """Load the correct bank handler class for a given configuration.
+
+    Args:
+        bank_config: Dictionary of bank configuration parameters.
+
+    Returns:
+        BankHandler: Bank handler instance for the given configuration.
+
+    Raises:
+        ImportError: If the specified plugin does not contain a build_bank method.
+    """
     plugin_module_name = bank_config.get("plugin", None)
     if plugin_module_name:
         module = importlib.import_module(

@@ -10,9 +10,9 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 class YNAB_API:
-    """
-    uses Personal Access Token stored in user_configuration.conf
-    (note for devs: be careful not to accidentally share API access token!)
+    """Uses Personal Access Token stored in user_configuration.conf.
+
+    Note: Be careful not to accidentally share the API access token.
     """
 
     def __init__(
@@ -114,9 +114,7 @@ class YNAB_API:
 
     def save_account_selection(self, bank, budget_id, account_id) -> None:
         # TODO move config saving to the ConfigHandler class?
-        """
-        saves YNAB account to use for each bank
-        """
+        """Saves YNAB account to use for each bank."""
         self.user_config.read(self.user_config_path)
         try:
             self.user_config.add_section(bank)
@@ -193,16 +191,16 @@ def generate_name_id_list(input_dict: dict) -> list[list[str]]:
 def apply_mapping(
     transaction_data: dict[str, list], mapping: dict[str, dict[str, str]]
 ) -> dict[str, dict[str, list]]:
-    """
-    Create a dictionary of budget_ids mapped to a dictionary of transactions.
-    Add an account_id to each transaction.
+    """Create a dictionary of budget IDs mapped to a dictionary of transactions.
 
-    :param transaction_data: dictionary of bank names to transaction data
-    :type transaction_data: dict[str, list]
-    :param mapping: dictionary mapping bank names to budget ID and account ID
-    :type mapping: dict[str, dict[str, str]]
-    :return: dictionary of budget_id mapped to a dictionary of transactions
-    :rtype: dict[str, dict]
+    Adds an account_id to each transaction.
+
+    Args:
+        transaction_data: Dictionary of bank names to transaction data.
+        mapping: Dictionary mapping bank names to budget ID and account ID.
+
+    Returns:
+        dict[str, dict[str, list]]: Dictionary of budget_id mapped to transactions.
     """
     logging.info("Adding budget and account IDs to transactions...")
     budget_transaction_dict: dict[str, dict[str, list]] = dict()

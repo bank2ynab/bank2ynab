@@ -1,12 +1,15 @@
 def get_user_input(options: list, msg: str) -> str:
-    """
-    Used to select from a list of options.
-    If only one item in list, selects that by default.
-    Otherwise displays "msg" asking for input selection (integer only).
+    """Used to select from a list of options.
 
-    :param options: list of [name, option] pairs to select from
-    :param msg: the message to display on the input line
-    :return option_selected: the selected item from the list
+    If only one item in list, selects that by default.
+    Otherwise displays msg asking for input selection (integer only).
+
+    Args:
+        options: List of [name, option] pairs to select from.
+        msg: The message to display on the input line.
+
+    Returns:
+        str: The selected item from the list.
     """
 
     selection = 1
@@ -25,12 +28,15 @@ def display_options(options: list):
 
 
 def get_int_input(min: int, max: int, msg: str) -> int:
-    """
-    Makes a user select an integer between min & max stated values
-    :param  min: the minimum acceptable integer value
-    :param  max: the maximum acceptable integer value
-    :param  msg: the message to display on the input line
-    :return user_input: sanitised integer input in acceptable range
+    """Makes a user select an integer between min & max stated values.
+
+    Args:
+        min: The minimum acceptable integer value.
+        max: The maximum acceptable integer value.
+        msg: The message to display on the input line.
+
+    Returns:
+        int: Sanitised integer input in acceptable range.
     """
     while True:
         try:

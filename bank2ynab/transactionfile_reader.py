@@ -15,23 +15,18 @@ def get_files(
     ext: str,
     prefix: str,
 ) -> list[str]:
-    """
-    Returns list of files matching the specified search parameters.
+    """Returns list of files matching the specified search parameters.
 
-    :param name: Bank format name
-    :type name: str
-    :param file_pattern: filename or regex pattern to match
-    :type file_pattern: str
-    :param try_path: provided path to search initially
-    :type try_path: str
-    :param regex_active: whether or not to use regex in file name check
-    :type regex_active: bool
-    :param ext: file extension
-    :type ext: str
-    :param prefix: prefix attached to processed files
-    :type prefix: str
-    :return: list of matching files
-    :rtype: list
+    Args:
+        name: Bank format name.
+        file_pattern: Filename or regex pattern to match.
+        try_path: Provided path to search initially.
+        regex_active: Whether or not to use regex in file name check.
+        ext: File extension.
+        prefix: Prefix attached to processed files.
+
+    Returns:
+        list[str]: List of matching files.
     """
 
     files: list[str] = list()
@@ -74,14 +69,16 @@ def get_files(
 
 
 def find_directory(filepath: str) -> str:
-    """
-    Finds the downloads directory for active user if filepath is not set.
+    """Find the downloads directory for active user if filepath is not set.
 
-    :param filepath: Filepath specified by the configuration file.
-    :type filepath: str
-    :raises FileNotFoundError: Error raised if the filepath is invalid.
-    :return: The desired directory to use.
-    :rtype: str
+    Args:
+        filepath: Filepath specified by the configuration file.
+
+    Raises:
+        FileNotFoundError: If the filepath is invalid.
+
+    Returns:
+        str: The desired directory to use.
     """
     if filepath == "":
         if os.name == "nt":
@@ -109,11 +106,13 @@ def find_directory(filepath: str) -> str:
 
 # TODO add check of config to see if we have encoding specified
 def detect_encoding(filepath: str) -> str:
-    """
-    Utility to detect file encoding. This is imperfect, but
-    should work for the most common cases.
-    :param filepath: string path to a given file
-    :return: encoding alias that can be used with open()
+    """Detect file encoding. Imperfect, but works for the most common cases.
+
+    Args:
+        filepath: String path to a given file.
+
+    Returns:
+        str: Encoding alias that can be used with open().
     """
     # First try to guess the encoding with chardet. Take it if the
     # confidence is >60% (randomly chosen)

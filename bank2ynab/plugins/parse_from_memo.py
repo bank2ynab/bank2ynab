@@ -1,6 +1,4 @@
-"""
-Plugin that uses information from the memo field to fill in other fields
-"""
+"""Plugin that uses information from the memo field to fill in other fields."""
 
 # Usage:
 # Ensure the relevant bank config has a Memo Parser config attribute
@@ -26,8 +24,10 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
 
 class ParseFromMemo(BankHandler):
     def __init__(self, config_object):
-        """
-        :param config_object: a dictionary of conf parameters
+        """Initialise ParseFromMemo bank handler.
+
+        Args:
+            config_object: A dictionary of conf parameters.
         """
         super().__init__(config_object)
 
@@ -44,8 +44,14 @@ class ParseFromMemo(BankHandler):
         )
 
     def _preprocess_file(self, file_path: str, plugin_args: list) -> str:
-        """
-        Override the memo, date and payee columns with information read from the memo field
+        """Override memo, date, and payee columns with information from the memo field.
+
+        Args:
+            file_path: Path to file.
+            plugin_args: Plugin-specific arguments (unused, parsers are read from config).
+
+        Returns:
+            str: Path to the modified output file.
         """
 
         # Read in the old CSV

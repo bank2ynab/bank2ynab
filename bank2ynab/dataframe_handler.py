@@ -1,3 +1,4 @@
+import csv
 import logging
 
 import pandas as pd
@@ -111,6 +112,8 @@ def read_csv(
         skip_blank_lines=True,  # skip blank lines
         encoding=encod,
         engine="python",
+        quotechar='"',
+        quoting=csv.QUOTE_MINIMAL,
     )
 
     return df

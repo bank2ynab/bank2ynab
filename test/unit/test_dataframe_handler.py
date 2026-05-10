@@ -1,3 +1,5 @@
+import os
+import tempfile
 import unittest
 from unittest import TestCase
 
@@ -7,6 +9,7 @@ from pandas._libs.missing import NA
 
 from bank2ynab.dataframe_handler import (
     add_missing_columns,
+    read_csv,
     auto_memo,
     auto_payee,
     cd_flag_process,
@@ -29,17 +32,26 @@ class TestDataframeHandler(TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
-    @unittest.skip("Not tested yet.")
-    def test_read_csv(self):
-        """Test reading of CSV file into dataframe."""
-        """
-        file_path: str,
-        delim: str,
-        header_rows: int,
-        footer_rows: int,
-        encod: str,
-        """
-        raise NotImplementedError
+    def test_read_csv_quoted_delimiter(self):
+        """Delimiter inside a quoted field must not split the field."""
+        csv_content = 'Date;Payee;Amount\n2024-01-01;"Smith; Jones Ltd";100\n'
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".csv", delete=False, encoding="utf-8"
+        ) as f:
+            f.write(csv_content)
+            tmp_path = f.name
+        try:
+            df = read_csv(
+                file_path=tmp_path,
+                delim=";",
+                header_rows=1,
+                footer_rows=0,
+                encod="utf-8",
+            )
+            self.assertEqual(df.shape[1], 3)
+            self.assertEqual(df.iloc[0, 1], "Smith; Jones Ltd")
+        finally:
+            os.unlink(tmp_path)
 
     @unittest.skip("Not tested yet.")
     def test_parse_data(self):

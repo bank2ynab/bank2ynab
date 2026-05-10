@@ -2,13 +2,14 @@ import csv
 import logging
 import re
 from decimal import Decimal, InvalidOperation
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 import pandas as pd
 
 from .config_handler import BankConfig
 
 
+@runtime_checkable
 class TransactionSource(Protocol):
     """Protocol for objects that supply a raw DataFrame of transaction rows.
 

@@ -15,8 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
-      - name: Run ruff (critical checks)
-        run: uvx ruff check . --select F,E9,I --output-format=github
+      - name: Check formatting
+        run: uvx ruff format --check .
+      - name: Run ruff
+        run: uvx ruff check . --output-format=github
 
   autofix:
     if: github.event_name == 'push'

@@ -1,5 +1,7 @@
 import csv
 import logging
+import re
+from decimal import Decimal, InvalidOperation
 
 import pandas as pd
 
@@ -344,38 +346,66 @@ def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
     df["Inflow"] = df["Inflow"] / currency_fix
     df["Outflow"] = df["Outflow"] / currency_fix
 
-    # create amount column for API (in milliunits)
-    df["amount"] = (1000 * (df["Inflow"] - df["Outflow"])).astype(int)
+    # create amount column for API (in milliunits); round before truncation
+    # to avoid float representation errors (e.g. 9.999999 → 9 instead of 10)
+    df["amount"] = (
+        (df["Inflow"] - df["Outflow"]).multiply(1000).round().astype(int)
+    )
     return df
 
 
-def clean_monetary_values(num_series: pd.Series) -> pd.Series:
-    """Clean a series of monetary strings into numeric values.
+def _parse_monetary_string(value: object) -> float:
+    """Parse a single monetary string to a float via Decimal for precision.
 
-    Converts "," to ".", removes all but the last ".", strips non-numeric
-    characters, and fills nulls with 0.
+    Using ``Decimal`` for the string-to-number conversion boundary avoids
+    the silent corruption that arises when locale-formatted strings are fed
+    directly to ``float()`` (e.g. ``float("1.234,56")`` raises rather than
+    returning ``1234.56``).  The result is stored as a plain float because
+    pandas requires a uniform numeric dtype for vectorised arithmetic.
 
     Args:
-        num_series: Series of values to modify.
+        value: Raw cell value — may be a string, int, float, or NaN.
 
     Returns:
-        pd.Series: Modified series as floats.
+        float: Parsed numeric value, or ``0.0`` if the input is null or
+            cannot be interpreted as a number.
     """
-    # convert all commas to full stops
-    num_series.replace({"\\,": "."}, regex=True, inplace=True)
-    # remove all except last decimal point
-    num_series.replace({"\\.(?=.*?\\.)": ""}, regex=True, inplace=True)
-    # remove all non-digit characters
-    num_series.replace(
-        {
-            "[^\\d\\.-]": "",
-        },
-        regex=True,
-        inplace=True,
-    )
-    # fill in null values with 0
-    return_series: pd.Series[float] = num_series.fillna(value=0).astype(float)
-    return return_series
+    if pd.isna(value):
+        return 0.0
+    s = str(value).strip()
+    if not s:
+        return 0.0
+    # normalise thousands/decimal separators: convert commas to periods, then
+    # remove all but the last period so "1.234.567,89" → "1234567.89"
+    s = s.replace(",", ".")
+    parts = s.split(".")
+    if len(parts) > 2:
+        s = "".join(parts[:-1]) + "." + parts[-1]
+    # strip everything except digits, a leading minus, and the decimal point
+    s = re.sub(r"[^\d.\-]", "", s)
+    if not s or s in ("-", "."):
+        return 0.0
+    try:
+        return float(Decimal(s))
+    except InvalidOperation:
+        return 0.0
+
+
+def clean_monetary_values(num_series: pd.Series) -> pd.Series:
+    """Clean a series of monetary strings into numeric float values.
+
+    Delegates per-cell parsing to :func:`_parse_monetary_string`, which uses
+    ``Decimal`` at the string-to-number boundary to prevent silent corruption
+    from locale-specific separators or floating-point parse artefacts.
+
+    Args:
+        num_series: Series of raw monetary values (strings, ints, floats, NaN).
+
+    Returns:
+        pd.Series: Series of ``float64`` values; unparseable entries become
+            ``0.0``.
+    """
+    return num_series.apply(_parse_monetary_string)
 
 
 def remove_invalid_rows(df: pd.DataFrame) -> pd.DataFrame:

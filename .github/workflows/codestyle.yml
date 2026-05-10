@@ -7,14 +7,31 @@ on:
       - develop
   pull_request:
 
-permissions:
-  contents: read
-
 jobs:
   lint:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - name: Run ruff (critical checks)
         run: uvx ruff check . --select F,E9,I --output-format=github
+
+  autofix:
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Auto-fix with ruff
+        run: |
+          uvx ruff check --fix .
+          uvx ruff format .
+      - name: Commit fixes if any
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git diff --quiet || (git add -A && git commit -m "style: auto-fix ruff violations" && git push)

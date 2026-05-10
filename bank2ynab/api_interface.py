@@ -16,9 +16,7 @@ class APIInterface:
             budget_dict = get_budgets(api_token=api_token)
             # add accounts dictionary to each budget in dict
             for budget_id in budget_dict.keys():
-                budget_accounts = get_budget_accounts(
-                    api_token=api_token, budget_id=budget_id
-                )
+                budget_accounts = get_budget_accounts(api_token=api_token, budget_id=budget_id)
                 budget_dict[budget_id]["accounts"] = budget_accounts
             self.budget_info = budget_dict
             logging.info("All budget and account data obtained.")
@@ -26,9 +24,7 @@ class APIInterface:
             logging.info("No API-token provided.")
 
 
-def access_api(
-    api_token: str, budget_id: str, keyword: str, method: str, data: dict
-) -> dict:
+def access_api(api_token: str, budget_id: str, keyword: str, method: str, data: dict) -> dict:
     base_url = "https://api.youneedabudget.com/v1/budgets/"
 
     if budget_id == "":
@@ -123,9 +119,7 @@ def get_budget_accounts(api_token: str, budget_id: str) -> dict[str, dict]:
     Returns:
         dict[str, dict]: Dictionary matching account id to parameters.
     """
-    accounts = api_read(
-        api_token=api_token, budget_id=budget_id, keyword="accounts"
-    )
+    accounts = api_read(api_token=api_token, budget_id=budget_id, keyword="accounts")
     return fix_id_based_dicts(accounts)
 
 
@@ -141,5 +135,4 @@ def get_budgets(
         dict[str, dict[str, str]]: Dictionary matching budget id to parameters.
     """
     budgets = api_read(api_token=api_token, budget_id="", keyword="budgets")
-    return fix_id_based_dicts(budgets)
     return fix_id_based_dicts(budgets)

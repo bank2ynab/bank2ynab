@@ -208,3 +208,16 @@ class ConfigHandler:
             list: Value matching parameter.
         """
         return self.config.get(section_name, param).split(splitter)
+
+    def get_log_level(self) -> int:
+        """Return the logging level integer from config, defaulting to WARNING.
+
+        Reads 'Log Level' from [DEFAULT]. Accepted values: DEBUG, INFO,
+        WARNING, ERROR, CRITICAL.
+        """
+        level_str = self.config.defaults().get("log level", "WARNING").upper()
+        level = getattr(logging, level_str, None)
+        if not isinstance(level, int):
+            logging.warning(f"Invalid log level '{level_str}', using WARNING.")
+            return logging.WARNING
+        return level

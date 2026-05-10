@@ -38,6 +38,8 @@ class BankConfig:
     currency_mult: float
     save_output: bool
     payee_mappings: dict[str, str] = field(default_factory=dict)
+    clean_payee: bool = True
+    clean_memo: bool = True
 
     def __post_init__(self) -> None:
         if self.input_delimiter == "\\t":
@@ -152,6 +154,8 @@ class ConfigHandler:
             }
             if self.config.has_section(f"{section} payee_mappings")
             else {},
+            clean_payee=self.config.getboolean(section, "Clean Payee"),
+            clean_memo=self.config.getboolean(section, "Clean Memo"),
         )
 
     def get_config_line_str(self, section_name: str, param: str) -> str:
@@ -216,3 +220,16 @@ class ConfigHandler:
             list: Value matching parameter.
         """
         return self.config.get(section_name, param).split(splitter)
+
+    def get_log_level(self) -> int:
+        """Return the logging level integer from config, defaulting to WARNING.
+
+        Reads 'Log Level' from [DEFAULT]. Accepted values: DEBUG, INFO,
+        WARNING, ERROR, CRITICAL.
+        """
+        level_str = self.config.defaults().get("log level", "WARNING").upper()
+        level = getattr(logging, level_str, None)
+        if not isinstance(level, int):
+            logging.warning(f"Invalid log level '{level_str}', using WARNING.")
+            return logging.WARNING
+        return level

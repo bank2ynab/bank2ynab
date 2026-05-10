@@ -7,3 +7,5 @@
 # Specify where you save your downloaded CSV files:
 Source Path =
 YNAB API Access Token =
+# Logging verbosity: DEBUG, INFO, WARNING, ERROR, CRITICAL (default: WARNING)
+Log Level = WARNING

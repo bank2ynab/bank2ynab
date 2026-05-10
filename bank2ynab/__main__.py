@@ -5,7 +5,7 @@ from .config_handler import ConfigHandler
 from .ynab_api import YNAB_API
 
 # configure our logger
-logging.basicConfig(format="%(levelname): %(message)", level=logging.INFO)
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.WARNING)
 
 
 def main() -> None:
@@ -15,6 +15,7 @@ def main() -> None:
         logging.error("No configuration file found, process aborted.")
         pass
     else:
+        logging.getLogger().setLevel(config_handler.get_log_level())
         # generate list of bank objects to process
         bank_obj_list: list[BankHandler] = []
         for bank_params in config_handler.config.sections():

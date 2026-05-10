@@ -3,7 +3,7 @@ import logging
 import os
 import shutil
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib import resources
 from pathlib import Path
 
@@ -37,6 +37,7 @@ class BankConfig:
     api_account: list[str]
     currency_mult: float
     save_output: bool
+    payee_mappings: dict[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.input_delimiter == "\\t":
@@ -144,6 +145,9 @@ class ConfigHandler:
             api_account=self.config.get(section, "YNAB Account ID").split("|"),
             currency_mult=self.config.getfloat(section, "Currency Conversion Factor"),
             save_output=self.config.getboolean(section, "Save Output File"),
+            payee_mappings=dict(self.config.items(f"{section} payee_mappings"))
+            if self.config.has_section(f"{section} payee_mappings")
+            else {},
         )
 
     def get_config_line_str(self, section_name: str, param: str) -> str:

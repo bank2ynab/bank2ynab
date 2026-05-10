@@ -7,6 +7,7 @@ from pandas._libs.missing import NA
 
 from bank2ynab.dataframe_handler import (
     add_missing_columns,
+    apply_payee_mappings,
     auto_memo,
     auto_payee,
     cd_flag_process,
@@ -539,3 +540,35 @@ class TestDataframeHandler(TestCase):
         expected_output = pd.DataFrame({"Col1": [45, 55], "Col2": [36, 98]})
         test_output = combine_dfs(dfs)
         pandas.testing.assert_frame_equal(expected_output, test_output)
+
+    def test_apply_payee_mappings_match(self):
+        """Exact match replaces payee."""
+        df = pd.DataFrame({"Payee": ["PAYPAL (EUROPE) S.A.R.L ET CIE,S.C.A."]})
+        result = apply_payee_mappings(df, {"PAYPAL (EUROPE)": "PayPal"})
+        self.assertEqual(result["Payee"].iloc[0], "PayPal")
+
+    def test_apply_payee_mappings_no_match(self):
+        """Non-matching payee is left unchanged."""
+        df = pd.DataFrame({"Payee": ["AMAZON EU"]})
+        result = apply_payee_mappings(df, {"PAYPAL": "PayPal"})
+        self.assertEqual(result["Payee"].iloc[0], "AMAZON EU")
+
+    def test_apply_payee_mappings_case_insensitive(self):
+        """Matching is case-insensitive."""
+        df = pd.DataFrame({"Payee": ["paypal europe"]})
+        result = apply_payee_mappings(df, {"PAYPAL": "PayPal"})
+        self.assertEqual(result["Payee"].iloc[0], "PayPal")
+
+    def test_apply_payee_mappings_first_match_wins(self):
+        """First matching mapping wins when multiple keys match."""
+        df = pd.DataFrame({"Payee": ["PAYPAL AMAZON"]})
+        result = apply_payee_mappings(
+            df, {"PAYPAL": "PayPal", "AMAZON": "Amazon"}
+        )
+        self.assertEqual(result["Payee"].iloc[0], "PayPal")
+
+    def test_apply_payee_mappings_empty(self):
+        """Empty mappings dict leaves payee unchanged."""
+        df = pd.DataFrame({"Payee": ["SOME PAYEE"]})
+        result = apply_payee_mappings(df, {})
+        self.assertEqual(result["Payee"].iloc[0], "SOME PAYEE")

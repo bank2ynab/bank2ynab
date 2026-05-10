@@ -1,7 +1,10 @@
 name: Update README
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
+      - develop
     paths:
       - "bank2ynab/**"
       - "bank2ynab/data/**"
@@ -16,23 +19,20 @@ jobs:
     name: Update bank list
     runs-on: ubuntu-latest
 
-    steps:    
+    steps:
         - name: Check out Git repository
           uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.ref }}
-        
+
         - name: Set up Python
           uses: actions/setup-python@v5
           with:
             python-version: "3.12"
-               
+
         - name: Update README.md
           id: update_readme
           uses: bank2ynab/bank2ynab-update-readme@master
-          
+
         - name: Commit and push changes
-          if: github.event.pull_request.head.repo.full_name == github.repository
           run: |
             git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git config --local user.name "github-actions[bot]"

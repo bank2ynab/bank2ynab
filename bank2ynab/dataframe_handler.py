@@ -51,7 +51,7 @@ class DataframeHandler:
             date_dedupe: Whether to fill in date with previous if blank.
             fill_memo: Whether to fill blank memo with payee data.
             currency_fix: Value to divide all currency amounts by.
-            payee_mappings: Optional dict of raw payee substring → friendly name.
+            payee_mappings: Dict of raw payee substring → friendly name; omit or pass None for no mapping.
         """
         # read data from input file to dataframe
         self.df = read_csv(
@@ -128,7 +128,7 @@ def parse_data(
     date_dedupe: bool,
     fill_memo: bool,
     currency_fix: float,
-    payee_mappings: dict[str, str] | None = None,
+    payee_mappings: dict[str, str],
 ) -> pd.DataFrame:
     """Convert each column of the dataframe to match ideal output data.
 
@@ -142,7 +142,7 @@ def parse_data(
         date_dedupe: Whether to fill in date with previous if blank.
         fill_memo: Whether to fill blank memo with payee data.
         currency_fix: Value to divide all currency amounts by.
-        payee_mappings: Optional dict of raw payee substring → friendly name.
+        payee_mappings: Dict of raw payee substring → friendly name.
 
     Returns:
         pd.DataFrame: Modified dataframe matching provided configuration values.
@@ -170,7 +170,7 @@ def parse_data(
     # auto fill payee from memo
     df = auto_payee(df)
     # apply payee rename mappings
-    df = apply_payee_mappings(df, payee_mappings or {})
+    df = apply_payee_mappings(df, payee_mappings)
     # fix strings
     df["Payee"] = clean_strings(df["Payee"])
     df["Memo"] = clean_strings(df["Memo"])

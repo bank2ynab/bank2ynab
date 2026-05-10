@@ -29,6 +29,30 @@ class TestConfigHandlerPaths(unittest.TestCase):
             self.assertTrue(bank_conf.exists())
             self.assertTrue(user_conf.exists())
 
+    def test_payee_mappings_excludes_default_section_keys(self) -> None:
+        """DEFAULT section keys must not bleed into payee_mappings."""
+        with tempfile.TemporaryDirectory() as temp_config:
+            os.environ["BANK2YNAB_CONFIG_DIR"] = temp_config
+
+            # Let ConfigHandler seed bank2ynab.conf (supplies all DEFAULT values),
+            # then append a test bank + its payee_mappings to the user conf.
+            handler = ConfigHandler()
+            user_conf = Path(handler.user_conf_path)
+            user_conf.write_text(
+                "[Test Bank]\n"
+                "\n"
+                "[Test Bank payee_mappings]\n"
+                "PAYPAL = PayPal\n"
+                "AMAZON = Amazon\n",
+                encoding="utf-8",
+            )
+            handler = ConfigHandler()
+            config = handler.fix_conf_params("Test Bank")
+
+        self.assertEqual(config.payee_mappings, {"paypal": "PayPal", "amazon": "Amazon"})
+        for default_key in handler.config.defaults():
+            self.assertNotIn(default_key, config.payee_mappings)
+
 
 if __name__ == "__main__":
     unittest.main()

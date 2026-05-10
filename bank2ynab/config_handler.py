@@ -145,7 +145,11 @@ class ConfigHandler:
             api_account=self.config.get(section, "YNAB Account ID").split("|"),
             currency_mult=self.config.getfloat(section, "Currency Conversion Factor"),
             save_output=self.config.getboolean(section, "Save Output File"),
-            payee_mappings=dict(self.config.items(f"{section} payee_mappings"))
+            payee_mappings={
+                k: v
+                for k, v in self.config.items(f"{section} payee_mappings")
+                if k not in self.config.defaults()
+            }
             if self.config.has_section(f"{section} payee_mappings")
             else {},
         )

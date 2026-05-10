@@ -5,6 +5,8 @@ from decimal import Decimal, InvalidOperation
 
 import pandas as pd
 
+from .config_handler import BankConfig
+
 
 class DataframeHandler:
     """Use config to produce a cleaned dataframe matching a given specification."""
@@ -24,71 +26,32 @@ class DataframeHandler:
         self,
         *,
         file_path: str,
-        delim: str,
-        header_rows: int,
-        footer_rows: int,
         encod: str,
-        input_columns: list[str],
-        output_columns: list[str],
-        api_columns: list[str],
-        cd_flags: list[str],
-        date_format: str,
-        date_dedupe: bool,
-        fill_memo: bool,
-        currency_fix: float,
-        payee_mappings: dict[str, str] | None = None,
-        clean_payee: bool = True,
-        clean_memo: bool = True,
+        config: BankConfig,
     ) -> None:
         """Complete handling of Dataframe creation & output.
 
         Args:
             file_path: Path to CSV file.
-            delim: CSV separator.
-            header_rows: Number of header rows.
-            footer_rows: Number of footer rows.
-            encod: CSV file encoding.
-            input_columns: Columns present in input data.
-            output_columns: Desired columns to be present in output data.
-            api_columns: Desired columns to be present in API data.
-            cd_flags: Parameter to indicate inflow/outflow for a row.
-            date_format: String format for date.
-            date_dedupe: Whether to fill in date with previous if blank.
-            fill_memo: Whether to fill blank memo with payee data.
-            currency_fix: Value to divide all currency amounts by.
-            payee_mappings: Dict of raw payee substring → friendly name; omit or pass None for no mapping.
-            clean_payee: Whether to apply string cleaning to Payee field.
-            clean_memo: Whether to apply string cleaning to Memo field.
+            encod: CSV file encoding (detected at runtime by the caller).
+            config: Bank configuration supplying all transformation parameters.
         """
         # read data from input file to dataframe
         self.df = read_csv(
             file_path=file_path,
-            delim=delim,
-            header_rows=header_rows,
-            footer_rows=footer_rows,
+            delim=config.input_delimiter,
+            header_rows=config.header_rows,
+            footer_rows=config.footer_rows,
             encod=encod,
         )
         # modify dataframe to match desired output
-        self.df = parse_data(
-            df=self.df,
-            input_columns=input_columns,
-            output_columns=output_columns,
-            api_columns=api_columns,
-            cd_flags=cd_flags,
-            date_format=date_format,
-            date_dedupe=date_dedupe,
-            fill_memo=fill_memo,
-            currency_fix=currency_fix,
-            payee_mappings=payee_mappings or {},
-            clean_payee=clean_payee,
-            clean_memo=clean_memo,
-        )
+        self.df = parse_data(df=self.df, config=config)
         # check if dataframe is empty
         self.empty = self.df.empty
         # set final columns & order for output file
-        self.output_df = self.df[output_columns]
+        self.output_df = self.df[config.output_columns]
         # set final columns & order for api output
-        self.api_transaction_df = self.df[api_columns]
+        self.api_transaction_df = self.df[config.api_columns]
 
 
 def read_csv(
@@ -128,69 +91,52 @@ def read_csv(
     return df
 
 
-def parse_data(
-    *,
-    df: pd.DataFrame,
-    input_columns: list[str],
-    output_columns: list[str],
-    api_columns: list[str],
-    cd_flags: list[str],
-    date_format: str,
-    date_dedupe: bool,
-    fill_memo: bool,
-    currency_fix: float,
-    payee_mappings: dict[str, str],
-    clean_payee: bool = True,
-    clean_memo: bool = True,
-) -> pd.DataFrame:
+def parse_data(*, df: pd.DataFrame, config: BankConfig) -> pd.DataFrame:
     """Convert each column of the dataframe to match ideal output data.
+
+    Each transformation step is a standalone function composed explicitly here.
+    Accepting a single ``BankConfig`` rather than a dozen positional parameters
+    makes the composition point readable and allows individual steps to be
+    tested in isolation without instantiating a handler.
 
     Args:
         df: Dataframe to process.
-        input_columns: Columns present in input data.
-        output_columns: Desired columns to be present in output data.
-        api_columns: Desired columns to be present in API data.
-        cd_flags: Parameter to indicate inflow/outflow for a row.
-        date_format: String format for date.
-        date_dedupe: Whether to fill in date with previous if blank.
-        fill_memo: Whether to fill blank memo with payee data.
-        currency_fix: Value to divide all currency amounts by.
-        payee_mappings: Dict of raw payee substring → friendly name.
-        clean_payee: Whether to apply string cleaning to Payee field.
-        clean_memo: Whether to apply string cleaning to Memo field.
+        config: Bank configuration supplying all transformation parameters.
 
     Returns:
         pd.DataFrame: Modified dataframe matching provided configuration values.
     """
     # set column names based on input column list
-    df.columns = input_columns
+    df.columns = config.input_columns
     # debug to see what our df is like before transformation
     logging.debug(f"\nInitial DF\n{df.head()}")
     # merge duplicate input columns
-    merge_duplicate_columns(df, input_columns)
+    merge_duplicate_columns(df, config.input_columns)
     # add missing columns
-    add_missing_columns(df, input_columns, output_columns + api_columns)
+    add_missing_columns(
+        df, config.input_columns, config.output_columns + config.api_columns
+    )
     # fix date format — keep as datetime while filling, then format to ISO string
-    df["Date"] = fix_date(df["Date"], date_format)
-    df["Date"] = fill_empty_dates(df["Date"], date_dedupe)
+    df["Date"] = fix_date(df["Date"], config.date_format)
+    df["Date"] = fill_empty_dates(df["Date"], config.date_dedupe)
     df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
     # fix inflow/outflow string formatting
     df["Inflow"] = clean_monetary_values(df["Inflow"])
     df["Outflow"] = clean_monetary_values(df["Outflow"])
     # process Inflow/Outflow flags
-    df = cd_flag_process(df, cd_flags)
+    df = cd_flag_process(df, config.cd_flags)
     # fix amounts (convert negative inflows and outflows etc)
-    df = fix_amount(df, currency_fix)
+    df = fix_amount(df, config.currency_mult)
     # auto fill memo from payee if required
-    df = auto_memo(df, fill_memo)
+    df = auto_memo(df, config.payee_to_memo)
     # auto fill payee from memo
     df = auto_payee(df)
     # apply payee rename mappings
-    df = apply_payee_mappings(df, payee_mappings)
+    df = apply_payee_mappings(df, config.payee_mappings)
     # fix strings
-    if clean_payee:
+    if config.clean_payee:
         df["Payee"] = clean_strings(df["Payee"])
-    if clean_memo:
+    if config.clean_memo:
         df["Memo"] = clean_strings(df["Memo"])
     # remove invalid rows
     df = remove_invalid_rows(df)

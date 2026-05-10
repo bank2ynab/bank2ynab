@@ -67,21 +67,8 @@ class BankHandler:
                 df_handler = DataframeHandler()
                 df_handler.run(
                     file_path=src_file,
-                    delim=self.config.input_delimiter,
-                    header_rows=self.config.header_rows,
-                    footer_rows=self.config.footer_rows,
                     encod=src_encod,
-                    input_columns=self.config.input_columns,
-                    output_columns=self.config.output_columns,
-                    api_columns=self.config.api_columns,
-                    cd_flags=self.config.cd_flags,
-                    date_format=self.config.date_format,
-                    date_dedupe=self.config.date_dedupe,
-                    fill_memo=self.config.payee_to_memo,
-                    currency_fix=self.config.currency_mult,
-                    payee_mappings=self.config.payee_mappings,
-                    clean_payee=self.config.clean_payee,
-                    clean_memo=self.config.clean_memo,
+                    config=self.config,
                 )
 
                 self.files_processed += 1

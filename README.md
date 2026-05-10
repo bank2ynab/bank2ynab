@@ -154,8 +154,10 @@ Here is a list of the banks and their formats that we already support. Note that
 1. CH Neon Monthly Account Statement
 1. CH Neon Yearly Account Statement
 1. CH SwissCard
+1. CH ZKB Konto CSV-Export (Mit Details)
 1. CH ZKB Erweiterte Suche
 1. CH ZKB Finanzassistent-Chronik
+1. CH ZugerKB Kontoauszug
 1. CO Bancolombia
 1. Crypto.com
 1. CZ AirBank checking and savings

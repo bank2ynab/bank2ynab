@@ -5,8 +5,6 @@ import pandas as pd
 
 
 class DataframeHandler:
-    # TODO - integrate payee mapping in this class
-
     """Use config to produce a cleaned dataframe matching a given specification."""
 
     def __init__(self) -> None:
@@ -36,6 +34,9 @@ class DataframeHandler:
         date_dedupe: bool,
         fill_memo: bool,
         currency_fix: float,
+        payee_mappings: dict[str, str] | None = None,
+        clean_payee: bool = True,
+        clean_memo: bool = True,
     ) -> None:
         """Complete handling of Dataframe creation & output.
 
@@ -53,6 +54,9 @@ class DataframeHandler:
             date_dedupe: Whether to fill in date with previous if blank.
             fill_memo: Whether to fill blank memo with payee data.
             currency_fix: Value to divide all currency amounts by.
+            payee_mappings: Dict of raw payee substring → friendly name; omit or pass None for no mapping.
+            clean_payee: Whether to apply string cleaning to Payee field.
+            clean_memo: Whether to apply string cleaning to Memo field.
         """
         # read data from input file to dataframe
         self.df = read_csv(
@@ -73,6 +77,9 @@ class DataframeHandler:
             date_dedupe=date_dedupe,
             fill_memo=fill_memo,
             currency_fix=currency_fix,
+            payee_mappings=payee_mappings or {},
+            clean_payee=clean_payee,
+            clean_memo=clean_memo,
         )
         # check if dataframe is empty
         self.empty = self.df.empty
@@ -130,6 +137,9 @@ def parse_data(
     date_dedupe: bool,
     fill_memo: bool,
     currency_fix: float,
+    payee_mappings: dict[str, str],
+    clean_payee: bool = True,
+    clean_memo: bool = True,
 ) -> pd.DataFrame:
     """Convert each column of the dataframe to match ideal output data.
 
@@ -143,6 +153,9 @@ def parse_data(
         date_dedupe: Whether to fill in date with previous if blank.
         fill_memo: Whether to fill blank memo with payee data.
         currency_fix: Value to divide all currency amounts by.
+        payee_mappings: Dict of raw payee substring → friendly name.
+        clean_payee: Whether to apply string cleaning to Payee field.
+        clean_memo: Whether to apply string cleaning to Memo field.
 
     Returns:
         pd.DataFrame: Modified dataframe matching provided configuration values.
@@ -169,9 +182,13 @@ def parse_data(
     df = auto_memo(df, fill_memo)
     # auto fill payee from memo
     df = auto_payee(df)
+    # apply payee rename mappings
+    df = apply_payee_mappings(df, payee_mappings)
     # fix strings
-    df["Payee"] = clean_strings(df["Payee"])
-    df["Memo"] = clean_strings(df["Memo"])
+    if clean_payee:
+        df["Payee"] = clean_strings(df["Payee"])
+    if clean_memo:
+        df["Memo"] = clean_strings(df["Memo"])
     # remove invalid rows
     df = remove_invalid_rows(df)
     # fill API-specific columns
@@ -183,6 +200,35 @@ def parse_data(
     # view final dataframe
     logging.debug(f"\nFinal DF\n{df.head(10)}")
 
+    return df
+
+
+def apply_payee_mappings(
+    df: pd.DataFrame, payee_mappings: dict[str, str]
+) -> pd.DataFrame:
+    """Replace raw payee strings with friendly names from a mapping dict.
+
+    Matching is case-insensitive substring; first match wins.
+
+    Args:
+        df: Dataframe to modify.
+        payee_mappings: Dict of raw substring → friendly name.
+
+    Returns:
+        pd.DataFrame: Modified dataframe.
+    """
+    if not payee_mappings:
+        return df
+
+    def map_payee(payee: str) -> str:
+        if pd.isna(payee):
+            return payee
+        for raw, friendly in payee_mappings.items():
+            if raw.lower() in str(payee).lower():
+                return friendly
+        return payee
+
+    df["Payee"] = df["Payee"].apply(map_payee)
     return df
 
 

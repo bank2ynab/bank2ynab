@@ -399,6 +399,7 @@ class TestDataframeHandler(TestCase):
                 pandas.testing.assert_series_equal(desired_output, test_output)
 
     def test_fix_date(self):
+        """fix_date returns datetime64 values; invalid dates become NaT."""
         test_params = [
             {
                 "date_format": "%Y-%m-%d",
@@ -407,6 +408,12 @@ class TestDataframeHandler(TestCase):
                     "b": "2021-09-21",
                     "c": "2021-02-29",
                     "d": "2001-10-01",
+                },
+                "expected": {
+                    "a": pd.Timestamp("2021-10-01"),
+                    "b": pd.Timestamp("2021-09-21"),
+                    "c": pd.NaT,
+                    "d": pd.Timestamp("2001-10-01"),
                 },
             },
             {
@@ -417,6 +424,12 @@ class TestDataframeHandler(TestCase):
                     "c": "20210229",
                     "d": "20011001",
                 },
+                "expected": {
+                    "a": pd.Timestamp("2021-10-01"),
+                    "b": pd.Timestamp("2021-09-21"),
+                    "c": pd.NaT,
+                    "d": pd.Timestamp("2001-10-01"),
+                },
             },
             {
                 "date_format": "%d.%m.%Y",
@@ -425,6 +438,12 @@ class TestDataframeHandler(TestCase):
                     "b": "21.09.2021",
                     "c": "29.02.2021",
                     "d": "01.10.2001",
+                },
+                "expected": {
+                    "a": pd.Timestamp("2021-10-01"),
+                    "b": pd.Timestamp("2021-09-21"),
+                    "c": pd.NaT,
+                    "d": pd.Timestamp("2001-10-01"),
                 },
             },
             {
@@ -435,40 +454,61 @@ class TestDataframeHandler(TestCase):
                     "c": "2021-02-29 01:59:44",
                     "d": "2001-10-01 01:10:35",
                 },
+                "expected": {
+                    "a": pd.Timestamp("2021-10-01 01:02:03"),
+                    "b": pd.Timestamp("2021-09-21 01:32:02"),
+                    "c": pd.NaT,
+                    "d": pd.Timestamp("2001-10-01 01:10:35"),
+                },
             },
         ]
-        desired_output = pd.Series(
-            data={
-                "a": "2021-10-01",
-                "b": "2021-09-21",
-                "c": NA,
-                "d": "2001-10-01",
-            }
-        )
         for test in test_params:
             with self.subTest(test=test):
-                test_series = fix_date(
-                    pd.Series(data=test["data"]), test["date_format"]
+                result = fix_date(pd.Series(data=test["data"]), test["date_format"])
+                pandas.testing.assert_series_equal(
+                    pd.Series(data=test["expected"]), result
                 )
-                pandas.testing.assert_series_equal(desired_output, test_series)
 
-    def test_fill_empty_dates(self):
-        """Test filling in of empty date values."""
+    def test_fix_date_mixed_format(self):
+        """fix_date parses a column where some rows have a time component."""
         test_series = pd.Series(
             data={
-                "a": "2021-10-01",
-                "b": "2021-09-21",
-                "c": "",
-                "d": "2001-10-01",
+                "a": "01.10.2021",
+                "b": "21.09.2021 14:30:00",
+                "c": "29.02.2021 08:00:00",
+                "d": "01.10.2001 00:00:00",
+            }
+        )
+        # fix_date preserves the parsed time; stripping to date-only happens
+        # in parse_data via dt.strftime after this function returns.
+        desired_output = pd.Series(
+            data={
+                "a": pd.Timestamp("2021-10-01"),
+                "b": pd.Timestamp("2021-09-21 14:30:00"),
+                "c": pd.NaT,
+                "d": pd.Timestamp("2001-10-01 00:00:00"),
+            }
+        )
+        result = fix_date(test_series, "%d.%m.%Y")
+        pandas.testing.assert_series_equal(desired_output, result)
+
+    def test_fill_empty_dates(self):
+        """Test filling in of empty date values with a datetime64 series."""
+        test_series = pd.Series(
+            data={
+                "a": pd.Timestamp("2021-10-01"),
+                "b": pd.Timestamp("2021-09-21"),
+                "c": pd.NaT,
+                "d": pd.Timestamp("2001-10-01"),
             }
         )
 
         target_filled_series = pd.Series(
             data={
-                "a": "2021-10-01",
-                "b": "2021-09-21",
-                "c": "2021-09-21",
-                "d": "2001-10-01",
+                "a": pd.Timestamp("2021-10-01"),
+                "b": pd.Timestamp("2021-09-21"),
+                "c": pd.Timestamp("2021-09-21"),
+                "d": pd.Timestamp("2001-10-01"),
             }
         )
 

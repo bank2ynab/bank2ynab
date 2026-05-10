@@ -168,9 +168,10 @@ def parse_data(
     merge_duplicate_columns(df, input_columns)
     # add missing columns
     add_missing_columns(df, input_columns, output_columns + api_columns)
-    # fix date format
+    # fix date format — keep as datetime while filling, then format to ISO string
     df["Date"] = fix_date(df["Date"], date_format)
     df["Date"] = fill_empty_dates(df["Date"], date_dedupe)
+    df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
     # fix inflow/outflow string formatting
     df["Inflow"] = clean_monetary_values(df["Inflow"])
     df["Outflow"] = clean_monetary_values(df["Outflow"])
@@ -465,30 +466,51 @@ def clean_strings(string_series: pd.Series) -> pd.Series:
 
 
 def fix_date(date_series: pd.Series, date_format: str) -> pd.Series:
-    """Process dates from input format to ISO format.
+    """Parse dates to datetime, accepting values with or without a time component.
 
-    Any non-parseable dates are returned as a NaT null value.
+    Tries the configured format first. Rows that fail (NaT) are retried with
+    the same format plus a " %H:%M:%S" suffix, so a mixed column — some cells
+    date-only, others date+time — is handled transparently.
+
+    Any values that still cannot be parsed are returned as NaT.
 
     Args:
         date_series: Series of dates to process.
         date_format: Date format codes per the 1989 C standard.
 
     Returns:
-        pd.Series: Series with dates in ISO format.
+        pd.Series: Series of datetime64 values (NaT for unparseable entries).
     """
-    formatted_date_series = pd.to_datetime(
-        date_series,
-        format=date_format,
-        errors="coerce",
-    ).dt.strftime("%Y-%m-%d")
+    result = pd.to_datetime(date_series, format=date_format, errors="coerce")
 
-    logging.debug(f"\nFixed dates:\n{date_series.head()}")
+    # Only retry with a time suffix when the configured format is date-only;
+    # formats that already include time codes would produce duplicate regex groups.
+    _time_codes = {"%H", "%I", "%M", "%S", "%p", "%f"}
+    format_has_time = any(code in date_format for code in _time_codes)
 
-    return formatted_date_series
+    if not format_has_time:
+        failed = result.isna() & date_series.notna() & (
+            date_series.astype(str).str.strip() != ""
+        )
+        if failed.any():
+            retry = pd.to_datetime(
+                date_series[failed],
+                format=date_format + " %H:%M:%S",
+                errors="coerce",
+            )
+            result = result.copy()
+            result[failed] = retry
+
+    logging.debug(f"\nFixed dates:\n{result.head()}")
+
+    return result
 
 
 def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
     """Fill in empty dates with values from previous cells.
+
+    Expects a datetime64 series; NaT values are propagated forward when
+    fill_dates is True.
 
     Args:
         date_series: Data series to modify.
@@ -498,7 +520,6 @@ def fill_empty_dates(date_series: pd.Series, fill_dates: bool) -> pd.Series:
         pd.Series: Modified data series.
     """
     if fill_dates:
-        date_series = date_series.replace(r"^\s*$", pd.NA, regex=True)
         date_series = date_series.ffill()
 
     return date_series

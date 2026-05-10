@@ -35,6 +35,8 @@ class DataframeHandler:
         date_dedupe: bool,
         fill_memo: bool,
         currency_fix: float,
+        clean_payee: bool = True,
+        clean_memo: bool = True,
     ) -> None:
         """Complete handling of Dataframe creation & output.
 
@@ -52,6 +54,8 @@ class DataframeHandler:
             date_dedupe: Whether to fill in date with previous if blank.
             fill_memo: Whether to fill blank memo with payee data.
             currency_fix: Value to divide all currency amounts by.
+            clean_payee: Whether to apply string cleaning to Payee field.
+            clean_memo: Whether to apply string cleaning to Memo field.
         """
         # read data from input file to dataframe
         self.df = read_csv(
@@ -72,6 +76,8 @@ class DataframeHandler:
             date_dedupe=date_dedupe,
             fill_memo=fill_memo,
             currency_fix=currency_fix,
+            clean_payee=clean_payee,
+            clean_memo=clean_memo,
         )
         # check if dataframe is empty
         self.empty = self.df.empty
@@ -127,6 +133,8 @@ def parse_data(
     date_dedupe: bool,
     fill_memo: bool,
     currency_fix: float,
+    clean_payee: bool = True,
+    clean_memo: bool = True,
 ) -> pd.DataFrame:
     """Convert each column of the dataframe to match ideal output data.
 
@@ -140,6 +148,8 @@ def parse_data(
         date_dedupe: Whether to fill in date with previous if blank.
         fill_memo: Whether to fill blank memo with payee data.
         currency_fix: Value to divide all currency amounts by.
+        clean_payee: Whether to apply string cleaning to Payee field.
+        clean_memo: Whether to apply string cleaning to Memo field.
 
     Returns:
         pd.DataFrame: Modified dataframe matching provided configuration values.
@@ -167,8 +177,10 @@ def parse_data(
     # auto fill payee from memo
     df = auto_payee(df)
     # fix strings
-    df["Payee"] = clean_strings(df["Payee"])
-    df["Memo"] = clean_strings(df["Memo"])
+    if clean_payee:
+        df["Payee"] = clean_strings(df["Payee"])
+    if clean_memo:
+        df["Memo"] = clean_strings(df["Memo"])
     # remove invalid rows
     df = remove_invalid_rows(df)
     # fill API-specific columns

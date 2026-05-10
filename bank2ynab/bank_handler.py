@@ -64,6 +64,8 @@ class BankHandler:
                     date_dedupe=self.config.date_dedupe,
                     fill_memo=self.config.payee_to_memo,
                     currency_fix=self.config.currency_mult,
+                    clean_payee=self.config.clean_payee,
+                    clean_memo=self.config.clean_memo,
                 )
 
                 self.files_processed += 1

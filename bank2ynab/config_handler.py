@@ -37,6 +37,8 @@ class BankConfig:
     api_account: list[str]
     currency_mult: float
     save_output: bool
+    clean_payee: bool = True
+    clean_memo: bool = True
 
     def __post_init__(self) -> None:
         if self.input_delimiter == "\\t":
@@ -144,6 +146,8 @@ class ConfigHandler:
             api_account=self.config.get(section, "YNAB Account ID").split("|"),
             currency_mult=self.config.getfloat(section, "Currency Conversion Factor"),
             save_output=self.config.getboolean(section, "Save Output File"),
+            clean_payee=self.config.getboolean(section, "Clean Payee"),
+            clean_memo=self.config.getboolean(section, "Clean Memo"),
         )
 
     def get_config_line_str(self, section_name: str, param: str) -> str:

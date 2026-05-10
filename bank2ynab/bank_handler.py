@@ -7,7 +7,7 @@ from typing import Any, Protocol, runtime_checkable
 
 from . import dataframe_handler, transactionfile_reader
 from .config_handler import BankConfig
-from .dataframe_handler import DataframeHandler
+from .dataframe_handler import CSVTransactionSource, DataframeHandler
 
 
 @runtime_checkable
@@ -64,12 +64,15 @@ class BankHandler:
                 src_encod = transactionfile_reader.detect_encoding(src_file)
                 # create our base dataframe
 
-                df_handler = DataframeHandler()
-                df_handler.run(
+                source = CSVTransactionSource(
                     file_path=src_file,
+                    delim=self.config.input_delimiter,
+                    header_rows=self.config.header_rows,
+                    footer_rows=self.config.footer_rows,
                     encod=src_encod,
-                    config=self.config,
                 )
+                df_handler = DataframeHandler()
+                df_handler.run(source=source, config=self.config)
 
                 self.files_processed += 1
             except ValueError as e:

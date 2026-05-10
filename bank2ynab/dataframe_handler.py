@@ -2,10 +2,66 @@ import csv
 import logging
 import re
 from decimal import Decimal, InvalidOperation
+from typing import Protocol
 
 import pandas as pd
 
 from .config_handler import BankConfig
+
+
+class TransactionSource(Protocol):
+    """Protocol for objects that supply a raw DataFrame of transaction rows.
+
+    Decouples ``DataframeHandler`` from the filesystem: any object with a
+    ``read()`` method returning a ``DataFrame`` satisfies this contract,
+    making it straightforward to substitute in-memory sources for tests.
+    """
+
+    def read(self) -> pd.DataFrame: ...
+
+
+class CSVTransactionSource:
+    """Reads transaction data from a delimited text file.
+
+    This is the production implementation of :class:`TransactionSource`; it
+    wraps :func:`read_csv` and holds the parameters that are only known at
+    runtime (file path and detected encoding).
+
+    Args:
+        file_path: Path to the CSV file.
+        delim: Field delimiter character.
+        header_rows: Number of header rows to skip.
+        footer_rows: Number of footer rows to skip.
+        encod: File encoding (as detected by the caller).
+    """
+
+    def __init__(
+        self,
+        file_path: str,
+        delim: str,
+        header_rows: int,
+        footer_rows: int,
+        encod: str,
+    ) -> None:
+        self.file_path = file_path
+        self.delim = delim
+        self.header_rows = header_rows
+        self.footer_rows = footer_rows
+        self.encod = encod
+
+    def read(self) -> pd.DataFrame:
+        """Read and return the raw CSV as a DataFrame.
+
+        Returns:
+            pd.DataFrame: Unprocessed rows from the source file.
+        """
+        return read_csv(
+            file_path=self.file_path,
+            delim=self.delim,
+            header_rows=self.header_rows,
+            footer_rows=self.footer_rows,
+            encod=self.encod,
+        )
 
 
 class DataframeHandler:
@@ -25,25 +81,19 @@ class DataframeHandler:
     def run(
         self,
         *,
-        file_path: str,
-        encod: str,
+        source: TransactionSource,
         config: BankConfig,
     ) -> None:
         """Complete handling of Dataframe creation & output.
 
         Args:
-            file_path: Path to CSV file.
-            encod: CSV file encoding (detected at runtime by the caller).
+            source: A :class:`TransactionSource` that supplies the raw rows.
+                Use :class:`CSVTransactionSource` for production file reads;
+                inject an in-memory source for tests.
             config: Bank configuration supplying all transformation parameters.
         """
-        # read data from input file to dataframe
-        self.df = read_csv(
-            file_path=file_path,
-            delim=config.input_delimiter,
-            header_rows=config.header_rows,
-            footer_rows=config.footer_rows,
-            encod=encod,
-        )
+        # read data from source into dataframe
+        self.df = source.read()
         # modify dataframe to match desired output
         self.df = parse_data(df=self.df, config=config)
         # check if dataframe is empty

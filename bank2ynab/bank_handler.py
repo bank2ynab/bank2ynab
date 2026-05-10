@@ -3,11 +3,26 @@ import logging
 import os
 import traceback
 from os import path
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
 from . import dataframe_handler, transactionfile_reader
 from .config_handler import BankConfig
 from .dataframe_handler import DataframeHandler
+
+
+@runtime_checkable
+class BankPlugin(Protocol):
+    """Protocol that every plugin-loaded bank handler must satisfy.
+
+    ``build_bank()`` in a plugin module returns a ``BankHandler`` subclass;
+    at load time ``bank_handler.build_bank()`` validates the returned object
+    against this Protocol so failures surface immediately rather than at
+    first use.
+    """
+
+    def _preprocess_file(
+        self, file_path: str, plugin_args: list[Any]
+    ) -> str: ...
 
 
 # TODO - there's a lot of overlap between BankHandler and BankConfig, review the division of responsibilities between these two classes and refactor if necessary
@@ -151,14 +166,21 @@ def build_bank(bank_config: BankConfig) -> BankHandler:
     """
     plugin_module_name = bank_config.plugin or None
     if plugin_module_name:
-        module = importlib.import_module(f".plugins.{plugin_module_name}", package="bank2ynab")
+        module = importlib.import_module(
+            f".plugins.{plugin_module_name}", package="bank2ynab"
+        )
         if not hasattr(module, "build_bank"):
-            s = (
+            raise ImportError(
                 f"The specified plugin {plugin_module_name}.py "
                 "does not contain the required build_bank(config) method."
             )
-            raise ImportError(s)
         bank = module.build_bank(bank_config)
+        if not isinstance(bank, BankPlugin):
+            raise ImportError(
+                f"Plugin {plugin_module_name} returned an object that does "
+                "not implement the BankPlugin protocol "
+                "(_preprocess_file is required)."
+            )
         return bank
     else:
         return BankHandler(config=bank_config)

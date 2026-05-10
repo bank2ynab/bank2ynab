@@ -2,6 +2,9 @@ name: Python testing
 
 on:
   push:
+    branches:
+      - main
+      - develop
   pull_request:
     paths-ignore:
       - "docs/**"
@@ -11,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: testing-${{ github.workflow }}-${{ github.ref }}
+  group: testing-${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:

@@ -213,6 +213,29 @@ class ConfigHandler:
         """
         return self.config.get(section_name, param).split(splitter)
 
+    def save_account_selection(
+        self, bank: str, budget_id: str, account_id: str
+    ) -> None:
+        """Save YNAB budget and account selection for a bank to the user config.
+
+        Writes the ``budget_id||account_id`` pair under the bank's section in
+        the user config file so it can be recalled on the next run.
+
+        Args:
+            bank: Bank section name (e.g. ``"My Bank"``).
+            budget_id: YNAB budget UUID to associate with this bank.
+            account_id: YNAB account UUID to associate with this bank.
+        """
+        self.config.read(self.user_conf_path)
+        try:
+            self.config.add_section(bank)
+            logging.info(f"Saving default account for {bank}...")
+        except configparser.DuplicateSectionError:
+            pass
+        self.config.set(bank, "YNAB Account ID", f"{budget_id}||{account_id}")
+        with open(self.user_conf_path, "w", encoding="utf-8") as config_file:
+            self.config.write(config_file)
+
     def get_log_level(self) -> int:
         """Return the logging level integer from config, defaulting to WARNING.
 

@@ -1,5 +1,5 @@
 import logging
-from configparser import DuplicateSectionError, NoSectionError
+from configparser import NoSectionError
 
 from . import api_interface, user_input
 from .api_interface import APIInterface
@@ -84,35 +84,27 @@ class YNAB_API:
         return bank_account_mapping
 
     def save_account_mappings(self, mapping: dict[str, dict]) -> None:
-        for bank_name in mapping:
-            # save account selection for bank
+        """Persist YNAB account selections for all banks that have opted in.
+
+        Delegates the actual file write to
+        ``ConfigHandler.save_account_selection`` on the user-mode handler.
+
+        Args:
+            mapping: Dict of bank name → ``{"budget_id": ..., "account_id": ...}``.
+        """
+        for bank_name, bank_mapping in mapping.items():
             save_ac_toggle = self.config_handler.get_config_line_boo(bank_name, "Save YNAB Account")
-            if save_ac_toggle is True:
-                self.save_account_selection(
+            if save_ac_toggle:
+                self.user_config_handler.save_account_selection(
                     bank_name,
-                    mapping[bank_name]["budget_id"],
-                    mapping[bank_name]["account_id"],
+                    bank_mapping["budget_id"],
+                    bank_mapping["account_id"],
                 )
             else:
                 logging.info(
                     f"Saving default YNAB account is disabled for {bank_name}"
                     " - account match not saved."
                 )
-
-    def save_account_selection(self, bank, budget_id, account_id) -> None:
-        # TODO move config saving to the ConfigHandler class?
-        """Saves YNAB account to use for each bank."""
-        self.user_config.read(self.user_config_path)
-        try:
-            self.user_config.add_section(bank)
-            logging.info(f"Saving default account for {bank}...")
-        except DuplicateSectionError:
-            pass
-        self.user_config.set(bank, "YNAB Account ID", f"{budget_id}||{account_id}")
-
-        with open(self.user_config_path, "w", encoding="utf-8") as config_file:
-            self.user_config.write(config_file)
-
 
 def remove_invalid_accounts(
     prev_saved_map: dict[str, dict[str, str]], api_data: dict[str, dict]

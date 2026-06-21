@@ -1,0 +1,23 @@
+changelog:
+  exclude:
+    labels:
+      - dependencies
+  categories:
+    - title: Breaking Changes
+      labels:
+        - breaking
+    - title: New Features
+      labels:
+        - enhancement
+        - bank format
+    - title: Bug Fixes
+      labels:
+        - bug
+    - title: Internal & CI
+      labels:
+        - automation
+        - optimisation
+        - meta
+        - packaging
+        - distribution
+        - docs

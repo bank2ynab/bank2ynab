@@ -1,0 +1,170 @@
+name: Bump and Tag
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run — log calculations without making any git changes"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  bump-and-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine bump type from PR labels
+        id: bump-type
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, subprocess, sys, urllib.request
+
+          sha = os.environ["GITHUB_SHA"]
+          repo = os.environ["GITHUB_REPOSITORY"]
+          token = os.environ["GH_TOKEN"]
+
+          url = f"https://api.github.com/repos/{repo}/commits/{sha}/pulls"
+          req = urllib.request.Request(url, headers={
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+          })
+          with urllib.request.urlopen(req) as resp:
+              prs = json.loads(resp.read())
+
+          if not prs:
+              print("::warning::No PR associated with this commit — defaulting to patch bump", flush=True)
+              labels = []
+          else:
+              labels = [lbl["name"] for lbl in prs[0]["labels"]]
+              print(f"PR #{prs[0]['number']} labels: {labels}", flush=True)
+
+          bump = "patch"
+          for level in ("major", "minor", "patch"):
+              if f"release: {level}" in labels:
+                  bump = level
+                  break
+          else:
+              print("::warning::No release: label found — defaulting to patch bump", flush=True)
+
+          print(f"Resolved bump type: {bump}", flush=True)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"bump_type={bump}\n")
+          EOF
+
+      - name: Calculate next version
+        id: next-version
+        run: |
+          python3 - <<'EOF'
+          import os, re
+
+          with open("pyproject.toml") as f:
+              content = f.read()
+
+          m = re.search(r'^version = "(\d+)\.(\d+)\.(\d+)"', content, re.MULTILINE)
+          if not m:
+              print("::error::Could not find version in pyproject.toml", flush=True)
+              raise SystemExit(1)
+
+          major, minor, patch = int(m.group(1)), int(m.group(2)), int(m.group(3))
+          current = f"{major}.{minor}.{patch}"
+          bump = os.environ["BUMP_TYPE"]
+
+          if bump == "major":
+              next_ver = f"{major + 1}.0.0"
+          elif bump == "minor":
+              next_ver = f"{major}.{minor + 1}.0"
+          else:
+              next_ver = f"{major}.{minor}.{patch + 1}"
+
+          print(f"Current version: {current}", flush=True)
+          print(f"Next version:    {next_ver}", flush=True)
+          print(f"Commit message:  chore: bump version to v{next_ver}", flush=True)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"current_version={current}\n")
+              f.write(f"next_version={next_ver}\n")
+          EOF
+        env:
+          BUMP_TYPE: ${{ steps.bump-type.outputs.bump_type }}
+
+      - name: Check tag does not already exist
+        run: |
+          TAG="v${{ steps.next-version.outputs.next_version }}"
+          if git ls-remote --tags origin | grep -q "refs/tags/${TAG}$"; then
+            echo "::error::Tag ${TAG} already exists — aborting to avoid duplicate release" >&2
+            exit 1
+          fi
+          echo "Tag ${TAG} is free to create."
+
+      - name: Update pyproject.toml
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          python3 - <<'EOF'
+          import os, re
+
+          next_ver = os.environ["NEXT_VERSION"]
+          with open("pyproject.toml") as f:
+              content = f.read()
+
+          new_content = re.sub(
+              r'^(version = ")[^"]+(")',
+              rf'\g<1>{next_ver}\g<2>',
+              content,
+              flags=re.MULTILINE,
+          )
+          with open("pyproject.toml", "w") as f:
+              f.write(new_content)
+
+          print(f"Updated pyproject.toml to version {next_ver}", flush=True)
+          EOF
+        env:
+          NEXT_VERSION: ${{ steps.next-version.outputs.next_version }}
+
+      - name: Commit, tag, and push
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          TAG="v${{ steps.next-version.outputs.next_version }}"
+          git add pyproject.toml
+          git commit -m "chore: bump version to ${TAG}"
+          git tag -a "${TAG}" -m "Release ${TAG}"
+          git push origin main
+          git push origin "${TAG}"
+
+      - name: Create GitHub Release
+        if: ${{ inputs.dry_run != true }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="v${{ steps.next-version.outputs.next_version }}"
+          gh release create "${TAG}" --generate-notes
+
+      - name: Dry-run summary
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          echo "=== DRY RUN — no changes made ==="
+          echo "Bump type:       ${{ steps.bump-type.outputs.bump_type }}"
+          echo "Current version: ${{ steps.next-version.outputs.current_version }}"
+          echo "Next version:    ${{ steps.next-version.outputs.next_version }}"
+          echo "Would create tag: v${{ steps.next-version.outputs.next_version }}"
+          echo "Would commit:    chore: bump version to v${{ steps.next-version.outputs.next_version }}"

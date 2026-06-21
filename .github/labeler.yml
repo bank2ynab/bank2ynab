@@ -1,27 +1,47 @@
 automation:
-  - ".github/workflows/**"
-  - ".github/labeler.yml"
-  - "utils/**"
+  - changed-files:
+    - any-glob-to-any-file:
+      - ".github/workflows/**"
+      - ".github/labeler.yml"
+      - "utils/**"
 meta:
-  - ".github/**"
+  - changed-files:
+    - any-glob-to-any-file:
+      - ".github/**"
 docs:
-  - "docs/**"
-  - "README.md"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "docs/**"
+      - "README.md"
 tests:
-  - "test/**"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "test/**"
 core:
-  - "bank2ynab/**"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "bank2ynab/**"
 plugins:
-  - "bank2ynab/plugins/**"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "bank2ynab/plugins/**"
 config:
-  - "bank2ynab/data/**"
-  - "bank2ynab/config_handler.py"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "bank2ynab/data/**"
+      - "bank2ynab/config_handler.py"
 api:
-  - "bank2ynab/ynab_api.py"
-  - "bank2ynab/api_interface.py"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "bank2ynab/ynab_api.py"
+      - "bank2ynab/api_interface.py"
 packaging:
-  - "pyproject.toml"
-  - "uv.lock"
-  - "LICENSE"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "pyproject.toml"
+      - "uv.lock"
+      - "LICENSE"
 windows:
-  - "bank2ynab.bat"
+  - changed-files:
+    - any-glob-to-any-file:
+      - "bank2ynab.bat"

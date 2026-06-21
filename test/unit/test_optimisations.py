@@ -20,7 +20,6 @@ from bank2ynab.dataframe_handler import (
     fix_amount,
 )
 
-
 # ── Shared helpers ─────────────────────────────────────────────────────────────
 
 

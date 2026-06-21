@@ -23,7 +23,8 @@ class BankPlugin(Protocol):
     def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str: ...
 
 
-# TODO - there's a lot of overlap between BankHandler and BankConfig, review the division of responsibilities between these two classes and refactor if necessary
+# TODO - there's a lot of overlap between BankHandler and BankConfig,
+# review the division of responsibilities and refactor if necessary
 class BankHandler:
     """Handle the flow for data input, parsing, and data output for a given bank configuration."""
 

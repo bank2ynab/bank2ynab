@@ -3,12 +3,12 @@ import logging
 import pandas as pd
 import pdfplumber
 
-logging.getLogger("pdfplumber").setLevel(logging.WARNING)
-logging.getLogger("pdfminer").setLevel(logging.WARNING)
-
 from .. import bank_handler
 from ..bank_handler import BankHandler
 from ..config_handler import BankConfig
+
+logging.getLogger("pdfplumber").setLevel(logging.WARNING)
+logging.getLogger("pdfminer").setLevel(logging.WARNING)
 
 
 class PDF_Converter(BankHandler):

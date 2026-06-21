@@ -130,9 +130,7 @@ class TestParseMonetaryString:
 
     def test_large_european_amount(self):
         """Multiple thousands-separator periods are all stripped."""
-        assert _parse_monetary_string("1.234.567,89") == pytest.approx(
-            1234567.89
-        )
+        assert _parse_monetary_string("1.234.567,89") == pytest.approx(1234567.89)
 
 
 class TestCleanMonetaryValues:
@@ -214,9 +212,7 @@ class TestBankPluginProtocol:
         return _make_config()
 
     def _load(self, plugin_name: str, config: BankConfig) -> object:
-        module = importlib.import_module(
-            f".plugins.{plugin_name}", package="bank2ynab"
-        )
+        module = importlib.import_module(f".plugins.{plugin_name}", package="bank2ynab")
         return module.build_bank(config)
 
     def test_null_plugin(self, config):
@@ -239,9 +235,7 @@ class TestBankPluginProtocol:
 
     def test_parse_from_memo_plugin(self):
         """parse_from_memo requires at least one regex in plugin_args."""
-        config = _make_config(
-            plugin_args=[r"(?P<payee>\w+)\s+(?P<memo>.*)"]
-        )
+        config = _make_config(plugin_args=[r"(?P<payee>\w+)\s+(?P<memo>.*)"])
         assert isinstance(self._load("parse_from_memo", config), BankPlugin)
 
     def test_build_bank_raises_for_non_compliant_plugin(self):
@@ -296,11 +290,11 @@ class TestTransactionSourceProtocol:
         """
         raw = pd.DataFrame(
             {
-                0: ["2024-01-15"],   # Date
+                0: ["2024-01-15"],  # Date
                 1: ["Corner Shop"],  # Payee
-                2: ["groceries"],    # Memo
-                3: ["0.00"],         # Outflow
-                4: ["25.00"],        # Inflow
+                2: ["groceries"],  # Memo
+                3: ["0.00"],  # Outflow
+                4: ["25.00"],  # Inflow
             }
         )
 
@@ -326,8 +320,8 @@ class TestTransactionSourceProtocol:
                 0: ["2024-03-01"],
                 1: ["Supermarkt"],
                 2: ["Einkauf"],
-                3: ["0,00"],       # European-format zero
-                4: ["1.234,56"],   # European-format €1 234.56
+                3: ["0,00"],  # European-format zero
+                4: ["1.234,56"],  # European-format €1 234.56
             }
         )
 

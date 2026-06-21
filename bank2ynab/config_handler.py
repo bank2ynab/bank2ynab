@@ -213,9 +213,7 @@ class ConfigHandler:
         """
         return self.config.get(section_name, param).split(splitter)
 
-    def save_account_selection(
-        self, bank: str, budget_id: str, account_id: str
-    ) -> None:
+    def save_account_selection(self, bank: str, budget_id: str, account_id: str) -> None:
         """Save YNAB budget and account selection for a bank to the user config.
 
         Writes the ``budget_id||account_id`` pair under the bank's section in

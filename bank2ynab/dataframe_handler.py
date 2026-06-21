@@ -164,9 +164,7 @@ def parse_data(*, df: pd.DataFrame, config: BankConfig) -> pd.DataFrame:
     # merge duplicate input columns
     merge_duplicate_columns(df, config.input_columns)
     # add missing columns
-    add_missing_columns(
-        df, config.input_columns, config.output_columns + config.api_columns
-    )
+    add_missing_columns(df, config.input_columns, config.output_columns + config.api_columns)
     # fix date format — keep as datetime while filling, then format to ISO string
     df["Date"] = fix_date(df["Date"], config.date_format)
     df["Date"] = fill_empty_dates(df["Date"], config.date_dedupe)
@@ -345,9 +343,7 @@ def fix_amount(df: pd.DataFrame, currency_fix: float) -> pd.DataFrame:
 
     # create amount column for API (in milliunits); round before truncation
     # to avoid float representation errors (e.g. 9.999999 → 9 instead of 10)
-    df["amount"] = (
-        (df["Inflow"] - df["Outflow"]).multiply(1000).round().astype(int)
-    )
+    df["amount"] = (df["Inflow"] - df["Outflow"]).multiply(1000).round().astype(int)
     return df
 
 

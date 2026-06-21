@@ -106,6 +106,7 @@ class YNAB_API:
                     " - account match not saved."
                 )
 
+
 def remove_invalid_accounts(
     prev_saved_map: dict[str, dict[str, str]], api_data: dict[str, dict]
 ) -> dict[str, dict[str, str]]:

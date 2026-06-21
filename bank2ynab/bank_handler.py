@@ -20,9 +20,7 @@ class BankPlugin(Protocol):
     first use.
     """
 
-    def _preprocess_file(
-        self, file_path: str, plugin_args: list[Any]
-    ) -> str: ...
+    def _preprocess_file(self, file_path: str, plugin_args: list[Any]) -> str: ...
 
 
 # TODO - there's a lot of overlap between BankHandler and BankConfig, review the division of responsibilities between these two classes and refactor if necessary
@@ -156,9 +154,7 @@ def build_bank(bank_config: BankConfig) -> BankHandler:
     """
     plugin_module_name = bank_config.plugin or None
     if plugin_module_name:
-        module = importlib.import_module(
-            f".plugins.{plugin_module_name}", package="bank2ynab"
-        )
+        module = importlib.import_module(f".plugins.{plugin_module_name}", package="bank2ynab")
         if not hasattr(module, "build_bank"):
             raise ImportError(
                 f"The specified plugin {plugin_module_name}.py "

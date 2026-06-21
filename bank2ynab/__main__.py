@@ -35,15 +35,11 @@ class Bank2YNABApp:
             list[BankHandler]: One handler per configured bank format.
         """
         return [
-            build_bank(
-                bank_config=self.config_handler.fix_conf_params(section)
-            )
+            build_bank(bank_config=self.config_handler.fix_conf_params(section))
             for section in self.config_handler.config.sections()
         ]
 
-    def _process_banks(
-        self, bank_obj_list: list[BankHandler]
-    ) -> tuple[int, dict[str, list]]:
+    def _process_banks(self, bank_obj_list: list[BankHandler]) -> tuple[int, dict[str, list]]:
         """Run each bank handler and collect transaction data.
 
         Args:
@@ -58,13 +54,9 @@ class Bank2YNABApp:
         for bank_object in bank_obj_list:
             bank_object.run()
             if bank_object.transaction_list:
-                bank_transaction_dict[bank_object.name] = (
-                    bank_object.transaction_list
-                )
+                bank_transaction_dict[bank_object.name] = bank_object.transaction_list
             files_processed += bank_object.files_processed
-        logging.info(
-            f"\nFile processing complete! {files_processed} files processed.\n"
-        )
+        logging.info(f"\nFile processing complete! {files_processed} files processed.\n")
         return files_processed, bank_transaction_dict
 
     def run(self) -> None:

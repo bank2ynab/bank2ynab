@@ -1,12 +1,11 @@
 import re
+import importlib.metadata
 
 import pytest
 
 
 def test_version_is_semver():
     try:
-        import importlib.metadata
-
         importlib.metadata.version("bank2ynab")
     except importlib.metadata.PackageNotFoundError:
         pytest.skip("package not installed; run pip install -e . to enable")

@@ -118,6 +118,7 @@ jobs:
           echo "Tag ${TAG} is free to create."
 
       - name: Update pyproject.toml
+        # inputs.dry_run is null on push events, which correctly evaluates != true
         if: ${{ inputs.dry_run != true }}
         run: |
           python3 - <<'EOF'
@@ -142,6 +143,7 @@ jobs:
           NEXT_VERSION: ${{ steps.next-version.outputs.next_version }}
 
       - name: Commit, tag, and push
+        # inputs.dry_run is null on push events, which correctly evaluates != true
         if: ${{ inputs.dry_run != true }}
         run: |
           TAG="v${{ steps.next-version.outputs.next_version }}"
@@ -152,6 +154,7 @@ jobs:
           git push origin "${TAG}"
 
       - name: Create GitHub Release
+        # inputs.dry_run is null on push events, which correctly evaluates != true
         if: ${{ inputs.dry_run != true }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

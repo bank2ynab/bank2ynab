@@ -15,11 +15,11 @@ jobs:
     name: Test gate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.x"
       - run: uv run python -m pytest
@@ -29,10 +29,13 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
       - run: uv build
       - run: uvx twine check dist/*
       - uses: actions/upload-artifact@v4
@@ -40,11 +43,11 @@ jobs:
           name: dist
           path: dist/
 
-  publish:
-    name: Publish to PyPI
+  publish-testpypi:
+    name: Publish to TestPyPI
     needs: build
     runs-on: ubuntu-latest
-    environment: pypi
+    environment: testpypi
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -55,15 +58,27 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+        continue-on-error: true
 
       - name: Verify TestPyPI install
         run: |
           VERSION="${{ github.ref_name }}"
           VERSION="${VERSION#v}"
-          pip install \
+          uv pip install \
             --index-url https://test.pypi.org/simple/ \
             --extra-index-url https://pypi.org/simple/ \
             "bank2ynab==${VERSION}"
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: publish-testpypi
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

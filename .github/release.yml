@@ -15,9 +15,9 @@ changelog:
         - bug
     - title: Internal & CI
       labels:
-        - CI
+        - automation
         - optimisation
         - meta
         - packaging
         - distribution
-        - documentation
+        - docs

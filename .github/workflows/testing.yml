@@ -36,12 +36,15 @@ jobs:
                   "https://endoflife.date/api/python.json", timeout=5
               ).read())
           except Exception as e:
-              print(f"ERROR: Failed to fetch EOL data: {e}", file=sys.stderr)
-              sys.exit(1)
+              print(f"WARNING: Failed to fetch EOL data: {e} — using fallback matrix", file=sys.stderr)
+              versions = json.dumps(["3.12", "3.13", "3.14"])
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write(f"versions={versions}\n")
+              sys.exit(0)
           today = datetime.date.today().isoformat()
           active = sorted(
               [c for c in data if str(c["eol"]) >= today],
-              key=lambda c: c["cycle"], reverse=True
+              key=lambda c: tuple(int(x) for x in c["cycle"].split(".")), reverse=True
           )[:3]
           if len(active) < 3:
               print(f"ERROR: Only {len(active)} active versions found", file=sys.stderr)

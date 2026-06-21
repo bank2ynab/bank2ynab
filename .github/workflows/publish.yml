@@ -1,7 +1,9 @@
-name: Publish (inactive)
+name: Publish to PyPI
 
 on:
-  # Manual trigger only while inactive.
+  push:
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
 
 permissions:
@@ -9,27 +11,59 @@ permissions:
   id-token: write
 
 jobs:
-  publish:
-    # Inactive by design. To activate:
-    # 1) remove this line
-    # 2) add a tag trigger under `on` (e.g. push.tags: ["v*"])
-    if: ${{ false }}
+  test:
+    name: Test gate
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: uv run python -m pytest
 
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v7
+  build:
+    name: Build distribution
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv build
+      - run: uvx twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
-      - name: Build distributions
-        run: uv build
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Verify TestPyPI install
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+          pip install \
+            --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            "bank2ynab==${VERSION}"
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

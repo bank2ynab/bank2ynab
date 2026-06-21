@@ -15,4 +15,4 @@
 
 **Checklist**
 
-- [ ] If this is a `develop → main` release PR, apply a `release:` label (`release: patch`, `release: minor`, or `release: major`) before merging. See [CONTRIBUTING.md](../CONTRIBUTING.md#release-label-semantics) for details.
+- [ ] **Release PRs only (`develop → main`):** apply a `release:` label (`release: patch`, `release: minor`, or `release: major`) before merging — skip this for regular feature/fix PRs. See [CONTRIBUTING.md](../CONTRIBUTING.md#release-label-semantics) for details.

@@ -145,5 +145,6 @@ abort with an error.
 4. Click **Run workflow**.
 
 The workflow will re-run against the existing tag and publish the distribution.
-If TestPyPI already has the version, the TestPyPI step may fail — that is
-expected and harmless; the PyPI publish step will still proceed.
+If TestPyPI already has the version, the TestPyPI publish step will fail but
+is marked `continue-on-error: true`, so the job continues and the PyPI
+publish step will still run.

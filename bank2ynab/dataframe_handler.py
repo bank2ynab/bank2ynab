@@ -368,6 +368,9 @@ def _parse_monetary_string(value: object) -> float:
     s = str(value).strip()
     if not s:
         return 0.0
+    # normalise the Unicode minus sign (U+2212) to an ASCII hyphen so it is
+    # kept as a sign below instead of being stripped as a stray symbol
+    s = s.replace("\u2212", "-")
     # normalise thousands/decimal separators: convert commas to periods, then
     # remove all but the last period so "1.234.567,89" → "1234567.89"
     s = s.replace(",", ".")

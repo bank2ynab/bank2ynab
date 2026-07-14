@@ -103,6 +103,13 @@ class TestParseMonetaryString:
     def test_negative_value(self):
         assert _parse_monetary_string("-42.50") == pytest.approx(-42.50)
 
+    def test_unicode_minus_sign(self):
+        """U+2212 minus sign is parsed as negative, not stripped (#527)."""
+        assert _parse_monetary_string("−123.45") == pytest.approx(-123.45)
+
+    def test_unicode_minus_sign_with_thousands(self):
+        assert _parse_monetary_string("−1.234,56") == pytest.approx(-1234.56)
+
     def test_integer_string(self):
         assert _parse_monetary_string("100") == pytest.approx(100.0)
 

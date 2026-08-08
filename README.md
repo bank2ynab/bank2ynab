@@ -21,6 +21,7 @@ This project consolidates other conversion efforts into one universal tool that 
 - [User Guide](#userguide)
 - [YNAB API Import](#api)
 - [Contributors](#contributors)
+- [Releases](#releases)
 - [Known Bugs](#knownbugs)
 - [List of Supported Banks](#formats)
 
@@ -121,6 +122,12 @@ Notes:
 ## <a name="contributors"></a>Contributors
 
 [![Contributors](https://contrib.rocks/image?repo=bank2ynab/bank2ynab)](https://github.com/bank2ynab/bank2ynab/graphs/contributors)
+
+## <a name="releases"></a>Releases
+
+Releases are published to [PyPI](https://pypi.org/project/bank2ynab/) automatically when a `develop → main` PR is merged with a `release:` label.
+
+For the full release process — including the `develop → main` flow, `release:` label semantics, one-time setup, dry-run instructions, and a manual recovery runbook — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## <a name="knownbugs"></a>Known Bugs
 

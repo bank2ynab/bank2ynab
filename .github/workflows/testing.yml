@@ -18,12 +18,50 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.matrix.outputs.versions }}
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+      - name: Generate Python version matrix
+        id: matrix
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, json, datetime, sys, os
+          try:
+              data = json.loads(urllib.request.urlopen(
+                  "https://endoflife.date/api/python.json", timeout=5
+              ).read())
+          except Exception as e:
+              print(f"WARNING: Failed to fetch EOL data: {e} — using fallback matrix", file=sys.stderr)
+              versions = json.dumps(["3.12", "3.13", "3.14"])
+              with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                  f.write(f"versions={versions}\n")
+              sys.exit(0)
+          today = datetime.date.today().isoformat()
+          active = sorted(
+              [c for c in data if str(c["eol"]) >= today],
+              key=lambda c: tuple(int(x) for x in c["cycle"].split(".")), reverse=True
+          )[:3]
+          if len(active) < 3:
+              print(f"ERROR: Only {len(active)} active versions found", file=sys.stderr)
+              sys.exit(1)
+          versions = json.dumps([c["cycle"] for c in active])
+          print(f"Resolved matrix: {versions}")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"versions={versions}\n")
+          PYEOF
+
   check:
+    needs: generate-matrix
     runs-on: ${{matrix.os}}
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ["3.12", "3.13", "3.14"]
+        python-version: ${{ fromJson(needs.generate-matrix.outputs.versions) }}
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
       fail-fast: false
 

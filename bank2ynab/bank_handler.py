@@ -129,7 +129,7 @@ def get_output_path(input_path: str, prefix: str, ext: str) -> str:
         str: Target filename for the output file.
     """
     target_dir = path.dirname(input_path)
-    target_fname = path.basename(input_path)[:-4]
+    target_fname = path.splitext(path.basename(input_path))[0]
 
     new_filename = f"{prefix}{target_fname}{ext}"
     new_path = path.join(target_dir, new_filename)

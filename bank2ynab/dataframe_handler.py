@@ -248,15 +248,23 @@ def merge_duplicate_columns(df: pd.DataFrame, input_columns: list[str]) -> pd.Da
             cols_to_merge[col] = []
         cols_to_merge[col] += [index]
 
+    # Rename duplicates on a copy of the labels, then assign them in one step:
+    # since pandas 3, df.columns.values is read-only and cannot be modified in place.
+    new_columns = list(df.columns)
+
     # go through each key
     for key in cols_to_merge:
         key_cols: list[int] = cols_to_merge[key]
         if len(key_cols) > 1:
             if key in {"Inflow", "Outflow"}:
-                # merge numerically using fillna to preserve float dtype
+                # Fill the gaps of the first column from the duplicates, then replace it in
+                # one step: an in-place set raises on pandas 3 when the dtype changes
+                # (e.g. an empty float column filled with text amounts).
+                merged_amounts = df.iloc[:, key_cols[0]]
                 for dupe_count, key_col in enumerate(key_cols[1:]):
-                    df.iloc[:, key_cols[0]] = df.iloc[:, key_cols[0]].fillna(df.iloc[:, key_col])
-                    df.columns.values[key_col] = f"{key} {dupe_count}"
+                    merged_amounts = merged_amounts.combine_first(df.iloc[:, key_col])
+                    new_columns[key_col] = f"{key} {dupe_count}"
+                df.isetitem(key_cols[0], merged_amounts.to_numpy())
             else:
                 # build the merged values separately, then replace the column in one
                 # step so pandas does not try to coerce strings back into float dtype.
@@ -265,12 +273,13 @@ def merge_duplicate_columns(df: pd.DataFrame, input_columns: list[str]) -> pd.Da
                 # of the column name
                 for dupe_count, key_col in enumerate(key_cols[1:]):
                     merged_col = merged_col + " " + df.iloc[:, key_col].fillna("").astype(str)
-                    df.columns.values[key_col] = f"{key} {dupe_count}"
+                    new_columns[key_col] = f"{key} {dupe_count}"
                 df.isetitem(
                     key_cols[0],
                     merged_col.str.replace("\\s{2,}", " ", regex=True).str.strip().to_numpy(),
                 )
 
+    df.columns = new_columns
     logging.debug(f"\nAfter duplicate merge\n{df.head()}")
     return df
 

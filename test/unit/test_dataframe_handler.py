@@ -97,6 +97,30 @@ class TestDataframeHandler(TestCase):
                 "merged_column": "Payee",
             },
             {
+                # test duplicate amount columns: an empty numeric column filled with text
+                "data": {
+                    "Date": ["2024-01-01", "2024-01-02"],
+                    "Inflow": [float("nan"), float("nan")],
+                    "Memo": ["1'234.50", "12,50"],
+                },
+                "input_cols": ["Date", "Inflow", "Inflow"],
+                "desired_column_output": ["1'234.50", "12,50"],
+                "desired_output": ["Date", "Inflow", "Inflow 0"],
+                "merged_column": "Inflow",
+            },
+            {
+                # test duplicate amount columns: values kept from the first, gaps from the second
+                "data": {
+                    "Date": ["2024-01-01", "2024-01-02"],
+                    "Inflow": [-5.0, float("nan")],
+                    "Memo": [float("nan"), 7.5],
+                },
+                "input_cols": ["Date", "Inflow", "Inflow"],
+                "desired_column_output": [-5.0, 7.5],
+                "desired_output": ["Date", "Inflow", "Inflow 0"],
+                "merged_column": "Inflow",
+            },
+            {
                 # test duplicate numeric columns with NaN values
                 "data": {
                     "Date": ["2024-01-01", "2024-01-02"],
